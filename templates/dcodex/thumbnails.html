@@ -1,0 +1,15 @@
+{% load static %}
+{% if thumbnails %}
+    {% for thumbnail in thumbnails %}
+        <div id='thumbnailContainer{{ thumbnail.page }}' class=thumbnailContainer data-page='{{ thumbnail.page }}'>
+            <img data-src='{% static thumbnail.src %}' src='' class='thumbnail' data-page='{{ thumbnail.page }}' data-folio='{{ thumbnail.folio }}' id='thumbnail{{ thumbnail.page }}' />
+            {% if thumbnail.folio %}
+                <p>{{ thumbnail.folio }} - p{{ thumbnail.page }}</p>
+            {% else %}
+                <p>Page {{ thumbnail.page }}</p>
+            {% endif %}
+        </div>            
+    {% endfor %}
+{% else %}
+    <p>No thumbnails available.</p>
+{% endif %}

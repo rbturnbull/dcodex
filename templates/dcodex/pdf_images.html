@@ -1,0 +1,10 @@
+{% load static %}
+{% if images %}
+    {% for image in images %}    
+        <div id="page{{ image.page }}" class=pageContainer data-page='{{ image.page }}'>
+            <img data-src='{% static image.src %}' src='' class='pageImage' data-page='{{ image.page }}' id='pageImage{{ image.page }}' />
+        </div>    
+    {% endfor %}
+{% else %}
+    <p>No images available.</p>
+{% endif %}

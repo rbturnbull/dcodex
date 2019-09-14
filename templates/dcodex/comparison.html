@@ -1,0 +1,13 @@
+{% load static %}
+
+<h2 class='groupHeading'>{{ heading }}</h2>
+{% for comparison_text in comparison_texts %}
+    <div class='comparison_text_box'>
+		<p class='comparison_manuscript_name'>{{ comparison_text.manuscript.short_name }}</p>
+        <p class=comparison_text>{{ comparison_text.transcription }}</p>
+        <div class=comparison_buttons>
+            <input type=image src="{% static 'dcodex/images/copy.png' %}" class="comparison_button copyToTranscription" data-transcription='{{ comparison_text.transcription }}' />
+            <input type=image src="{% static 'dcodex/images/preview.png' %}" class="mshover comparison_button" data-manuscriptid="{{ comparison_text.manuscript.manuscript_id }}" />
+        </div>
+    </div>
+{% endfor %}

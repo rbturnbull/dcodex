@@ -1,0 +1,85 @@
+{% extends "dcodex/base.html" %}
+{% load static %}
+{% block title %}{{ manuscript.short_name }} {{ verse }}{% endblock %}
+
+{% block stylesheet %}
+<link rel="stylesheet" type="text/css" href="{% static 'dcodex/css/manuscript.css' %}" />
+<style>
+</style>
+{% endblock %}
+
+{% block content %}
+<div id=msHover style='overflow:hidden;'></div>
+
+<div id=leftSidebar>
+    <center>
+        <img src="{% static 'dcodex/images/DCodex-Logo.svg' %}" id='logo' />
+        <form>
+            <input type=text name=pageNumber value='' size=5  class=pageInput id=pageNumberInput placeholder='Page'>	
+            <input type="submit" value="⤵︎︎" name=load id=goToPage >
+        </form>
+    </center>
+    <div id=thumbnails>
+    </div>
+</div>
+<div id=middle>
+	<div id=manuscript>
+        <div id=manuscriptHeader></div>
+        <div id=manuscriptImages></div>
+        <div id=marker></div>
+        <div id=markerX></div>
+	</div>
+
+
+    <div id=heading>
+        <div id=verseSearch></div>
+        <div id=details></div>
+        
+        <div id=toggleReferences  class='toggle_header_button'><img src="{% static 'dcodex/images/RightSidebar.svg' %}" /></div>
+        <div id=toggleLeftSidebar class='toggle_header_button'><img src="{% static 'dcodex/images/LeftSidebar.svg' %}"  /></div>
+    </div>  
+    <div id=transcriptionEntry>
+        <form action="" method="GET">
+            <div style='left: 0px; top: 0px; right: 60px; position: absolute; z-index: 2222;'>
+                <textarea name="transcription" id=transcription></textarea>
+            </div>
+
+            <div style='width: 45px; top: 0px; right: 5px; position: absolute; z-index: 2222;'>
+                <div  class='inputHeader inputButton'>
+                    <img src="{% static 'dcodex/images/TEI-Grayscale.svg' %}" style='width: 80%; margin-top: 5px; margin-left:1px; cursor: hand;' id='teiOptionsView'>
+                </div>
+                <br><br><br>
+                <input type="submit" value="✓" class='inputHeader inputButton'  name=submit style="width: 100%; height: 100%;" id=saveTranscription>				
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id=locationOptions>
+</div>
+
+<div id=comparison></div>
+<div id=manuscriptSelectWindow></div>	
+<div id=tagPageWindow>
+	<div id=tagPageWindowClose class=closeButton></div>
+	<input id=tagPageFolioNumber type=text style='text-align: center; font-size: 2.0em;' size=4>
+	<input id=tagPageFolioLetter type=text style='text-align: center; font-size: 2.0em;' size=2>
+	<input type="submit" value="✓" class='inputHeader inputButton'  name=submit style="width: 50px; height: 45px;" id=saveTagPage>		
+	
+</div>	
+
+{% endblock %}
+
+
+{% block javascript %}
+<script src="{% static 'dcodex/js/jquery.lazy.min.js' %}"></script>
+<script src="{% static 'dcodex/js/jquery.scrollTo.min.js' %}"></script>
+<script src="{% static 'dcodex/js/manuscript.js' %}"></script>
+<script>
+$( document ).ready(function() {
+    console.log( "loading from manuscript.html" );
+    load_pdf( "{{ location.pdf.filename }}", {{ manuscript.manuscript_id }} );
+    seekVerse( {{ verse.id }}, {{ manuscript.manuscript_id }} )
+});
+</script>
+{% endblock %}
