@@ -248,8 +248,11 @@ class PDF(models.Model):
 
     def thumbnail_path(self, page_index):
         src = "facsimiles/small/%s-%d.small.jpg" % (self.filename, page_index)
-        dir = facsimile_dir()        
-        if not os.access(dir+src, os.R_OK):
+        dir = facsimile_dir()      
+        
+        system_path = "%s/%s" % (dir, src)
+                  
+        if not os.access(system_path, os.R_OK):
             src = self.image_path(page_index)
         return src
 

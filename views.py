@@ -11,23 +11,28 @@ import json
 def get_request_dict(request):
     return request.POST if request.method == "POST" else request.GET
     
+@login_required
 def get_verse(request, manuscript):
     request_dict = get_request_dict(request)
     return get_object_or_404(manuscript.verse_class(), id=request_dict.get('verse_id'))
 
+@login_required
 def get_manuscript(request):
     request_dict = get_request_dict(request)
     return get_object_or_404(Manuscript, manuscript_id=request_dict.get('manuscript_id'))   
 
+@login_required
 def get_pdf(request):
     request_dict = get_request_dict(request)
     return get_object_or_404(PDF, filename=request_dict.get('pdf_filename'))   
 
+@login_required
 def get_manuscript_and_verse(request):
     manuscript = get_manuscript(request)
     verse = get_verse(request, manuscript)
     return manuscript, verse
 
+@login_required
 def manuscript_verse_view(request, request_siglum, request_verse = None):
     logger = logging.getLogger(__name__)    
 
@@ -54,18 +59,21 @@ def manuscript_verse_view(request, request_siglum, request_verse = None):
     }
     return render(request, 'dcodex/manuscript.html', context)
 
+@login_required
 def thumbnails(request, pdf_filename):
     pdf    = get_object_or_404(PDF, filename=pdf_filename)   
     thumbnails = pdf.thumbnails( )
     
     return render(request, 'dcodex/thumbnails.html', {'thumbnails': thumbnails} )
 
+@login_required
 def pdf_images(request, pdf_filename):
     pdf    = get_object_or_404(PDF, filename=pdf_filename)   
     images = pdf.images( )
     
     return render(request, 'dcodex/pdf_images.html', {'images': images} )
 
+@login_required
 def page_locations_json(request):
     request_dict = get_request_dict(request)
     manuscript = get_manuscript(request)
@@ -76,6 +84,8 @@ def page_locations_json(request):
     
     list = [location.values_dict() for location in locations]
     return HttpResponse(json.dumps(list))
+    
+@login_required
 def title_json(request):
     manuscript, verse = get_manuscript_and_verse(request)
     
@@ -87,7 +97,8 @@ def title_json(request):
     }
     
     return HttpResponse(json.dumps(dict))
-    
+
+@login_required
 def verse_location_json(request):
     manuscript, verse = get_manuscript_and_verse(request)
 
@@ -97,6 +108,7 @@ def verse_location_json(request):
         result = json.dumps(location.values_dict())
     return HttpResponse(result)
 
+@login_required
 def verse_id(request):
     request_dict = get_request_dict(request)
     manuscript = get_manuscript(request)
@@ -160,6 +172,7 @@ def delete_location(request):
     location.delete()
     return HttpResponse('')
 
+@login_required
 def comparison(request):
     manuscript, verse = get_manuscript_and_verse(request)
     
@@ -174,18 +187,22 @@ def comparison(request):
     
     return render(request, 'dcodex/comparison.html', {'heading': "All Transcribed", 'comparison_texts': comparison_texts} )
 
+@login_required
 def transcription_mini(request):
     manuscript, verse = get_manuscript_and_verse(request)    
     verse_transcription = manuscript.transcription_class().objects.filter( manuscript=manuscript, verse=verse ).first()
     location = manuscript.location( verse )
     
     return render(request, 'dcodex/transcription_mini.html', {'verse_transcription': verse_transcription, 'location': location} )
+    
+@login_required
 def transcription_text(request):
     manuscript, verse = get_manuscript_and_verse(request)    
     verse_transcription = manuscript.transcription_class().objects.filter( manuscript=manuscript, verse=verse ).first()
     text = verse_transcription.transcription if verse_transcription else ""
     return HttpResponse(text)
 
+@login_required
 def page_number(request):
     request_dict = get_request_dict(request)
     pdf = get_pdf(request)
@@ -193,18 +210,22 @@ def page_number(request):
     
     return HttpResponse(pdf.page_number(folio_ref) )
 
+@login_required
 def verse_search(request):
     manuscript, verse = get_manuscript_and_verse(request)
     return manuscript.render_verse_search( request, verse )
 
+@login_required
 def location_popup(request):
     manuscript, verse = get_manuscript_and_verse(request)
     return manuscript.render_location_popup( request, verse )    
     
+@login_required
 def select_manuscript(request):
     manuscripts = Manuscript.objects.all()
     return render(request, 'dcodex/select_manuscript.html', {'manuscripts': manuscripts} )
-    
+
+@login_required
 def index(request):
     context = {'siglum': 1 + 3}
     return render(request, 'dcodex/index.html', context)
