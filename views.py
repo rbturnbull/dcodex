@@ -5,7 +5,6 @@ from django.shortcuts import get_object_or_404, render
 from dcodex.models import *
 from django.contrib.auth.decorators import login_required
 
-from project_dcodex.settings import STATIC_ROOT
 import logging
 import json
 
