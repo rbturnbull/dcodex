@@ -404,6 +404,13 @@ function load_comparison(verse_id, manuscript_id) {
             setTranscription(text);
             return false;
         });
+        $(".comparison_manuscript_name").click(function(e) {
+            manuscript_id = $(this).data('manuscript');
+            window.location.replace("/dcodex/ms/"+manuscript_id+"/"+current_verse_id);		// Better to do this with ajax?
+            return false;
+        });
+        
+        
     } );
 }
 

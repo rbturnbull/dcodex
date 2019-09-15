@@ -297,6 +297,9 @@ body {
     padding: 20px; 
     
 }
+.comparison_manuscript_name {
+	cursor: pointer;
+}
 
 .msbox {
     visibility: hidden;
