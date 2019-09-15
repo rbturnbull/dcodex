@@ -4,6 +4,13 @@ var currentPage;
 var current_verse_id;
 var pageImageController = null;
 
+function setLoadVerseLink() {
+    $( ".loadVerseLink" ).click(function(e) {
+        verse_id = $(this).data('verseid');
+        load_verse(verse_id, current_manuscript_id);				
+        return false;
+    });
+}
 
 function setCurrentPage( page ) {
     if ( currentPage == page ) 
@@ -549,7 +556,7 @@ function load_verse_location_popup(verse_id, manuscript_id) {
             $('#locationOptions').hide();
             return false;
         });
-        
+        setLoadVerseLink();
     });
 }
 

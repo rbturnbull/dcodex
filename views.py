@@ -106,6 +106,7 @@ def verse_id(request):
 
 @login_required
 def save_location(request):
+    request_dict = get_request_dict(request)
     pdf = get_pdf(request)
     manuscript, verse = get_manuscript_and_verse(request)
     
@@ -122,6 +123,7 @@ def save_location(request):
 
 @login_required
 def save_transcription(request):
+    request_dict = get_request_dict(request)
     manuscript, verse = get_manuscript_and_verse(request)
     
     transcription = request_dict.get('transcription')
