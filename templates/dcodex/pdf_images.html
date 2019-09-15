@@ -1,8 +1,9 @@
 {% load static %}
+{% get_media_prefix as MEDIA_PREFIX %}
 {% if images %}
     {% for image in images %}    
         <div id="page{{ image.page }}" class=pageContainer data-page='{{ image.page }}'>
-            <img data-src='{% static image.src %}' src='' class='pageImage' data-page='{{ image.page }}' id='pageImage{{ image.page }}' />
+            <img data-src='{{ MEDIA_PREFIX }}{{ image.src }}' src='' class='pageImage' data-page='{{ image.page }}' id='pageImage{{ image.page }}' />
         </div>    
     {% endfor %}
 {% else %}

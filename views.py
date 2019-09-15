@@ -55,17 +55,15 @@ def manuscript_verse_view(request, request_siglum, request_verse = None):
     }
     return render(request, 'dcodex/manuscript.html', context)
 
-static_dir = "/Users/rob/Ridley/ArabicManuscripts/DCodex/project_dcodex/dcodex/static/" # BIG HACK
-
 def thumbnails(request, pdf_filename):
     pdf    = get_object_or_404(PDF, filename=pdf_filename)   
-    thumbnails = pdf.thumbnails( static_dir )
+    thumbnails = pdf.thumbnails( )
     
     return render(request, 'dcodex/thumbnails.html', {'thumbnails': thumbnails} )
 
 def pdf_images(request, pdf_filename):
     pdf    = get_object_or_404(PDF, filename=pdf_filename)   
-    images = pdf.images( static_dir )
+    images = pdf.images( )
     
     return render(request, 'dcodex/pdf_images.html', {'images': images} )
 

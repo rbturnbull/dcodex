@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 from polymorphic.models import PolymorphicModel
 from django.shortcuts import render
 import re
@@ -6,6 +7,10 @@ from django.db.models import Max, Min
 import os
 import glob
 import logging
+
+def facsimile_dir():
+    return settings.MEDIA_ROOT
+
 
 # Create your models here.
 class Manuscript(PolymorphicModel):
@@ -136,14 +141,17 @@ class PDF(models.Model):
         return self.filename
     class Meta:
         verbose_name_plural = 'PDFs'
+        
+
     
-    def get_page_count(self, dir):
+    def get_page_count(self):
         logger = logging.getLogger(__name__)    
         
         if self.page_count:
             return self.page_count
-            
-        glob_string = "%s/dcodex/facsimiles/%s-*.jpg" % (dir, self.filename)
+
+        dir = facsimile_dir()
+        glob_string = "%s/facsimiles/%s-*.jpg" % (dir, self.filename)
         files = glob.glob(glob_string)
         logger.error(glob_string)
         logger.error(files)
@@ -222,30 +230,31 @@ class PDF(models.Model):
 
     
     
-    def thumbnails(self, dir):
-        page_count = self.get_page_count(dir)
+    def thumbnails(self):
+        page_count = self.get_page_count()
         thumbnails = []
         for page_index in range(1, page_count + 1):
             folio = self.folio_name( page_index )
-            thumbnails.append( ManuscriptImage( page_index, self.thumbnail_path(page_index, dir), folio ) )
+            thumbnails.append( ManuscriptImage( page_index, self.thumbnail_path(page_index), folio ) )
         return thumbnails
 
-    def images(self, dir):
-        page_count = self.get_page_count(dir)
+    def images(self):
+        page_count = self.get_page_count()
         thumbnails = []
         for page_index in range(1, page_count + 1):
             folio = self.folio_name( page_index )
             thumbnails.append( ManuscriptImage( page_index, self.image_path(page_index), folio ) )
         return thumbnails
 
-    def thumbnail_path(self, page_index, dir):
-        src = "/dcodex/facsimiles/small/%s-%d.small.jpg" % (self.filename, page_index)
+    def thumbnail_path(self, page_index):
+        src = "facsimiles/small/%s-%d.small.jpg" % (self.filename, page_index)
+        dir = facsimile_dir()        
         if not os.access(dir+src, os.R_OK):
             src = self.image_path(page_index)
         return src
 
     def image_path(self, page_index):
-        return "/dcodex/facsimiles/%s-%d.jpg" % (self.filename, page_index)
+        return "facsimiles/%s-%d.jpg" % (self.filename, page_index)
 
 class Page(models.Model):
     manuscript = models.ForeignKey(Manuscript, on_delete=models.CASCADE) # SHOULD THIS BE HERE??
