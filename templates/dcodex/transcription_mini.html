@@ -1,4 +1,5 @@
 {% load static %}
+{% get_media_prefix as MEDIA_PREFIX %}
 <script type="text/javascript">
 //    alert("Outside the jQuery ready");
 	$(document).ready(function() {	
@@ -23,7 +24,7 @@
 
 <div id=manuscriptInBox style='position: relative; overflow:hidden;'>
 
-    <img src="{% static location.image_path %}" style='width: 100%;' id=manuscriptInBoxImage />
+    <img src="{{ MEDIA_PREFIX }}{{ location.image_path }}" style='width: 100%;' id=manuscriptInBoxImage />
 
     <div id=verseMarkerInBox class=verseMarker style='background-color: green; height: 1px; width: 100%;'></div>
     <div id=verseMarkerInBoxX class=verseMarker style='position: absolute; background-color: green; height: 30px; width: 1px;'></div>
