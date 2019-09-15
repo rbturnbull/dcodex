@@ -1,0 +1,770 @@
+#leftSidebar {
+	position: absolute;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    width: 150px;
+	z-index: 2;
+	background: url("../images/BlackBackground-Tile-01.jpg");
+	background-color: black;
+	color: white;	
+}
+#comparison {
+	position: absolute;
+    top: 0px;
+    bottom: 0px;
+    right: 0px;
+    width: 290px;
+    padding: 5px;
+	overflow:scroll;
+	z-index: 2;
+	background: url("../images/BlackBackground-Tile-01.jpg");
+	background-color: black;
+	color: white;	
+}
+
+.comparison_button {
+    height: 15px; 
+    padding-top: 8px;
+}
+#manuscriptHeader {
+    position: relative; 
+    height: 245px; 
+    right: 0px; 
+    top: 0px; 
+    left: 0px; 
+    background-color: white;
+}
+.comparison_text_box {
+    background-color: white;
+    color: black;
+    padding: 5px;
+    margin: 5px;
+    float: left;
+    width: 270px;
+}
+
+.manuscriptLoad {
+	color: white;
+	cursor: pointer;
+	font-family: 'Noto Sans', sans-serif;
+	size: 1.3em;
+}
+#tagPageWindow {
+	display: none;
+	position: absolute;
+	top: 100px;
+	left: 100px;
+	width: auto;
+	height: auto;
+	padding: 30px;
+	background-color: white;
+    box-shadow:0 2px 4px rgba(0, 0, 0, 0.5);	
+    z-index: 2000000;
+	border-radius: 25px;
+    border: 2px solid #007AFF;	
+    
+}
+body {
+	margin:0;
+	padding:0;
+}
+#paper {
+    box-shadow:0 2px 4px rgba(0, 0, 0, 0.5);
+    cursor:crosshair;
+    height:auto;
+    width:2000px;
+    margin:0 0;
+	position: absolute;
+	image-orientation: from-image;
+
+    background-size: auto; 
+    background-repeat: no-repeat;
+}
+#container {
+    height:1000px;
+    width:1000px;    
+    margin:0 200;
+
+}
+#container2 {
+	position: absolute;
+    overflow:scroll;
+	left: 0px;
+	right: 230px;
+	top: 0px;
+	bottom: 0px;
+	image-orientation: from-image;
+}
+#glyphs {
+	width: 200px; 
+	height: 200px; 
+	text-align: center; 
+	font-size: 8em;
+    box-shadow:0 2px 4px rgba(0, 0, 0, 0.5);	
+}
+#page {
+    cursor:crosshair;
+}
+#thumbnail {
+	position: absolute;
+	image-orientation: from-image;
+    width: auto; 
+    height: auto;
+	visibility: visible;
+}
+#arabic {
+	position: absolute;
+    overflow:scroll;
+    text-align: center;
+    width: 200px; 
+    top: 220px;
+    bottom: 0px;
+	font-size: 2.1em;
+	z-index: 100;
+}
+
+#baseline {
+	position: absolute;
+	height: 1px;
+	background-color: red;
+	left: 200px;
+	width: 200px;
+	top: 200px;
+	z-index: 1000;
+	visibility: hidden;
+}
+#manuscript {
+	position: absolute;
+    top: 0px;
+    bottom: 0px;
+    right: 0px;
+    left: 0px;
+	overflow:scroll;
+	z-index: 100;
+	background-color: black;
+}
+
+#transcription {
+	width: 100%; 
+    font-size: 48px;
+    height: 164px;
+	
+	text-align: center; 
+	font-family: Scheherazade; 
+	background-color:rgba(255, 255, 255, 0.5);
+}
+
+#details {
+	position: absolute;
+    left: 0px;
+    height: 25px;
+    right: 0px;
+    top: 45px;
+	z-index: 101;
+	text-align: center;
+}
+#marker {
+	position: absolute;
+	height: 1px;
+	background-color: red;
+	left: 0px;
+	right: 0px;
+	top: 0px;
+	z-index: 1000;
+	opacity: 0.5;
+	visibility: hidden;
+	pointer-events: none;
+
+}
+#markerX {
+	position: absolute;
+	width: 1px;
+	height: 30px;
+	background-color: red;
+	left: 0px;
+	top: 0px;
+	z-index: 1000;
+	opacity: 0.5;
+	visibility: hidden;
+	pointer-events: none;
+	
+}
+.verseMarker {
+	position: absolute;
+	height: 1px;
+	background-color: green;
+	left: 0px;
+	right: 0px;
+	top: 0px;
+	z-index: 1000;
+	opacity: 0.5;
+}
+.verseMarkerX {
+	position: absolute;
+	width: 1px;
+	height: 30px;
+	background-color: green;
+	left: 0px;
+	top: 0px;
+	z-index: 1000;
+	opacity: 0.5;
+}
+.verseMapDelete {
+	position: absolute;
+	height: 20px;
+	color: green;
+	text-align: right; 
+	background: green;
+	width: 100px;
+	right: 0px;
+	top: 0px;
+	font-size: 1em;
+	z-index: 1000;
+	opacity: 1;
+}
+/* Tooltip text */
+.verseReference .tooltiptext {
+    visibility: hidden;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    padding: 5px 0;
+    border-radius: 6px;
+ 
+    /* Position the tooltip text - see examples below! */
+    position: absolute;
+    z-index: 1001;
+    
+    width: 200px;
+    top: 100%;
+    left: 50%; 
+    margin-left: -160px;
+    direction: rtl;
+}
+
+.removeMarker {
+	background: url('../images/CloseButtonBlack.png');
+    background-repeat: no-repeat;
+    background-size: 30px 30px;
+
+	width: 30px;
+	height: 30px;
+	top: -15px;
+	right: -15px;
+	position: absolute;
+	cursor: not-allowed;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.verseReference:hover .tooltiptext {
+    visibility: visible;
+}
+
+
+
+.infoButton {
+    position: absolute;
+    width: 30px;
+	top: 5px;
+	left: 5px;
+}
+.teiInputClose {
+    position: absolute;
+    width: 30px;
+	top: 5px;
+	right: 5px;
+	cursor:hand;
+}
+.infoButton a {
+}
+
+.teiOption {
+	cursor:hand;
+	color: red;
+}
+.teiInput {
+	display: none;
+    position: absolute;
+    z-index: 3004;
+    width: 400px;
+    top: 200px;
+    left: 200px;
+    background-color: #eee;
+	font-family: 'Euphemia-UCAS';
+	border-radius: 25px;
+    border: 2px solid #007AFF;
+    padding: 20px; 
+    
+}
+
+.msbox {
+    visibility: hidden;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    padding: 5px 0;
+    border-radius: 6px;
+ 
+    /* Position the tooltip text - see examples below! */
+    position: absolute;
+    z-index: 1001;
+    
+    width: 500px;
+    height: 200px;
+    top: 0px;
+    left: 50%; 
+    margin-left: -250px;
+    direction: rtl;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.mshover:hover .msbox {
+    visibility: visible;
+}	
+.loadVerseLink {
+	cursor: pointer;
+}
+#locationOptions{
+	display:none;
+    position: absolute;
+    height: 150px;
+    width: 530px;
+    left: 0px;
+    top: 0px;
+    z-index: 9001;
+    background-color: #eee;
+	font-family: 'Noto Sans', sans-serif;
+	border-radius: 6px;
+    border: 2px solid #007AFF;
+    border: 2px solid red;    
+	padding: 10px;
+	z-index: 2000000;
+    box-shadow:0 2px 4px rgba(0, 0, 0, 0.5);	
+}
+.verseReference {
+	position: absolute;
+	height: 20px;
+	color: green;
+	width: fit-content;
+	right: 20px;
+	top: 0px;
+	text-align: right; 
+	font-size: 1em;
+	z-index: 1000;
+	opacity: 1;
+	padding: 5px;
+	background-color: rgba(255, 255, 255, 0.50);
+	cursor: pointer;
+
+}
+
+.pageImage{
+	width: 100%;
+	min-height: 500px;
+	display: block;
+	padding: 0px;
+	
+	background-image: url('../images/loading.gif');
+	background-color: white;
+	background-repeat: no-repeat;
+	background-position: 50% 50%;
+	
+}
+.pageContainer{
+	position: relative;
+}
+#thumbnails {
+	position: absolute;
+    top: 125px;
+    bottom: 0px;
+    left: 0px;
+    width: 100%;
+	overflow:scroll;
+	z-index: 2;
+}
+#middle {
+	position: absolute;
+    top: 0px;
+    bottom: 0px;
+    right: 300px;
+    left: 150px;
+	overflow:scroll;
+	z-index: 3;
+	background-color: white;
+}
+.thumbnail {
+	width: calc(100% - 20px);
+	padding-right: 10px;
+	padding-left: 10px;	
+	padding-top: 10px;		
+	padding-bottom: 0px;			
+}
+.thumbnailCurrent {
+	background-color: rgba(255, 255, 255, 0.64);
+	color: red;
+}
+table {
+
+    cellpadding: 15px;
+    background-color:rgba(0, 0, 0, 0);
+        border-collapse: separate;
+    border-spacing: 10px 10px;
+	table-layout: fixed;
+	width: 100%;	
+}
+#verseSearch {
+	position: relative;
+	top: -10px;
+	z-index: 222;
+}
+th, td {
+    text-align: center;
+
+}
+table, tbody {
+    background-color: rgba(0, 0, 0, 0.0) !important;
+}
+.closeButton {
+	background: url('../images/close_button_black_small.png') no-repeat;
+	background-size: 100% 100%;
+    position: absolute;
+    width: 30px;
+    height: 30px;
+	top: 5px;
+	right: 5px;
+	z-index:2000000000;
+	cursor:pointer;
+}
+.manuscriptSelect {
+	cursor:pointer;
+}
+#manuscriptSelectWindow {
+    display: none;
+	position: absolute;
+	top: 50px;
+	bottom: 30px;
+	left: 150px;
+	width: 600px;
+	background-color:rgba(255, 255, 255, 0.8);	
+	z-index: 2000000;
+	font-family: 'Noto Sans', sans-serif;
+	font-weight: normal;
+    color: rgba(0, 122, 255, 1.0); 
+    font-size: 1.5em;	
+	border-radius: 12px;  
+
+    box-shadow:0 2px 4px rgba(0, 0, 0, 0.5);	
+    border: 2px solid #007AFF;	
+	
+}
+.otherPDF a {
+    color: rgba(122, 122, 122, 1.0); 
+    padding-left: 30px;
+    font-size: 0.5em;
+}
+#showManuscriptSelect {
+	cursor:pointer;
+}
+#allManuscripts {
+	position: absolute;
+	top: 10px;
+	bottom: 10px;	
+	left: 10px;		
+	right: 10px;		
+	overflow:scroll;
+	padding: 10px;	
+	
+}
+#transcriptionEntry {
+	position: absolute;
+    right: 0px;
+    top: 70px;
+    height: 170px;
+    left: 0px;
+	z-index: 100;
+	background-color:rgba(255, 255, 255, 0.8);
+}
+
+table tbody 
+{
+  display: block;
+  	table-layout: fixed;
+}
+td {
+    padding: 8px;
+    direction: rtl;
+    color: black;
+    margin: 8px;
+  background-color: rgba(255, 255, 255, 0.95);
+  	table-layout: fixed;
+  	  width: 50%;   
+
+}
+a {
+    text-decoration: none;	 
+    color: rgba(0, 122, 255, 1.0);   
+}
+a.highlight {
+    color: rgba(0, 0, 255, 1.0);   
+}
+a:hover {
+    color: red;
+}
+.comparison_manuscript_name {
+    color: rgba(0, 122, 255, 1.0); 
+    direction: ltr;
+    font-size: 1.3em;
+    position: relative;  
+    text-align: center;
+}
+.comparison_text {
+    text-align: center;
+}
+.comparison_buttons {
+    text-align: center;
+}
+.groupHeading {
+    color: red; 
+    color: rgba(0, 122, 255, 1.0); 
+    font-size: 2.3em;      
+    margin-bottom: 0px;
+    margin-top: 10px;   
+    text-align: center;
+    margin-right: 10px;
+    margin-left: 10px; 
+font-family: 'Noto Sans', sans-serif;
+	font-weight: normal;
+    
+}
+.sidebarList {
+  background-color: rgba(255, 255, 255, 0.95);
+    text-align: center;
+	margin: 16px;
+	padding-bottom: 8px;
+font-family: 'Noto Sans', sans-serif;
+}
+.referenceTranscription {
+	color: rgb(0,0,0,0.7);
+	font-family: Scheh;
+	
+}
+.inputHeader {
+    outline: none;
+    background-color:rgba(0, 0, 0, 0);
+    border: none;
+    outline:none;
+	font-family: 'Noto Sans', sans-serif;
+	color: rgba(0, 122, 255, 1.0); 
+	font-size: 1.6em;
+    text-shadow: 0px 0px 5px #ffffff,0px 0px 5px #ffffff,0px 0px 10px #ffffff;
+    text-align: center;
+    text-align-last:center;
+	
+}
+.inputButton {
+	color: red;
+	border: red;
+    outline: yes;
+    background-color:rgba(0, 0, 0, 0.05);    
+	border-radius: 12px;    
+	cursor: pointer;
+	  border: 2px solid rgba(0, 0, 0, 0.05);
+	position: relative;
+}
+#goToPage {
+    outline: none;
+
+    background-color:rgba(0, 0, 0, 0);
+	font-family: 'Noto Sans', sans-serif;
+	font-size: 1.6em;
+    text-align: center;
+    text-align-last:center;
+
+
+	color: red;
+	border: 2px solid rgba(255, 255, 255, 0.25);
+    outline: yes;
+    background-color:rgba(0, 0, 0, 0.05);    
+	border-radius: 12px;    
+	cursor: pointer;
+	background-color:rgba(255, 255, 255, 0.15);
+	position: relative;
+
+}
+#goToPage:focus {
+  border: 2px solid red;
+}
+.pageInput:focus {
+  border: 2px solid red;
+}
+
+.pageInput {
+    outline: none;
+    background-color:rgba(255, 255, 255, 0.15);
+    border: none;
+    outline:none;
+	border: 2px solid rgba(255, 255, 255, 0.25);
+    
+	border-radius: 6px;    
+	font-family: 'Noto Sans', sans-serif;
+	color: red;
+	font-size: 1.6em;
+    text-align: center;
+    text-align-last:center;
+}
+
+.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
+}
+.magnifyingGlass {
+	background: url('../images/MagnifyingGlass.svg') no-repeat;
+	width:40px;
+	height: 38px;
+	margin-top: 0px;
+	top: 6px;
+	position: relative;
+	padding-top: 0px;
+    background-color:rgba(0, 0, 0, 0.05);    
+}
+.inputButton .tooltiptext {
+    visibility: hidden;
+    width: 150px;
+    top: 45px;
+    left: 0px;
+    background-color: black;
+    color: #fff;
+    text-shadow: none;
+    font-size: 0.6em;
+    text-align: center;
+    padding: 5px 0;
+    border-radius: 6px;
+ 	position: absolute;
+    /* Position the tooltip text - see examples below! */
+    z-index: 19000;
+}
+.tooltiptext {
+    visibility: hidden;
+    width: 150px;
+    top: 45px;
+    left: 0px;
+    background-color: black;
+    color: #fff;
+    text-shadow: none;
+    font-size: 0.6em;
+    text-align: center;
+    padding: 5px 0;
+    font-family: 'Noto Sans', sans-serif;
+    border-radius: 6px;
+ 	position: absolute;
+    /* Position the tooltip text - see examples below! */
+    z-index: 19000;
+}
+.inputButton:hover .tooltiptext {
+    visibility: visible;
+}
+.comparison_manuscript_name:hover .tooltiptext {
+    visibility: visible;
+}
+.comparison_manuscript_name .tooltiptext {
+    font-size: 1.0em;
+	width: auto;
+	padding-left: 15px;
+	padding-right: 15px;
+    left: -20px;
+
+}
+.inputButton:focus {
+  border: 2px solid red;
+}
+
+.referenceTranscription a{
+
+}
+.thumbnailContainer {
+	width: 94%;
+	padding: 0px;
+	margin: 0px;	
+	margin-left: 3%;		
+	color: white;
+	color: rgba(0, 122, 255, 1.0); 
+	font-family: 'Noto Sans', sans-serif;
+	cursor: pointer;
+    border-radius: 6px;
+}
+.thumbnailContainer p {
+	margin: 0px;!important;
+    text-align: center;
+	padding-bottom: 10px;			
+
+}
+#msHover{
+	display:none;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    padding: 5px 0;
+    border-radius: 6px;
+ 
+    /* Position the tooltip text - see examples below! */
+    position: absolute;
+    z-index: 2222;
+    
+    height: 400px;
+    bottom: 20px;
+    left: 200px; 
+    right: 400px; 
+    direction: rtl;
+	box-shadow: 0px 0px 5px #ffffff,0px 0px 5px #ffffff,0px 0px 10px #ffffff;
+	box-shadow: 0px 0px 55px #000;
+
+}
+#teiOptions {
+	display: none;
+    position: absolute;
+    z-index: 2004;
+    width: 400px;
+    top: 140px;
+    right: 150px;
+    background-color: #eee;
+	font-family: 'Noto Sans', sans-serif;
+	font-size: 1.5em;
+	border-radius: 25px;
+    border: 2px solid #007AFF;
+    padding: 20px; 
+    box-shadow:0 2px 4px rgba(0, 0, 0, 0.5);	
+	
+}
+#heading {
+	position: absolute;
+    right: 0px;
+    top: 0px;
+    height: 70px;
+    left: 0px;
+	z-index: 300;
+	background-color:rgba(255, 255, 255, 0.8);	
+}
+.toggle_header_button {
+    position: absolute;
+    height: auto; 
+    color: red; 
+    cursor:pointer; 
+    z-index: 1000;
+    width: 30px; 
+    top: 18px;
+}
+.toggle_header_button img{
+    width: 100%;
+}
+#toggleReferences {
+    right: 18px;
+}
+#toggleLeftSidebar {
+    left: 18px;
+}
