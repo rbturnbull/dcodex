@@ -514,10 +514,13 @@ function register_close_buttons() {
 function load_verse_search_div(verse_id, manuscript_id) {
     $( "#verseSearch" ).load( "/dcodex/ajax/verse-search/", { manuscript_id:manuscript_id, verse_id:verse_id }, function() {
         $( "#seekVerseButton" ).click(function(e) {
-            book_id = $('#bookSelect').val();
-            chapter = $('#chapterSelect').val();				
-            verse = $('#verseSelect').val();
-            $.post('/dcodex/ajax/verse-id/', { manuscript_id:manuscript_id, book_id:book_id, chapter:chapter, verse:verse }, function(response) {
+            dict = { manuscript_id:manuscript_id }
+            $(".verseSearchField").each(function() {
+                dict[$(this).attr('name')] = $(this).val();
+                console.log($(this).attr('name'))
+            });
+            $.post('/dcodex/ajax/verse-id/', dict, function(response) {
+                console.log("Seeking verse: " + response)            
                 verse_id = response;
                 seekVerse(verse_id, manuscript_id);
             });
@@ -563,6 +566,20 @@ function load_verse_location_popup(verse_id, manuscript_id) {
             $('#locationOptions').hide();
             return false;
         });
+        $( "#loadVerseAtLocation" ).click(function(e) {
+            dict = { manuscript_id:manuscript_id }
+            $(".verseLoadField").each(function() {
+                dict[$(this).attr('name')] = $(this).val();
+                console.log($(this).attr('name'))
+            });
+            $.post('/dcodex/ajax/verse-id/', dict, function(response) {
+                console.log("Loading verse: " + response)                        
+                verse_id = response;
+                load_verse(verse_id, manuscript_id);				
+            });
+            return false;            
+        });
+
         setLoadVerseLink();
     });
 }

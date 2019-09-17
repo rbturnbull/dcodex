@@ -96,7 +96,7 @@ class Manuscript(PolymorphicModel):
             location_B = self.location_after( verse )
             if location_B is None:
                 location_B = location_A;
-                location_A = self.first_location( manuscript, map2.pdf )
+                location_A = self.first_location( location_B.pdf )
                 if location_A is None or location_A.id == location_B.id:
                     return location_B
     
