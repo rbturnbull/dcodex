@@ -217,16 +217,6 @@ function CopyToClipboard(containerid) {
 	setLoadVerseLink();
 	
 	
-	$( "#loadVerseAtLocation" ).click(function(e) {
-		book = $('#bookAtLocation').val();
-		chapter = $('#chapterAtLocation').val();				
-		verse = $('#verseAtLocation').val();				
-		$.post('/VerseID.php', { book:book, chapter:chapter, verse:verse }, function(response) {
-			verseID = response;
-			loadVerse(verseID);				
-		});
-		return false;
-	});
 	
 
 	

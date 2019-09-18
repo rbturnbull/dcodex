@@ -190,7 +190,7 @@ def comparison(request):
 @login_required
 def transcription_mini(request):
     manuscript, verse = get_manuscript_and_verse(request)    
-    verse_transcription = manuscript.transcription_class().objects.filter( manuscript=manuscript, verse=verse ).first()
+    verse_transcription = manuscript.transcription( verse )
     location = manuscript.location( verse )
     
     return render(request, 'dcodex/transcription_mini.html', {'verse_transcription': verse_transcription, 'location': location} )
@@ -198,7 +198,7 @@ def transcription_mini(request):
 @login_required
 def transcription_text(request):
     manuscript, verse = get_manuscript_and_verse(request)    
-    verse_transcription = manuscript.transcription_class().objects.filter( manuscript=manuscript, verse=verse ).first()
+    verse_transcription = manuscript.transcription( verse )
     text = verse_transcription.transcription if verse_transcription else ""
     return HttpResponse(text)
 
