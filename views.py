@@ -1,6 +1,7 @@
 from django.http import HttpResponse
 
 from django.shortcuts import get_object_or_404, render
+from django.template import loader
 
 from dcodex.models import *
 from dcodex.util import get_request_dict
@@ -161,13 +162,14 @@ def delete_location(request):
 @login_required
 def comparison(request):
     manuscript, verse = get_manuscript_and_verse(request)
-    
+    template = loader.get_template('dcodex/comparison.html')
 #    $dcodex->comparisonTable("Reference", array($dcodex->getManuscript(18), $dcodex->getManuscript(16)), $verseID, $columns );
 #    $dcodex->comparisonTableForGroups($manuscriptID, $verseID, $columns );
     
-    comparison_texts = manuscript.comparison_texts( verse )
-        
-    return render(request, 'dcodex/comparison.html', {'heading': "All Transcribed", 'comparison_texts': comparison_texts} )
+    reference_mss = request.user.profile.reference_texts.all()
+    profile_reference = template.render({'heading': "Reference", 'comparison_texts': manuscript.comparison_texts( verse, reference_mss )}, request)
+    all_mss = template.render({'heading': "All Transcribed", 'comparison_texts': manuscript.comparison_texts( verse )}, request)
+    return HttpResponse(profile_reference+all_mss)
 
 @login_required
 def transcription_mini(request):

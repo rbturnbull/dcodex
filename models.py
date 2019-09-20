@@ -68,8 +68,11 @@ class Manuscript(PolymorphicModel):
     def transcription( self, verse ):
         return self.transcription_class().objects.filter( manuscript=self, verse=verse ).first()
 
-    def comparison_texts( self, verse ):
-        return self.transcription_class().objects.filter( verse=verse ).all()        
+    def comparison_texts( self, verse, manuscripts = None ):
+        if manuscripts is None:
+            return self.transcription_class().objects.filter( verse=verse ).all()        
+
+        return self.transcription_class().objects.filter( verse=verse, manuscript__in=manuscripts ).all()                
 
     def save_transcription( self, verse, text ):
         transcription, created = self.transcription_class().objects.update_or_create(
@@ -404,3 +407,21 @@ class VerseTranscription(VerseTranscriptionBase):
     def __str__(self):
         return super(VerseTranscription, self).__str__()
     
+    
+#https://simpleisbetterthancomplex.com/tutorial/2016/11/23/how-to-add-user-profile-to-django-admin.html
+from django.contrib.auth.models import User
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    reference_texts = models.ManyToManyField(Manuscript)
+    def __str__(self):
+        return self.user.username
+
+@receiver(post_save, sender=User)
+def create_or_update_user_profile(sender, instance, created, **kwargs):
+    if created:
+        Profile.objects.create(user=instance)
+    instance.profile.save()
+
