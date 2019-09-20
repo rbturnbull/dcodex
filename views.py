@@ -5,7 +5,6 @@ from django.shortcuts import get_object_or_404, render
 from dcodex.models import *
 from dcodex.util import get_request_dict
 from django.contrib.auth.decorators import login_required
-
 import logging
 import json
     
@@ -43,7 +42,7 @@ def manuscript_verse_view(request, request_siglum, request_verse = None):
     logger.error(request_verse)
 
     if request_verse and request_verse.isdigit():
-        verse = manuscript.verse_from_id( request_verse )
+        verse = manuscript.verse_from_id( request_verse )        
     else:
         verse = manuscript.verse_from_string(request_verse)
         
@@ -166,12 +165,8 @@ def comparison(request):
 #    $dcodex->comparisonTable("Reference", array($dcodex->getManuscript(18), $dcodex->getManuscript(16)), $verseID, $columns );
 #    $dcodex->comparisonTableForGroups($manuscriptID, $verseID, $columns );
     
-    comparison_texts = manuscript.transcription_class().objects.filter( verse=verse ).all()        
-    
-    
-    logger = logging.getLogger(__name__)    
-    logger.error(manuscript)
-    
+    comparison_texts = manuscript.comparison_texts( verse )
+        
     return render(request, 'dcodex/comparison.html', {'heading': "All Transcribed", 'comparison_texts': comparison_texts} )
 
 @login_required

@@ -68,6 +68,9 @@ class Manuscript(PolymorphicModel):
     def transcription( self, verse ):
         return self.transcription_class().objects.filter( manuscript=self, verse=verse ).first()
 
+    def comparison_texts( self, verse ):
+        return self.transcription_class().objects.filter( verse=verse ).all()        
+
     def save_transcription( self, verse, text ):
         transcription, created = self.transcription_class().objects.update_or_create(
             manuscript=self, 
