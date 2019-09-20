@@ -78,8 +78,8 @@
 <script>
 $( document ).ready(function() {
     console.log( "loading from manuscript.html" );
-    load_pdf( "{{ location.pdf.filename }}", {{ manuscript.manuscript_id }} );
-    seekVerse( {{ verse.id }}, {{ manuscript.manuscript_id }} )
+    load_pdf( "{{ location.pdf.filename }}", {{ manuscript.id }} );
+    seekVerse( {{ verse.id }}, {{ manuscript.id }} )
 });
 </script>
 {% endblock %}

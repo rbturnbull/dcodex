@@ -14,7 +14,6 @@ def facsimile_dir():
 
 # Create your models here.
 class Manuscript(PolymorphicModel):
-    manuscript_id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=200, blank=True)
     siglum = models.CharField(max_length=20, blank=True)
     def __str__(self):
@@ -26,13 +25,13 @@ class Manuscript(PolymorphicModel):
             return self.name
         if self.siglum:
             return self.siglum
-        return str(self.manuscript_id)
+        return str(self.id)
     def short_name(self):
         if self.siglum:
             return self.siglum
         if self.name:
             return self.name
-        return str(self.manuscript_id)
+        return str(self.id)
         
     @classmethod
     def verse_class(cls):
@@ -45,6 +44,10 @@ class Manuscript(PolymorphicModel):
     @classmethod
     def verse_from_string(cls, verse_as_string):
         return cls.verse_class().get_from_string( verse_as_string )
+
+    @classmethod
+    def verse_from_id(cls, verse_id):
+        return cls.verse_class().objects.filter(id=verse_id).first()        
         
     @classmethod
     def verse_from_dict(cls, dictionary):
@@ -64,6 +67,34 @@ class Manuscript(PolymorphicModel):
         
     def transcription( self, verse ):
         return self.transcription_class().objects.filter( manuscript=self, verse=verse ).first()
+
+    def save_transcription( self, verse, text ):
+        transcription, created = self.transcription_class().objects.update_or_create(
+            manuscript=self, 
+            verse=verse, 
+            defaults={"transcription": text}
+        )
+        return transcription
+
+    def title_dict( self, verse ):
+        ref = verse.reference_abbreviation()
+        url_ref = verse.url_ref()
+        dict = { 
+            'title': "%s – %s" % (self.siglum, ref), 
+            'url': "/dcodex/ms/%s/%s/" % ( self.siglum, url_ref ) 
+        }
+        return dict    
+
+    def save_location( self, verse, pdf, page, x, y ):
+        location, created = VerseLocation.objects.update_or_create(
+            manuscript=self, 
+            verse=verse, 
+            defaults={"pdf": pdf, "page": page, 'x':x, 'y':y}
+        )
+        return location
+
+    def transcriptions( self ):
+        return self.transcription_class().objects.filter( manuscript=self )
     
     def location_before_or_equal( self, verse ):
         return VerseLocation.objects.filter( manuscript=self, verse__id__lte=verse.id ).order_by('-verse__id').first()
@@ -298,6 +329,9 @@ class Verse(PolymorphicModel):
     def distance_to(self, other_verse):
         return other_verse.cumulative_mass() - self.cumulative_mass()
 
+    def url_ref(self):
+        return self.reference_abbreviation().replace(" ", '')
+
     @classmethod
     def get_from_string( cls, verse_as_string ):
         return None
@@ -353,7 +387,7 @@ class VerseLocation(models.Model):
     def image_path(self):
         return self.pdf.image_path( self.page )
     def values_dict(self):
-        return {'manuscript_id': self.manuscript.manuscript_id, 'pdf_filename': self.pdf.filename, 'x':self.x, 'y':self.y, 'page':self.page, 'verse_id':self.verse.id, 'ref':self.verse.reference_abbreviation(), 'tooltip':'', 'exact': True if self.pk else False }
+        return {'manuscript_id': self.manuscript.id, 'pdf_filename': self.pdf.filename, 'x':self.x, 'y':self.y, 'page':self.page, 'verse_id':self.verse.id, 'ref':self.verse.reference_abbreviation(), 'tooltip':'', 'exact': True if self.pk else False }
         
 
 class VerseTranscriptionBase(PolymorphicModel):

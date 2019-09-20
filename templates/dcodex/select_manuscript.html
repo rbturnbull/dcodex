@@ -7,7 +7,7 @@
 <div id=manuscriptSelectClose class=closeButton></div>
 <div id=allManuscripts>
     {% for manuscript in manuscripts %}
-        <div data-manuscript="{{ manuscript.manuscript_id }}" class=manuscriptSelect>{{ manuscript }}</div>
+        <div data-manuscript="{{ manuscript.id }}" class=manuscriptSelect>{{ manuscript }}</div>
         {% if manuscript.pdf_set.count > 1 %}
             {% for pdf in manuscript.pdf_set %}
                 <div class=otherPDF>

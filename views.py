@@ -3,23 +3,22 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 
 from dcodex.models import *
+from dcodex.util import get_request_dict
 from django.contrib.auth.decorators import login_required
 
 import logging
 import json
-
-def get_request_dict(request):
-    return request.POST if request.method == "POST" else request.GET
     
 @login_required
 def get_verse(request, manuscript):
     request_dict = get_request_dict(request)
-    return get_object_or_404(manuscript.verse_class(), id=request_dict.get('verse_id'))
+    verse_id = request_dict.get('verse_id')
+    return manuscript.verse_from_id( verse_id )
 
 @login_required
 def get_manuscript(request):
     request_dict = get_request_dict(request)
-    return get_object_or_404(Manuscript, manuscript_id=request_dict.get('manuscript_id'))   
+    return get_object_or_404(Manuscript, id=request_dict.get('manuscript_id'))   
 
 @login_required
 def get_pdf(request):
@@ -37,14 +36,14 @@ def manuscript_verse_view(request, request_siglum, request_verse = None):
     logger = logging.getLogger(__name__)    
 
     if request_siglum.isdigit():
-        manuscript = get_object_or_404(Manuscript, manuscript_id=request_siglum)            
+        manuscript = get_object_or_404(Manuscript, id=request_siglum)            
     else:
         manuscript = get_object_or_404(Manuscript, siglum=request_siglum)    
     logger.error(manuscript)
     logger.error(request_verse)
 
     if request_verse and request_verse.isdigit():
-        verse = manuscript.verse_class().objects.get(id=request_verse)
+        verse = manuscript.verse_from_id( request_verse )
     else:
         verse = manuscript.verse_from_string(request_verse)
         
@@ -88,14 +87,7 @@ def page_locations_json(request):
 @login_required
 def title_json(request):
     manuscript, verse = get_manuscript_and_verse(request)
-    
-    ref = verse.reference_abbreviation()
-    
-    dict = { 
-        'title': "%s – %s" % (manuscript.siglum, ref), 
-        'url': "/dcodex/ms/%s/%s/" % ( manuscript.siglum, ref.replace(" ", "") ) 
-    }
-    
+    dict = manuscript.title_dict( verse )    
     return HttpResponse(json.dumps(dict))
 
 @login_required
@@ -113,7 +105,9 @@ def verse_id(request):
     request_dict = get_request_dict(request)
     manuscript = get_manuscript(request)
     verse = manuscript.verse_from_dict(request_dict)
-    return HttpResponse(verse.id)
+    if verse:
+        return HttpResponse(verse.id)
+    return HttpResponse("No verse found")
 
 @login_required
 def save_location(request):
@@ -125,11 +119,8 @@ def save_location(request):
     x = request_dict.get('x')
     y = request_dict.get('y')
 
-    location, created = VerseLocation.objects.update_or_create(
-        manuscript=manuscript, 
-        verse=verse, 
-        defaults={"pdf": pdf, "page": page, 'x':x, 'y':y}
-    )
+    location = manuscript.save_location( verse, pdf, page, x, y )
+    
     return HttpResponse(json.dumps(location.values_dict()))
 
 @login_required
@@ -137,13 +128,9 @@ def save_transcription(request):
     request_dict = get_request_dict(request)
     manuscript, verse = get_manuscript_and_verse(request)
     
-    transcription = request_dict.get('transcription')
-
-    transcription, created = manuscript.transcription_class().objects.update_or_create(
-        manuscript=manuscript, 
-        verse=verse, 
-        defaults={"transcription": transcription}
-    )
+    text = request_dict.get('transcription')
+    transcription = manuscript.save_transcription( verse, text )
+    
     return HttpResponse('')
 
 @login_required

@@ -101,7 +101,7 @@ function loadVerseMarker(dict) {
 
         verseReference.click(function(e) {
             var verse = $(this).data('verse');
-            loadVerse(verse);
+            load_verse(verse, current_manuscript_id);
             e.stopPropagation();
         });
     }
