@@ -7,6 +7,19 @@ from matplotlib import pyplot as plt
 import scipy.spatial.distance as ssd
 import scipy.cluster.hierarchy as hcluster
 
+
+def similarity_from_edit_distance( string1, string2, edit_distance ):
+    max_length = max(len(string1), len(string2))
+    if max_length == 0:
+        return 1.0
+    return (max_length-edit_distance)/max_length
+
+
+def similaity_levenshtein( string1, string2 ):
+    return similarity_from_edit_distance( string1, string2, Levenshtein.distance( string1, string2 ) )
+
+
+
 def distance_matrix( manuscripts, verses, distance_func = Levenshtein.distance, verbose = False, triangular = False ):
     manuscripts_count = len(manuscripts)
     

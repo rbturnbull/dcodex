@@ -1,0 +1,36 @@
+{% extends "dcodex/base.html" %}
+{% load static %}
+{% block title %}{{ title }}{% endblock %}
+
+{% block stylesheet %}
+<link rel="stylesheet" type="text/css" href="{% static 'dcodex/css/table.css' %}" />
+<style>
+body {
+    background-color: white;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+th, td {
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even) {background-color: #f2f2f2;}
+
+</style>
+{% endblock %}
+
+{% block content %}
+{% autoescape off %}
+    {{ table }}
+{% endautoescape %}
+{% endblock %}
+
+
+{% block javascript %}
+<script>
+</script>
+{% endblock %}

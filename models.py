@@ -8,6 +8,7 @@ import os
 import glob
 import logging
 
+
 def facsimile_dir():
     return settings.MEDIA_ROOT
 
@@ -32,6 +33,8 @@ class Manuscript(PolymorphicModel):
         if self.name:
             return self.name
         return str(self.id)
+    class Meta:
+        ordering = ['siglum', 'name']
         
     @classmethod
     def verse_class(cls):
@@ -87,7 +90,8 @@ class Manuscript(PolymorphicModel):
         url_ref = verse.url_ref()
         dict = { 
             'title': "%s – %s" % (self.siglum, ref), 
-            'url': "/dcodex/ms/%s/%s/" % ( self.siglum, url_ref ) 
+            'url': "/dcodex/ms/%s/%s/" % ( self.siglum, url_ref ),
+            'verse_url_ref': url_ref,             
         }
         return dict    
 
@@ -103,7 +107,10 @@ class Manuscript(PolymorphicModel):
         return self.transcription_class().objects.filter( manuscript=self )
     
     def location_before_or_equal( self, verse ):
-        return VerseLocation.objects.filter( manuscript=self, verse__id__lte=verse.id ).order_by('-verse__id').first()
+        try:
+            return VerseLocation.objects.filter( manuscript=self, verse__id__lte=verse.id ).order_by('-verse__id').first()
+        except:
+            return VerseLocation.objects.filter( manuscript=self ).order_by('-verse__id').first()                    
         
     def location_after( self, verse ):
         return VerseLocation.objects.filter( manuscript=self, verse__id__gt=verse.id ).order_by('verse__id').first()
@@ -114,6 +121,9 @@ class Manuscript(PolymorphicModel):
         return VerseLocation.objects.filter( manuscript=self, pdf=pdf ).order_by('verse__id').first()
 
     def location( self, verse ):
+        if not verse:
+            return VerseLocation.objects.filter( manuscript=self ).order_by('-verse__id').first()                    
+            
         location_A = self.location_before_or_equal( verse )
         
         # If this location is already saved then return it

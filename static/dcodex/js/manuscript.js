@@ -3,6 +3,7 @@ var current_pdf_filename;
 var currentPage;
 var current_verse_id;
 var pageImageController = null;
+var current_verse_url_ref = null;
 
 function setLoadVerseLink() {
     $( ".loadVerseLink" ).click(function(e) {
@@ -247,9 +248,9 @@ function setup_manuscript_image_click() {
 		$('#markerX').show();		
 //		alert('make vis');
 //		alert(page);
-		$("#saveLocation").data("page", page);
-		$("#saveLocation").data("y0", y0);		
-		$("#saveLocation").data("x0", x0);		
+		$("#marker").data("page", page);
+		$("#marker").data("y0", y0);		
+		$("#marker").data("x0", x0);		
 
 		var height = $('#locationOptions').height();
 		var width = $('#locationOptions').width();	
@@ -389,7 +390,7 @@ function highlightVerseMarker( verse_id, manuscript_id, highlightedCallback = nu
 function load_comparison(verse_id, manuscript_id) {
     $( "#comparison" ).load( "/dcodex/ajax/comparison/", { manuscript_id:manuscript_id, verse_id:verse_id }, function() {
         $(".mshover").hover(function(){
-            $('#msHover').load("/dcodex/ajax/transcription-mini/", { manuscript_id:$(this).data('manuscriptid'), verse_id:verse_id } );
+            $('#msHover').load("/dcodex/ajax/transcription-mini/", { manuscript_id:$(this).data('manuscriptid'), verse_id:$(this).data('verseid') } );
             $('#msHover').show();
         }, function() {
             $('#msHover').hide();	  
@@ -404,11 +405,11 @@ function load_comparison(verse_id, manuscript_id) {
             setTranscription(text);
             return false;
         });
-        $(".comparison_manuscript_name").click(function(e) {
-            manuscript_id = $(this).data('manuscript');
-            window.location.replace("/dcodex/ms/"+manuscript_id+"/"+current_verse_id);		// Better to do this with ajax?
-            return false;
-        });
+//        $(".comparison_manuscript_name").click(function(e) {
+//            manuscript_id = $(this).data('manuscript');
+//            window.location.href = "/dcodex/ms/"+manuscript_id+"/"+current_verse_url_ref;		
+//            return false;
+//        });
         
         
     } );
@@ -536,7 +537,7 @@ function load_verse_search_div(verse_id, manuscript_id) {
                 register_close_buttons();
                 $( ".manuscriptSelect" ).click(function(e) {
                     ms = $(this).data('manuscript');
-                    window.location.replace("/dcodex/ms/"+ms+"/"+verse_id);		
+                    window.location.href = "/dcodex/ms/"+ms+"/"+current_verse_url_ref;		
                 });	
                 $( "#manuscriptSelectWindow" ).show();
             });
@@ -551,11 +552,11 @@ function load_verse_location_popup(verse_id, manuscript_id) {
     $( "#locationOptions" ).load( "/dcodex/ajax/location-popup/", { manuscript_id:manuscript_id, verse_id:verse_id }, function() {
         register_close_buttons();
         $( "#saveLocation" ).click(function(e) {
-            var page = $("#saveLocation").data("page");
-            var y = $("#saveLocation").data("y0");
-            var x = $("#saveLocation").data("x0");		
+            var page = $("#marker").data("page");
+            var y = $("#marker").data("y0");
+            var x = $("#marker").data("x0");		
             console.log("SaveLocation try: ");
-
+//            alert("verse_id:"+verse_id+", manuscript_id: "+manuscript_id+", current_pdf_filename: "+current_pdf_filename+" page: "+page+" y:"+y+" x:"+x);
             $.post('/dcodex/ajax/save-location/', { manuscript_id:manuscript_id, verse_id:verse_id, pdf_filename:current_pdf_filename, page:page, y:y, x:x }, function(response) {
                 loadVerseMarker(response);
                 highlightVerseMarker(verse_id);	    
@@ -598,12 +599,15 @@ function load_verse_to_title(verse_id, manuscript_id) {
     $.post('/dcodex/ajax/title-json/', { manuscript_id:manuscript_id, verse_id:verse_id }, function(data) {
         $(document).attr("title", data.title);
         window.history.replaceState("object or string", "Manuscript", data.url);
+        current_verse_url_ref = data.verse_url_ref;
     }, "json");
 }
 
 
 function load_verse( verse_id, manuscript_id ) {
     console.log( "Loading verse: ", verse_id );
+    current_verse_url_ref = verse_id; // This will be replaced by url ref after ajax call
+
     load_comparison( verse_id, manuscript_id );
     load_verse_search_div( verse_id, manuscript_id );
     load_verse_transcription( verse_id, manuscript_id );
