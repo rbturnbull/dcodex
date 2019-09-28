@@ -60,13 +60,13 @@ class Manuscript(PolymorphicModel):
         raise NotImplementedError("Please implement this method")
 
     def render_verse_search( self, request, verse ):
-        return render(request, self.verse_search_template(), {'verse': verse, 'manuscript': self} )
+        return render(request, self.verse_search_template(), {'verse': verse, 'manuscript': self, 'next_verse':self.next_verse(verse), 'prev_verse':self.prev_verse(verse), } )
     
     def location_popup_template(self):
         raise NotImplementedError("Please implement this method")
     
     def render_location_popup( self, request, verse ):
-        return render(request, self.location_popup_template(), {'verse': verse, 'manuscript': self} )
+        return render(request, self.location_popup_template(), {'verse': verse, 'manuscript': self,  'next_verse':self.next_verse(verse), 'prev_verse':self.prev_verse(verse), } )
         
     def transcription( self, verse ):
         return self.transcription_class().objects.filter( manuscript=self, verse=verse ).first()
@@ -165,6 +165,12 @@ class Manuscript(PolymorphicModel):
         y = (my_location_value - page) * (1.0-2*textbox_top) + textbox_top
         
         return VerseLocation(manuscript=self, pdf=location_A.pdf, verse=verse, page=page, y=y, x=0.0)
+    def next_verse(self, verse):
+        return verse.next()
+
+    def prev_verse(self, verse):
+        return verse.prev()
+
 
 class ManuscriptImage():
     page = None
