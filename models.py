@@ -155,8 +155,8 @@ class Manuscript(PolymorphicModel):
         location_A_value = location_A.value( textbox_top ) 
         location_B_value = location_B.value( textbox_top ) 
 
-        distance_verse_location_A = location_A.verse.distance_to(verse)
-        distance_locations_B_location_A = location_A.verse.distance_to(location_B.verse)
+        distance_verse_location_A = self.distance_between_verses( location_A.verse, verse )
+        distance_locations_B_location_A = self.distance_between_verses( location_A.verse, location_B.verse )
 
         value_delta = (distance_verse_location_A)*(location_B_value - location_A_value)/(distance_locations_B_location_A)
     
@@ -170,6 +170,9 @@ class Manuscript(PolymorphicModel):
 
     def prev_verse(self, verse):
         return verse.prev()
+    
+    def distance_between_verses( self, verse1, verse2 ):
+        return verse1.distance_to(verse2)
 
 
 class ManuscriptImage():

@@ -130,8 +130,10 @@ def save_transcription(request):
     
     text = request_dict.get('transcription')
     transcription = manuscript.save_transcription( verse, text )
+    next_verse = manuscript.next_verse( verse )
+    next_verse_id_string = "%d" % (next_verse.id)
     
-    return HttpResponse('')
+    return HttpResponse(next_verse_id_string)
 
 @login_required
 def save_folio_ref(request):

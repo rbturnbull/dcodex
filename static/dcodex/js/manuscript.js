@@ -744,7 +744,7 @@ $( document ).ready(function() {
         var textarea = $( "#transcription" );
         transcription = textarea.val();
         $.post('/dcodex/ajax/save-transcription/', { manuscript_id:current_manuscript_id, verse_id:current_verse_id, transcription:transcription }, function(response) {
-            nextVerseID = parseInt(current_verse_id)+1
+            nextVerseID = parseInt(response)
             console.log( "Progressing to verse: ", nextVerseID );
             load_verse( nextVerseID, current_manuscript_id );
             highlightVerseMarker( nextVerseID, current_manuscript_id );            

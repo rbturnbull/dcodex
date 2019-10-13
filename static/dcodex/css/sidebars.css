@@ -1,0 +1,40 @@
+#middle {
+	position: absolute;
+    top: 0px;
+    bottom: 0px;
+    right: 300px;
+    left: 150px;
+	overflow:scroll;
+	z-index: 3;
+	background-color: white;
+}
+#left_sidebar {
+	position: absolute;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    width: 150px;
+	z-index: 2;
+	background: url("../images/BlackBackground-Tile-01.jpg");
+	background-color: black;
+	color: white;	
+}
+#right_sidebar {
+	position: absolute;
+    top: 0px;
+    bottom: 0px;
+    right: 0px;
+    width: 290px;
+    padding: 5px;
+	overflow:scroll;
+	z-index: 2;
+	background: url("../images/BlackBackground-Tile-01.jpg");
+	background-color: black;
+	color: white;	
+}
+#toggle_right_sidebar {
+    right: 18px;
+}
+#toggle_left_sidebar {
+    left: 18px;
+}
