@@ -6,7 +6,7 @@ from collections import Counter
 from matplotlib import pyplot as plt
 import scipy.spatial.distance as ssd
 import scipy.cluster.hierarchy as hcluster
-
+from collections import defaultdict
 
 def similarity_from_edit_distance( string1, string2, edit_distance ):
     max_length = max(len(string1), len(string2))
@@ -19,8 +19,47 @@ def similaity_levenshtein( string1, string2 ):
     return similarity_from_edit_distance( string1, string2, Levenshtein.distance( string1, string2 ) )
 
 
+def distance_matrix_from_transcriptions( transcriptions, distance_func = Levenshtein.distance ):
+    names = list(transcriptions.keys())
+    count = len(names)
+    
+    # Setup initial empty list for each pair
+    distances = defaultdict( lambda: defaultdict( list ) )
+    
+    for x_index, x_name in enumerate( names ):
+        for verse_id, x_transcription in transcriptions[ x_name  ].items():
+            for y_index in range(x_index + 1, count):
+                y_name = names[y_index]
+                
+                if verse_id not in transcriptions[y_name]:
+                    continue
+                    
+                y_transcription = transcriptions[y_name][verse_id]
+                
+                distance = distance_func( x_transcription, y_transcription )
+                max_length = max(len(x_transcription), len(y_transcription))
+                if max_length == 0:
+                    normalized_distance = 0.0
+                else:
+                    normalized_distance = distance/max_length
+                
+                distances[x_index][y_index].append( normalized_distance )
+            
+    distance_matrix = np.zeros( (count,count) )
+    variance_matrix = np.zeros( (count,count) )
+    for x_index, x_name in enumerate( names ):
+        for y_index in range(x_index + 1, count):
+            distance_array = np.asarray( distances[x_index][y_index] )
+            distance_matrix[x_index][y_index] = np.mean( distance_array )
+            variance_matrix[x_index][y_index] = np.var(  distance_array )
 
-def distance_matrix( manuscripts, verses, distance_func = Levenshtein.distance, verbose = False, triangular = False ):
+            distance_matrix[y_index][x_index] = distance_matrix[x_index][y_index]
+            variance_matrix[y_index][x_index] = variance_matrix[x_index][y_index]
+    return distance_matrix, variance_matrix
+    
+
+
+def distance_matrix_unnormalized( manuscripts, verses, distance_func = Levenshtein.distance, verbose = False, triangular = False ):
     manuscripts_count = len(manuscripts)
     
     
@@ -90,37 +129,40 @@ def dendrogram( filename, manuscripts, verses, distance_func = Levenshtein.dista
     
 
 def clean_siglum(siglum):
+    # TODO Use Translate call
     siglum = siglum.replace("-", "_")
     siglum = siglum.replace(".", "_")
     siglum = siglum.replace("(", "_")
     siglum = siglum.replace(")", "_")
     siglum = siglum.replace(",", "_")
     siglum = siglum.replace(" ", "_")
+    siglum = siglum.replace("+", "_plus")
     return siglum
     
     
-def distance_matrix_nexus( filename, manuscripts, verses, distance_func = Levenshtein.distance ):
-    np_matrix = distance_matrix( manuscripts, verses, distance_func )
-    sigla = [clean_siglum(ms.short_name()) for ms in manuscripts]
-
+def nexus_distance_matrix( filename, distance_matrix, sigla ):
     with open(filename, 'w') as f:
         f.write("#NEXUS\n")
         f.write("Begin taxa;\n")
-        f.write("	Dimensions ntax=%d;\n" % (len(manuscripts)) )
+        f.write("	Dimensions ntax=%d;\n" % (len(sigla)) )
         f.write("	Taxlabels\n" )
-        for row_i in range(len(manuscripts)):
-            f.write("	%s\n" % sigla[row_i] )
+        for row_i in range(len(sigla)):
+            f.write("	%s\n" % clean_siglum(sigla[row_i]) )
         f.write("	;\n" )
         f.write("End;\n" )
         f.write("Begin distances;\n" )
         f.write("	Format triangle=lower labels nodiagonal;\n" )
         f.write("		Matrix\n" )
-        for row_i in range(len(manuscripts)):
-            f.write("%s               " % sigla[row_i] )
+        for row_i in range(len(sigla)):
+            f.write("%s               " % clean_siglum(sigla[row_i]) )
             for column_i in range(row_i):            
-                f.write("%f         " % (np_matrix[row_i][column_i]))                    
+                f.write("%f         " % (distance_matrix[row_i][column_i]))                    
             f.write("\n")
         f.write("	;\n" )
         f.write("End;\n" )
                 
+def nexus_distance_matrix_from_transcriptions( filename, transcriptions, **kwargs ):
+    distance_matrix, _ = distance_matrix_from_transcriptions( transcriptions, **kwargs )
+    sigla = list(transcriptions.keys())
 
+    return nexus_distance_matrix( filename, distance_matrix, sigla )

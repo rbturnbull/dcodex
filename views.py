@@ -42,14 +42,21 @@ def manuscript_verse_view(request, request_siglum, request_verse = None):
     logger.error(manuscript)
     logger.error(request_verse)
 
-    if request_verse and request_verse.isdigit():
+    if request_verse == None:
+        verse = None
+    elif request_verse.isdigit():
         verse = manuscript.verse_from_id( request_verse )        
+    elif request_verse == 'empty':
+        verse = manuscript.first_empty_verse()
     else:
         verse = manuscript.verse_from_string(request_verse)
         
-    transcription = manuscript.transcription( verse )
-    location = manuscript.location( verse )
 
+    location = manuscript.location( verse )
+    if verse is None:
+        verse = location.verse
+    transcription = manuscript.transcription( verse )
+    
     context = {
         'manuscript': manuscript,
         'verse': verse,

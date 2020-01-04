@@ -105,6 +105,26 @@ class Manuscript(PolymorphicModel):
 
     def transcriptions( self ):
         return self.transcription_class().objects.filter( manuscript=self )
+        
+    def transcriptions_range( self, ranges=None, range=None, start=None, end=None ):
+        if ranges is None:
+            if range is None:
+                range = [start, end]
+            ranges = [range]
+
+        transcriptions = []
+        for range in ranges:
+            transcriptions_set = self.transcriptions()
+            if range[0] is not None:
+                transcriptions_set.filter( verse__id__gte = range[0].id )
+            if range[1] is not None:
+                transcriptions_set.filter( verse__id__lte = range[1].id )
+            transcriptions += transcriptions_set.all()
+        
+        return transcriptions
+        
+    def transcriptions_range_dict( self, **kwargs ):
+        return { transcription.verse.id : transcription.transcription for transcription in self.transcriptions_range( **kwargs ) }
     
     def location_before_or_equal( self, verse ):
         try:
@@ -158,11 +178,22 @@ class Manuscript(PolymorphicModel):
         distance_verse_location_A = self.distance_between_verses( location_A.verse, verse )
         distance_locations_B_location_A = self.distance_between_verses( location_A.verse, location_B.verse )
 
+        if distance_locations_B_location_A == 0:
+            return location_A
         value_delta = (distance_verse_location_A)*(location_B_value - location_A_value)/(distance_locations_B_location_A)
     
         my_location_value = location_A_value + value_delta
         page = int(my_location_value)
         y = (my_location_value - page) * (1.0-2*textbox_top) + textbox_top
+        
+        
+        if False:
+            logger = logging.getLogger(__name__)            
+            logger.error( str(location_A) )
+            logger.error( str(location_B) )
+            logger.error( str(distance_verse_location_A) )
+            logger.error( str(distance_locations_B_location_A) )
+        
         
         return VerseLocation(manuscript=self, pdf=location_A.pdf, verse=verse, page=page, y=y, x=0.0)
     def next_verse(self, verse):
@@ -360,6 +391,10 @@ class Verse(PolymorphicModel):
     @classmethod
     def get_from_string( cls, verse_as_string ):
         return None
+    # Override
+    @classmethod
+    def get_range_from_strings( cls, verse_as_string1, verse_as_string2 ):
+        return [cls.get_from_string( verse_as_string1 ), cls.get_from_string( verse_as_string2 ) ]
 
     @classmethod
     def get_from_dict( cls, dictionary ):
