@@ -161,8 +161,25 @@ def nexus_distance_matrix( filename, distance_matrix, sigla ):
         f.write("	;\n" )
         f.write("End;\n" )
                 
+def revbayes_distance_matrix( filename, distance_matrix, sigla ):
+    sigla_cleaned = [clean_siglum(siglum) for siglum in sigla]
+    with open(filename, 'w') as f:
+        d = " "
+        f.write("%s\n" % d.join(sigla_cleaned) )
+    
+        for index, siglum in enumerate( sigla_cleaned ):
+            distances = d.join( [str(distance_matrix[index][x]*1000.0) for x in range(len(distance_matrix[index]))] )
+            f.write("%s%s%s\n" % ( siglum, d, distances ) )
+                
 def nexus_distance_matrix_from_transcriptions( filename, transcriptions, **kwargs ):
     distance_matrix, _ = distance_matrix_from_transcriptions( transcriptions, **kwargs )
     sigla = list(transcriptions.keys())
 
     return nexus_distance_matrix( filename, distance_matrix, sigla )
+
+def revbayes_distance_matrix_from_transcriptions( distance_filename, variance_filename, transcriptions, **kwargs ):
+    distance_matrix, variance_matrix = distance_matrix_from_transcriptions( transcriptions, **kwargs )
+    sigla = list(transcriptions.keys())
+
+    revbayes_distance_matrix( distance_filename, distance_matrix, sigla )
+    revbayes_distance_matrix( variance_filename, variance_matrix, sigla )    

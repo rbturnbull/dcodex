@@ -116,10 +116,12 @@ class Manuscript(PolymorphicModel):
         for range in ranges:
             transcriptions_set = self.transcriptions()
             if range[0] is not None:
-                transcriptions_set.filter( verse__id__gte = range[0].id )
+                transcriptions_set = transcriptions_set.filter( verse__id__gte = range[0].id )
             if range[1] is not None:
-                transcriptions_set.filter( verse__id__lte = range[1].id )
+                transcriptions_set = transcriptions_set.filter( verse__id__lte = range[1].id )
+            
             transcriptions += transcriptions_set.all()
+            print(  'range', range[0].id, range[1].id, len(transcriptions))
         
         return transcriptions
         
