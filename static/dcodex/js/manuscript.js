@@ -5,6 +5,8 @@ var current_verse_id;
 var pageImageController = null;
 var current_verse_url_ref = null;
 
+var text_modified = false;
+
 function setLoadVerseLink() {
     $( ".loadVerseLink" ).click(function(e) {
         verse_id = $(this).data('verseid');
@@ -403,6 +405,7 @@ function load_comparison(verse_id, manuscript_id) {
             var text = textarea.val();				
             text+=transcription
             setTranscription(text);
+            text_modified = true;
             return false;
         });
 //        $(".comparison_manuscript_name").click(function(e) {
@@ -591,6 +594,7 @@ function load_verse_transcription(verse_id, manuscript_id) {
         resetTranscriptionFont();
         setTranscription(response);
         textarea.focus();			
+        text_modified = false;
         console.log("TranscriptionText Response: "+response);
     });
 }
@@ -752,5 +756,13 @@ $( document ).ready(function() {
 
         return false;
     });
+    $( "#transcription" ).change(function() {
+        text_modified = true;
+    });
+    window.onbeforeunload = function(){
+        if (text_modified) {
+            return 'Are you sure you want to leave?';
+        }
+    };
 
 });

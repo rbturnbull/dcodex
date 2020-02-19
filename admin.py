@@ -22,7 +22,8 @@ class MembershipAdmin(admin.ModelAdmin):
 class VerseTranscriptionChildAdmin(PolymorphicChildModelAdmin):
     base_model = VerseTranscription
     show_in_index = True  # makes child model admin visible in main admin site
-    
+    search_fields = ('manuscript__siglum', 'transcription')
+
     # By using these `base_...` attributes instead of the regular ModelAdmin `form` and `fieldsets`,
     # the additional fields of the child models are automatically added to the admin form.
     '''

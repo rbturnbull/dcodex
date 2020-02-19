@@ -8,6 +8,8 @@ import os
 import glob
 import logging
 
+from .strings import normalize_transcription
+from .distance import similarity_levenshtein, similarity_damerau_levenshtein, similarity_ratcliff_obershelp, similarity_jaro
 
 def facsimile_dir():
     return settings.MEDIA_ROOT
@@ -56,6 +58,14 @@ class Manuscript(PolymorphicModel):
     def verse_from_dict(cls, dictionary):
         return cls.verse_class().get_from_dict( dictionary )
 
+    @classmethod
+    def find(cls, description):
+        manuscript = cls.objects.filter( siglum=description ).first()
+        if manuscript:
+            return manuscript
+        return cls.objects.filter( name=description ).first()
+        
+
     def verse_search_template(self):
         raise NotImplementedError("Please implement this method")
 
@@ -70,6 +80,12 @@ class Manuscript(PolymorphicModel):
         
     def transcription( self, verse ):
         return self.transcription_class().objects.filter( manuscript=self, verse=verse ).first()
+
+    def normalized_transcription( self, verse ):
+        transcription = self.transcription(verse)
+        if transcription:
+            return transcription.normalize()
+        return None
 
     def comparison_texts( self, verse, manuscripts = None ):
         if manuscripts is None:
@@ -106,6 +122,8 @@ class Manuscript(PolymorphicModel):
     def transcriptions( self ):
         return self.transcription_class().objects.filter( manuscript=self )
         
+    def normalized_transcriptions_dict( self ):
+        return {transcription.id:transcription.normalize(  ) for transcription in self.transcriptions()}
     def transcriptions_range( self, ranges=None, range=None, start=None, end=None ):
         if ranges is None:
             if range is None:
@@ -458,7 +476,21 @@ class VerseTranscriptionBase(PolymorphicModel):
     transcription = models.CharField(max_length=1024)
     def __str__(self):
         return "%s in %s: %s" % (self.verse.reference(abbreviation=True), self.manuscript.short_name(), self.transcription )
+    def normalize(self):
+        return normalize_transcription( self.transcription )
 
+    def similarity( self, comparison_transcription, similarity_func = None ):
+        return similarity_func( self.normalize(), comparison_transcription.normalize() )
+
+    def similarity_levenshtein( self, comparison_transcription ):
+        return self.similarity( comparison_transcription, similarity_levenshtein )
+    def similarity_damerau_levenshtein( self, comparison_transcription ):
+        return self.similarity( comparison_transcription, similarity_damerau_levenshtein )
+    def similarity_ratcliff_obershelp( self, comparison_transcription ):
+        return self.similarity( comparison_transcription, similarity_ratcliff_obershelp )
+    def similarity_jaro( self, comparison_transcription ):
+        return self.similarity( comparison_transcription, similarity_jaro )
+        
 class VerseTranscription(VerseTranscriptionBase):
     def __str__(self):
         return super(VerseTranscription, self).__str__()

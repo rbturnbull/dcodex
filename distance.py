@@ -8,15 +8,32 @@ import scipy.spatial.distance as ssd
 import scipy.cluster.hierarchy as hcluster
 from collections import defaultdict
 
+from pyxdameraulevenshtein import damerau_levenshtein_distance
+import difflib
+
+
 def similarity_from_edit_distance( string1, string2, edit_distance ):
     max_length = max(len(string1), len(string2))
     if max_length == 0:
         return 1.0
-    return (max_length-edit_distance)/max_length
+    return (max_length-edit_distance)/max_length*100.0
 
 
-def similaity_levenshtein( string1, string2 ):
+def similarity_levenshtein( string1, string2 ):
     return similarity_from_edit_distance( string1, string2, Levenshtein.distance( string1, string2 ) )
+
+def similarity_damerau_levenshtein( string1, string2 ):
+    return similarity_from_edit_distance( string1, string2, damerau_levenshtein_distance( string1, string2 ) )
+
+def similarity_ratcliff_obershelp( string1, string2 ):
+
+    s1 = difflib.SequenceMatcher(None, string1, string2 )
+    s2 = difflib.SequenceMatcher(None, string2, string1 )
+    return (s1.ratio( )+s2.ratio()) * 50.0;
+
+def similarity_jaro( string1, string2 ):
+    return Levenshtein.jaro( string1, string2 )*100.0;
+
 
 
 def distance_matrix_from_transcriptions( transcriptions, distance_func = Levenshtein.distance ):
