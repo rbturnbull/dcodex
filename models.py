@@ -160,7 +160,7 @@ class Manuscript(PolymorphicModel):
     def first_location( self, pdf ):
         return VerseLocation.objects.filter( manuscript=self, pdf=pdf ).order_by('verse__id').first()
 
-    def location( self, verse ):
+    def location( self, verse, verbose=False ):
         if not verse:
             return VerseLocation.objects.filter( manuscript=self ).order_by('-verse__id').first()                    
             
@@ -207,7 +207,7 @@ class Manuscript(PolymorphicModel):
         y = (my_location_value - page) * (1.0-2*textbox_top) + textbox_top
         
         
-        if False:
+        if verbose:
             logger = logging.getLogger(__name__)            
             logger.error( str(location_A) )
             logger.error( str(location_B) )
@@ -389,7 +389,7 @@ class Verse(PolymorphicModel):
     def reference(self, abbreviation = False, end_verse=None):
         if end_verse != None:
             return "%s–%s" % (self.reference( abbreviation=abbreviation ), end_verse.reference( abbreviation=abbreviation ) )
-        return "%d" % (verse.pk)
+        return "%d" % (self.pk)
     def reference_abbreviation(self):
         return self.reference(abbreviation = True)
     

@@ -34,3 +34,17 @@ body {
 	box-shadow: 0px 0px 55px #000;
 
 }
+.popup {
+	display:none;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    background-color: #eee;
+	font-family: 'Noto Sans', sans-serif;
+	border-radius: 6px;
+    border: 2px solid #007AFF;
+    border: 2px solid red;    
+	padding: 10px;
+	z-index: 2000000;
+    box-shadow:0 2px 4px rgba(0, 0, 0, 0.5);	
+}

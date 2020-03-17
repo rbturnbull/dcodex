@@ -138,7 +138,8 @@ def save_transcription(request):
     text = request_dict.get('transcription')
     transcription = manuscript.save_transcription( verse, text )
     next_verse = manuscript.next_verse( verse )
-    next_verse_id_string = "%d" % (next_verse.id)
+    next_verse_id_string = "%d" % (next_verse.id if next_verse else verse.id)
+    
     
     return HttpResponse(next_verse_id_string)
 
