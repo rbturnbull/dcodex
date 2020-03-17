@@ -121,6 +121,10 @@ class Manuscript(PolymorphicModel):
 
     def transcriptions( self ):
         return self.transcription_class().objects.filter( manuscript=self )
+                
+    def verse_ids_with_locations(self):
+        # See https://docs.djangoproject.com/en/3.0/ref/models/querysets/#values-list
+        return VerseLocation.objects.filter( manuscript=self ).values_list('verse__id', flat=True)
         
     def normalized_transcriptions_dict( self ):
         return {transcription.id:transcription.normalize(  ) for transcription in self.transcriptions()}
@@ -160,7 +164,7 @@ class Manuscript(PolymorphicModel):
     def first_location( self, pdf ):
         return VerseLocation.objects.filter( manuscript=self, pdf=pdf ).order_by('verse__id').first()
 
-    def location( self, verse, verbose=False ):
+    def location( self, verse, verbose=True ):
         if not verse:
             return VerseLocation.objects.filter( manuscript=self ).order_by('-verse__id').first()                    
             
@@ -209,10 +213,10 @@ class Manuscript(PolymorphicModel):
         
         if verbose:
             logger = logging.getLogger(__name__)            
-            logger.error( str(location_A) )
-            logger.error( str(location_B) )
-            logger.error( str(distance_verse_location_A) )
-            logger.error( str(distance_locations_B_location_A) )
+            logger.error( "Location A: %s " % str(location_A) )
+            logger.error( "Location B: %s " % str(location_B) )
+            logger.error( "distance_verse_location_A: %s " % str(distance_verse_location_A) )
+            logger.error( "distance_locations_B_location_A: %s " % str(distance_locations_B_location_A) )
         
         
         return VerseLocation(manuscript=self, pdf=location_A.pdf, verse=verse, page=page, y=y, x=0.0)
