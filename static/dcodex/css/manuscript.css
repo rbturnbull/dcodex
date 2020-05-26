@@ -328,6 +328,17 @@ body {
 .loadVerseLink {
 	cursor: pointer;
 }
+.loadVerseLink:hover {
+    color: red;
+}
+
+
+.link {
+	cursor: pointer;
+    color: rgba(0, 122, 255, 1.0); 
+
+}
+
 #locationOptions{
 	display:none;
     position: absolute;

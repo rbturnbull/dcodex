@@ -176,7 +176,7 @@ def verse_ref_at_position(request):
     y            = float(request_dict.get('y'))
     
     verse = manuscript.approximate_verse_at_position( pdf, page, x, y )
-    return HttpResponse( str(verse) )
+    return render(request, 'dcodex/approx_verse.html', {'verse': verse} )
 
 @login_required
 def delete_location(request):

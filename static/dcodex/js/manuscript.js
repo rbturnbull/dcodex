@@ -257,7 +257,9 @@ function setup_manuscript_image_click() {
 		var height = $('#locationOptions').height();
 		var width = $('#locationOptions').width();
 		
-        $('#approximateVerseFromPosition').load("/dcodex/ajax/verse_ref_at_position/", {'manuscript_id':current_manuscript_id, 'pdf_filename':current_pdf_filename, 'page':page, 'x':x0, 'y':y0 }, function() {});
+        $('#approximateVerseFromPosition').load("/dcodex/ajax/verse_ref_at_position/", {'manuscript_id':current_manuscript_id, 'pdf_filename':current_pdf_filename, 'page':page, 'x':x0, 'y':y0 }, function() {
+            setLoadVerseLink();
+        });
 		
 		var locationOptionsY = e.pageY -height - 80;
 		var locationOptionsX = e.pageX -width*0.5;
