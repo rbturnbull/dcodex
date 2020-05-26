@@ -23,6 +23,7 @@ urlpatterns = [
     path('ajax/save-transcription/', views.save_transcription, name='dcodex-save-transcription'),   
     path('ajax/delete-location/', views.delete_location, name='dcodex-delete-location'),   
     path('ajax/title-json/', views.title_json, name='dcodex-title-json'),   
+    path('ajax/verse_ref_at_position/', views.verse_ref_at_position, name='dcodex-verse_ref_at_position'),   
     
     
 ]

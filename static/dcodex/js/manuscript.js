@@ -255,7 +255,9 @@ function setup_manuscript_image_click() {
 		$("#marker").data("x0", x0);		
 
 		var height = $('#locationOptions').height();
-		var width = $('#locationOptions').width();	
+		var width = $('#locationOptions').width();
+		
+        $('#approximateVerseFromPosition').load("/dcodex/ajax/verse_ref_at_position/", {'manuscript_id':current_manuscript_id, 'pdf_filename':current_pdf_filename, 'page':page, 'x':x0, 'y':y0 }, function() {});
 		
 		var locationOptionsY = e.pageY -height - 80;
 		var locationOptionsX = e.pageX -width*0.5;
@@ -282,9 +284,9 @@ function setup_manuscript_image_click() {
 		$('#locationOptions').show();
 		$('input[name=locationOptionsY]').val(locationOptionsY);
 		$('input[name=locationOptionsX]').val(locationOptionsX);
-		$('#approximateVerseFromPosition').load("/ApproximateVerseFromPosition.php?manuscript=manuscriptID&msPDF=pdf&pageNumber="+page+"&y0="+y0, function() {
+//		$('#approximateVerseFromPosition').load("/ApproximateVerseFromPosition.php?manuscript=manuscriptID&msPDF=pdf&pageNumber="+page+"&y0="+y0, function() {
 			//setLoadVerseLink();
-		});
+//		});
 		$('#saveLocation').focus();		
 	});    
 }
@@ -453,7 +455,7 @@ $( "#directionToggle" ).click(function(e) {
     }
     else {
         setTranscriptionRTL();
-    }
+    }    
 });
 
 function resetTranscriptionFont() {
@@ -465,6 +467,8 @@ function setTranscription( text ) {
 
     $('#transcription').val(text);
     resizeTranscription();
+    setTranscriptionRTL(); // hack for rob's system
+    
     if ( text.length == 0 )
         return;
     if ( isRTL(text) ) {
@@ -475,6 +479,8 @@ function setTranscription( text ) {
 //			alert('ltr');		
         setTranscriptionLTR();
     }
+    setTranscriptionRTL(); // hack for rob's system
+    
 }
 
 function resizeTranscription( ) {
@@ -560,7 +566,7 @@ function load_verse_location_popup(verse_id, manuscript_id) {
             var x = $("#marker").data("x0");		
             console.log("SaveLocation try: ");
 //            alert("verse_id:"+verse_id+", manuscript_id: "+manuscript_id+", current_pdf_filename: "+current_pdf_filename+" page: "+page+" y:"+y+" x:"+x);
-            $.post('/dcodex/ajax/save-location/', { manuscript_id:manuscript_id, verse_id:verse_id, pdf_filename:current_pdf_filename, page:page, y:y, x:x }, function(response) {
+            $.post('/dcodex/ajax/save-location/', { manuscript_id:manuscript_id, verse_id:current_verse_id, pdf_filename:current_pdf_filename, page:page, y:y, x:x }, function(response) {
                 loadVerseMarker(response);
                 highlightVerseMarker(verse_id);	    
                 console.log("SaveLocation Response: "+response);
@@ -612,13 +618,13 @@ function load_verse( verse_id, manuscript_id ) {
     console.log( "Loading verse: ", verse_id );
     current_verse_url_ref = verse_id; // This will be replaced by url ref after ajax call
 
+    current_verse_id = verse_id;
+
     load_comparison( verse_id, manuscript_id );
     load_verse_search_div( verse_id, manuscript_id );
     load_verse_transcription( verse_id, manuscript_id );
     load_verse_to_title( verse_id, manuscript_id );
-    load_verse_location_popup( verse_id, manuscript_id );
-    
-    current_verse_id = verse_id;
+    load_verse_location_popup( verse_id, manuscript_id );    
 }
 function seekVerse( verse_id, manuscript_id ) {
     $('#marker').data("keepLocation", false);	

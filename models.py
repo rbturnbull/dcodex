@@ -7,9 +7,12 @@ from django.db.models import Max, Min
 import os
 import glob
 import logging
-
+import pandas as pd
+import numpy as np
+import gotoh_scores
 from .strings import normalize_transcription
 from .distance import similarity_levenshtein, similarity_damerau_levenshtein, similarity_ratcliff_obershelp, similarity_jaro
+from scipy.special import expit
 
 def facsimile_dir():
     return settings.MEDIA_ROOT
@@ -17,8 +20,11 @@ def facsimile_dir():
 
 # Create your models here.
 class Manuscript(PolymorphicModel):
-    name = models.CharField(max_length=200, blank=True)
-    siglum = models.CharField(max_length=20, blank=True)
+    """ An abstract class used for bringing together all the elements of a document. 
+    """
+
+    name = models.CharField(max_length=200, blank=True, help_text='A descriptive string for this manuscript.')
+    siglum = models.CharField(max_length=20, blank=True, help_text='A unique short string for this manuscript.')
     def __str__(self):
         if self.name and self.siglum:
             if self.name == self.siglum:
@@ -94,11 +100,16 @@ class Manuscript(PolymorphicModel):
         return self.transcription_class().objects.filter( verse=verse, manuscript__in=manuscripts ).all()                
 
     def save_transcription( self, verse, text ):
-        transcription, created = self.transcription_class().objects.update_or_create(
-            manuscript=self, 
-            verse=verse, 
-            defaults={"transcription": text}
-        )
+        try:
+            transcription, created = self.transcription_class().objects.update_or_create(
+                manuscript=self, 
+                verse=verse, 
+                defaults={"transcription": text}
+            )
+        except:
+            self.transcription_class().objects.filter(manuscript=self, verse=verse).delete()
+            return self.save_transcription( verse, text )
+
         return transcription
 
     def title_dict( self, verse ):
@@ -120,7 +131,7 @@ class Manuscript(PolymorphicModel):
         return location
 
     def transcriptions( self ):
-        return self.transcription_class().objects.filter( manuscript=self )
+        return self.transcription_class().objects.filter( manuscript=self ).order_by( 'verse__rank' )
                 
     def verse_ids_with_locations(self):
         # See https://docs.djangoproject.com/en/3.0/ref/models/querysets/#values-list
@@ -143,7 +154,7 @@ class Manuscript(PolymorphicModel):
                 transcriptions_set = transcriptions_set.filter( verse__id__lte = range[1].id )
             
             transcriptions += transcriptions_set.all()
-            print(  'range', range[0].id, range[1].id, len(transcriptions))
+            #print(  'range', range[0].id, range[1].id, len(transcriptions))
         
         return transcriptions
         
@@ -163,8 +174,115 @@ class Manuscript(PolymorphicModel):
         return VerseLocation.objects.filter( manuscript=self, pdf=pdf ).order_by('-verse__id').first()
     def first_location( self, pdf ):
         return VerseLocation.objects.filter( manuscript=self, pdf=pdf ).order_by('verse__id').first()
+        
+    def location_above( self, pdf, page, y ):
+        # Search on this page
+        location = VerseLocation.objects.filter( manuscript=self, pdf=pdf, page=page, y__lte=y ).order_by('-y').first()
+        if location:
+            return location
+        # Search on previous pages
+        location = VerseLocation.objects.filter( manuscript=self, pdf=pdf, page__lt=page ).order_by('-page','-y').first()
+        return location
+
+    def location_below( self, pdf, page, y ):
+        # Search on this page
+        location = VerseLocation.objects.filter( manuscript=self, pdf=pdf, page=page, y__gte=y ).order_by('y').first()
+        if location:
+            return location
+        # Search on previous pages
+        location = VerseLocation.objects.filter( manuscript=self, pdf=pdf, page__gt=page ).order_by('page','y').first()
+        return location
+
+        
+    def gotoh_counts_verses( self, ms, verses, gotoh_param=(0,-1,-1,-1) ):
+        total_counts = np.zeros( (4,) )
+        for verse in verses:            
+            transcription1 = self.normalized_transcription(verse)
+            transcription2 = ms.normalized_transcription(verse)
+            if transcription1 and transcription2:
+                counts = gotoh_scores.scores( transcription1, transcription2, *gotoh_param )
+                print(verse, counts)
+                total_counts += np.asarray( counts[1:] )
+        return total_counts
+
+    def compare_transcriptions( self, weights, prior_log_odds=0.0, **kwargs ):
+        counts = self.gotoh_counts_verses( **kwargs )
+        length = counts.sum()
+        similarity = counts[0]/length*100.0 if length > 0 else np.NAN
+        logodds = prior_log_odds + np.dot( counts, weights )
+        prob = expit( logodds )
+        return similarity, prob, logodds
+                       
+    def gotoh_counts( self, mss=None, transcriptions=None, gotoh_param=(0,-1,-1,-1) ):
+        if transcriptions is None:
+            transcriptions = self.transcriptions()
+        if mss is None:
+            print("You need to specify the manuscripts ('mss') to compare with.")
+            raise KeyError
+            
+        columns = ['verse__id', 'verse__rank', 'verse_description']
+        for ms in mss:
+            columns += [ms.siglum+"_m", ms.siglum+"_d", ms.siglum+"_g",ms.siglum+"_e" ]
+        df = pd.DataFrame( columns=columns )
+        for transcription in transcriptions:
+            row = {'verse__id':transcription.verse.id, 'verse__rank':transcription.verse.rank, 'verse_description':str(transcription.verse) }
+            normalized_transcription = transcription.normalize()
+            for ms in mss:
+                ms_transcription = ms.transcription( transcription.verse )
+                if ms_transcription:
+                    counts = gotoh_scores.scores( normalized_transcription, ms_transcription.normalize(), *gotoh_param )
+                else:
+                    counts = (0,0,0,0,0)
+                row[ms.siglum+"_m"] = counts[1]
+                row[ms.siglum+"_d"] = counts[2]
+                row[ms.siglum+"_g"] = counts[3]
+                row[ms.siglum+"_e"] = counts[4]
+                
+            df = df.append(row, ignore_index=True)
+                    
+        return df
+
+    def rolling_average_gotoh_counts( self, window=4, **kwargs ):
+        df = self.gotoh_counts( **kwargs )        
+        columns = df.columns
+        
+        def average_over_window( row ):
+            rank = row['verse__rank']            
+            window_df = df[ (df['verse__rank'] >= rank - window) & (df['verse__rank'] <= rank + window) ]
+            values = [row[x] for x in columns[:3]] + [window_df[x].sum() for x in columns[3:]]
+            return pd.Series( values, columns )
+            
+        return df.apply( average_over_window, axis=1 )
+        
+    def rolling_average_probability( self, weights, mss, prior_log_odds=0.0, **kwargs ):
+        weights = np.asarray( weights )    
+        df = self.rolling_average_gotoh_counts( mss=mss, **kwargs )
+        
+        columns = list(df.columns[:3])
+        for ms in mss:
+            columns += [ms.siglum+"_length", ms.siglum+"_similarity", ms.siglum+"_logodds", ms.siglum+"_probability" ]
+        
+        def compute_posterior( row ):
+            values = [row[x] for x in columns[:3]]
+            for ms in mss:
+                counts = np.asarray( [row[ms.siglum+"_m"], row[ms.siglum+"_d"], row[ms.siglum+"_g"], row[ms.siglum+"_e"]] )
+                length = counts.sum()
+                similarity = counts[0]/length*100.0 if length > 0 else np.NAN
+                logodds = prior_log_odds + np.dot( counts, weights )
+                prob = expit( logodds )
+                values += [length, similarity, logodds, prob]
+            return pd.Series( values, columns )
+        
+        return df.apply( compute_posterior, axis=1 )
+                
 
     def location( self, verse, verbose=True ):
+        """ Finds (or estimates) the location of a verse in a manuscript.
+        
+        If the location is already tagged in the manuscript, the saved location is returned from the database. 
+        If not, then it estimates the location of the verse via interpolation or extrapolation 
+        """
+        
         if not verse:
             return VerseLocation.objects.filter( manuscript=self ).order_by('-verse__id').first()                    
             
@@ -178,6 +296,7 @@ class Manuscript(PolymorphicModel):
         if location_A is None:
             location_A = self.location_after( verse )
             if location_A is None: 
+                # No verses have been transcribed, then nothing is known about locations in the manuscript and so return nothing
                 return None
 
             location_B = self.last_location( pdf=location_A.pdf )
@@ -191,7 +310,7 @@ class Manuscript(PolymorphicModel):
                 if location_A is None or location_A.id == location_B.id:
                     return location_B
     
-        if location_A.pdf != location_B.pdf:
+        if location_A.pdf != location_B.pdf: # Hack for different PDFs. This out to be fixed
             return location_A
     
         textbox_top = VerseLocation.textbox_top(self)
@@ -221,14 +340,58 @@ class Manuscript(PolymorphicModel):
         
         return VerseLocation(manuscript=self, pdf=location_A.pdf, verse=verse, page=page, y=y, x=0.0)
     def next_verse(self, verse):
+        """ Returns the next verse after the specified verse in this manuscript. """
         return verse.next()
 
     def prev_verse(self, verse):
+        """ Returns the next verse after the specified verse in this manuscript. """    
         return verse.prev()
     
     def distance_between_verses( self, verse1, verse2 ):
         return verse1.distance_to(verse2)
 
+
+
+    def approximate_verse_at_position( self, pdf, page, x, y ):
+        """ Estimates the verse at a particular location """
+        location_A = self.location_above( pdf, page, y )
+        
+        # Find two locations to interpolate from
+        if location_A is None:
+            location_A = self.location_below( pdf, page, y )
+            if location_A is None: 
+                # No verses have been transcribed, then nothing is known about locations in the manuscript and so return nothing
+                return None
+
+            location_B = self.last_location( pdf=location_A.pdf )
+            if location_B is None or location_B.id == location_A.id:
+                return location_A
+        else:
+            location_B = self.location_below( pdf, page, y )
+            if location_B is None:
+                location_B = location_A;
+                location_A = self.first_location( location_B.pdf )
+                if location_A is None or location_A.id == location_B.id:
+                    return location_B
+    
+        if location_A.pdf != location_B.pdf: # Hack for different PDFs. This out to be fixed
+            return location_A
+
+        textbox_top = VerseLocation.textbox_top(self)
+
+        location_A_value = location_A.value( textbox_top ) 
+        location_B_value = location_B.value( textbox_top ) 
+        
+        target_value = page + ( y - textbox_top )/(1.0-2*textbox_top)
+        
+        additional_mass = self.distance_between_verses( location_A.verse, location_B.verse ) * (target_value - location_A_value)/(location_B_value - location_A_value)
+        return self.verse_from_mass_difference( location_A.verse, additional_mass )
+        
+    def verse_from_mass_difference( self, reference_verse, additional_mass ):
+        """Default implementation assuming mass of each verse = 1 and that the verses are ordered according to the verse id"""
+        verse_id = reference_verse.id + int(additional_mass)
+        return self.verse_class().objects.filter( id=verse_id ).first()
+                
 
 class ManuscriptImage():
     page = None
@@ -241,6 +404,7 @@ class ManuscriptImage():
     def __hash__(self):
         return hash((self.page, self.src, self.folio))
     
+# TODO Refactor as 'Facsimile' class and add 'PDFFacsimile' class using qpdf and ImageMagick.
 class PDF(models.Model):
     filename = models.CharField(max_length=200)
     page_count = models.IntegerField(blank=True, null=True, default=None)
@@ -386,42 +550,103 @@ class Page(models.Model):
     
     
 class Verse(PolymorphicModel):
-    rank = models.IntegerField()
+    """ An abstract class used for the smallest textual unit appropriate for the manuscript type. 
+    Each Verse object ought only occur once per manuscript. 
+    For each possible verse, there must be an instance of a child-class of Verse saved in the database. 
+    """
+
+    rank = models.IntegerField(help_text="An integer to enable sorting of the verses (deprecated)") # Is this necessary??
+    
+    
     def __str__(self):
         return self.reference()
     
     def reference(self, abbreviation = False, end_verse=None):
+        """ Returns a unique reference for this verse as a string.
+        
+        :param abbreviation: If set to True, the method returns an abbreviated form of the reference (e.g. 'Mt 1:1'). Like the unabbreviated reference, this must be unique for this verse instance.
+        :type abbreviation: Boolean
+        :param abbreviation: If provided, the method returns the reference as a range between 'self' and 'end_verse'
+        :type abbreviation: `dcodex.Verse`
+        :return: The reference string. For example 'Matthew 1:1'.
+        :rtype: String
+        """    
         if end_verse != None:
             return "%s–%s" % (self.reference( abbreviation=abbreviation ), end_verse.reference( abbreviation=abbreviation ) )
         return "%d" % (self.pk)
+    def url_ref(self):
+        """ Returns a unique reference for this verse as a string that is appropriate to use in a URL. The default implementation is to use the unabbreviated reference string and remove spaces."""
+        return self.reference_abbreviation().replace(" ", '')
+
     def reference_abbreviation(self):
+        """Returns the reference string with the abbreviation option set to True. 
+        
+        This is useful for Django templates where giving arguments to functions is not always simple
+        """
         return self.reference(abbreviation = True)
+
     
+    # Should this be here? This should be handled by the manuscript
     def next(self):
+        """Deprecated.
+
+        This should be handled by the Manuscript.
+        """
         return self.__class__.objects.filter( rank__gt=self.rank ).order_by('rank').first()
 
+    # Should this be here? This should be handled by the manuscript
     def prev(self):
+        """Deprecated.
+
+        This should be handled by the Manuscript.
+        """
         return self.__class__.objects.filter( rank__lt=self.rank ).order_by('-rank').first()
 
+    # Should this be here? This should be handled by the manuscript
     def cumulative_mass(self):
-        return self.rank
-        
-    def distance_to(self, other_verse):
-        return other_verse.cumulative_mass() - self.cumulative_mass()
+        """Deprecated.
 
-    def url_ref(self):
-        return self.reference_abbreviation().replace(" ", '')
+        This should be handled by the Manuscript.
+        """
+        return self.rank
+
+    # Should this be here? This should be handled by the manuscript        
+    def distance_to(self, other_verse):
+        """Deprecated.
+
+        This should be handled by the Manuscript.
+        """
+        return other_verse.cumulative_mass() - self.cumulative_mass()
 
     @classmethod
     def get_from_string( cls, verse_as_string ):
+        """ Locates a `dcodex.Verse` object instance from a string.
+        
+        As a minimum this method must be able to interpret the unique reference string (with any abbreviation option if appropriate). This function is used to find verses embedded in a URL.
+        
+        :param verse_as_string: A reference string for the sought-after verse.
+        :type verse_as_string: String
+        :return: The verse associated with that string. If none exists, then it returns None.
+        :rtype: `dcodex.Verse`
+        """        
         return None
-    # Override
+
     @classmethod
     def get_range_from_strings( cls, verse_as_string1, verse_as_string2 ):
+        """ Convenience function that returns a two-element list with the two verses associated with the two strings """
         return [cls.get_from_string( verse_as_string1 ), cls.get_from_string( verse_as_string2 ) ]
 
     @classmethod
     def get_from_dict( cls, dictionary ):
+        """ Locates a `dcodex.Verse` object instance from a Python dictionary.
+        
+        The keys for the dictionary are determined by the child class.
+        
+        :param dictionary: A dictionary with elements used to find the `dcodex.Verse`.
+        :type dictionary: Dictionary
+        :return: The `dcodex.Verse` associated with that string. If none exists, then it returns None.
+        :rtype: `dcodex.Verse`
+        """            
         return None
         
         
@@ -441,12 +666,14 @@ class Membership(models.Model):
         
     
 class VerseLocation(models.Model):
+    """The 'Location' class joins a manuscript and verse object and associates them with the pixel coordinates on a facsimile image."""
+    
     manuscript = models.ForeignKey(Manuscript, on_delete=models.CASCADE)
     verse = models.ForeignKey(Verse, on_delete=models.CASCADE)
     pdf = models.ForeignKey(PDF, on_delete=models.CASCADE)
     page = models.IntegerField()
-    x = models.FloatField()
-    y = models.FloatField()
+    x = models.FloatField(help_text="The number of horizontal pixels from the left of the facsimile image to the the location of the verse, normalized by the height of the image.")
+    y = models.FloatField(help_text="The number of vertical pixels from the top of the facsimile image to the the location of the verse, normalized by the height of the image.")
     def __str__(self):
         return "%s in %s in %s on p%d at (%0.1g, %0.1g)" % (self.verse.reference(abbreviation=True), self.manuscript.short_name(), self.pdf.__str__(), self.page, self.x, self.y )
 
@@ -475,13 +702,17 @@ class VerseLocation(models.Model):
         
 
 class VerseTranscriptionBase(PolymorphicModel):
-    manuscript = models.ForeignKey(Manuscript, on_delete=models.CASCADE)
-    verse = models.ForeignKey(Verse, on_delete=models.CASCADE)
-    transcription = models.CharField(max_length=1024)
+    """The 'Transcription' class stores the text of a transcribed verse and associates it with the manuscript and verse instances."""
+    
+    manuscript = models.ForeignKey(Manuscript, on_delete=models.CASCADE, help_text='The manuscript this transcription is from.' )
+    verse = models.ForeignKey(Verse, on_delete=models.CASCADE, help_text='The verse of this transcription.')
+    transcription = models.CharField(max_length=1024, help_text='The unnormalized text of this transcription.') # This should be refactored as 'text' and made a TextField.
+    # Should reference a Markup class
+    
     def __str__(self):
         return "%s in %s: %s" % (self.verse.reference(abbreviation=True), self.manuscript.short_name(), self.transcription )
     def normalize(self):
-        return normalize_transcription( self.transcription )
+        return normalize_transcription( self.transcription ) # Should be handled by the markup class 
 
     def similarity( self, comparison_transcription, similarity_func = None ):
         return similarity_func( self.normalize(), comparison_transcription.normalize() )

@@ -1,4 +1,4 @@
-import xml.etree.ElementTree as ET
+from bs4 import BeautifulSoup
 import re
 
 def remove_markup( string ):
@@ -6,26 +6,13 @@ def remove_markup( string ):
     string = re.sub('\{.*?\}', '', string);
     string = string.replace('؟','')
 
-    tree = ET.fromstring("<xml>"+string+"</xml>");
-#		root = tree.getroot()
-#		print("tree text", tree.text)
-#		print("tree tail", tree.tail)		
-    for child in tree:
-#			print("child text", child.text)
-#			print("child tail", child.tail)
-        if child.tag == "add" or child.tag == "del":
-#				print("ADD")
-            child.text = ''
-            #tree.remove(child)
-
-    
-    string = ET.tostring(tree, encoding='utf8', method='text')
-    string = string.decode('utf8')
+    string = BeautifulSoup(string, "lxml").text
+#    string = string.decode('utf8')
 
     return string
 
 def get_punctuation_markers():
-    punctuation = ["❊", "◦", "❇︎", "※", "ᐥ", "܀", "🕂", "⦿", ".", "?", "/", "؟", ",", '\\', '،', '∴']
+    punctuation = ["❊", "◦", "❇︎", "※", "ᐥ", "܀", "🕂", "⦿", ".", "?", "/", "؟", ",", '\\', '،', '∴', ':']
     return punctuation
 
 def standardise_arabic_graphemes( string ):
@@ -47,6 +34,7 @@ def remove_arabic_vocalization( string ):
     string = string.replace('إ','ا')
     string = string.replace('آ','ا')
     string = string.replace('أ','ا')
+    string = string.replace('ئ','ا')
     string = string.replace('ً','ا')
     string = string.replace('ٍ','ا')
     string = string.replace('ؤ','و')
@@ -58,6 +46,10 @@ def remove_arabic_vocalization( string ):
     string = string.replace('ٍ','')
     string = string.replace('ْ','')
     string = string.replace('ٌ','')
+    string = string.replace('⧙','')
+    string = string.replace('ـ','')
+    string = string.replace('ّ','')    
+    
     return string
 
 
@@ -66,10 +58,7 @@ def normalize_transcription( transcription ):
 
     string = remove_arabic_vocalization( string )
     string = remove_punctuation( string )
-    try:
-        string = remove_markup( string )
-    except:
-        pass
+    string = remove_markup( string )    
     string = standardise_arabic_graphemes( string )
 
     return string.strip()

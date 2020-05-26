@@ -161,6 +161,23 @@ def save_folio_ref(request):
     )
     return HttpResponse(created)
 
+
+@login_required
+def verse_ref_at_position(request):
+
+    request_dict = get_request_dict(request)
+
+    manuscript   = get_manuscript( request )
+    
+    pdf          = get_pdf(request)
+    
+    page         = int(request_dict.get('page'))
+    x            = float(request_dict.get('x'))
+    y            = float(request_dict.get('y'))
+    
+    verse = manuscript.approximate_verse_at_position( pdf, page, x, y )
+    return HttpResponse( str(verse) )
+
 @login_required
 def delete_location(request):
     manuscript, verse = get_manuscript_and_verse(request)
@@ -212,6 +229,7 @@ def verse_search(request):
 @login_required
 def location_popup(request):
     manuscript, verse = get_manuscript_and_verse(request)
+
     return manuscript.render_location_popup( request, verse )    
     
 @login_required
