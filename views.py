@@ -194,9 +194,18 @@ def comparison(request):
 #    $dcodex->comparisonTableForGroups($manuscriptID, $verseID, $columns );
     
     reference_mss = request.user.profile.reference_texts.all()
+    
+    renders = []
     profile_reference = template.render({'heading': "Reference", 'comparison_texts': manuscript.comparison_texts( verse, reference_mss )}, request)
+    renders.append( profile_reference )
+    
+    groups = manuscript.groups_at(verse)
+    for group in groups:
+        renders.append( template.render({'heading': group.name, 'comparison_texts': group.transcriptions_at( verse )}, request) )
+        
     all_mss = template.render({'heading': "All Transcribed", 'comparison_texts': manuscript.comparison_texts( verse )}, request)
-    return HttpResponse(profile_reference+all_mss)
+    renders.append( all_mss )    
+    return HttpResponse("".join(renders))
 
 @login_required
 def transcription_mini(request):

@@ -4,19 +4,72 @@ from polymorphic.admin import PolymorphicParentModelAdmin, PolymorphicChildModel
 # Register your models here.
 from .models import *
 
-class MembershipInline(admin.TabularInline):
-    model = Membership
-    extra = 0
-    raw_id_fields = ("start_verse","end_verse")
+#class MembershipInline(admin.TabularInline):
+#    model = Membership
+#    extra = 0
+#    raw_id_fields = ("start_verse","end_verse")
+
+
+class AffiliationChildAdmin(PolymorphicChildModelAdmin):
+    base_model = AffiliationBase  # Optional, explicitly set here.
+
+    # By using these `base_...` attributes instead of the regular ModelAdmin `form` and `fieldsets`,
+    # the additional fields of the child models are automatically added to the admin form.
+#    base_form = 
+#    base_fieldsets = (
+#    )
+
+
+@admin.register(AffiliationAll)
+class AffiliationAllAdmin(AffiliationChildAdmin):
+    base_model = AffiliationAll
+    show_in_index = True  # makes child model admin visible in main admin site
+
+@admin.register(AffiliationRange)
+class AffiliationRangeAdmin(AffiliationChildAdmin):
+    base_model = AffiliationRange
+    raw_id_fields = ("start_verse","end_verse",)    
     
-@admin.register(Group)    
-class GroupAdmin(admin.ModelAdmin):
-    inlines = [MembershipInline]
+    show_in_index = True  # makes child model admin visible in main admin site
+
     
-@admin.register(Membership)    
-class MembershipAdmin(admin.ModelAdmin):
-    autocomplete_fields = []
-    raw_id_fields = ("start_verse","end_verse")
+@admin.register(AffiliationBase)    
+class AffiliationBaseAdmin(PolymorphicParentModelAdmin):
+    base_model = AffiliationBase
+    child_models = (AffiliationAll,)
+    list_filter = (PolymorphicChildModelFilter,)  # This is optional.
+    show_in_index = False
+
+
+class FamilyChildAdmin(PolymorphicChildModelAdmin):
+    base_model = FamilyBase  # Optional, explicitly set here.
+
+    # By using these `base_...` attributes instead of the regular ModelAdmin `form` and `fieldsets`,
+    # the additional fields of the child models are automatically added to the admin form.
+#    base_form = 
+#    base_fieldsets = (
+#    )
+
+@admin.register(FamilyBase)    
+class FamilyBaseAdmin(PolymorphicParentModelAdmin):
+    base_model = FamilyBase
+    child_models = (Family,)
+    list_filter = (PolymorphicChildModelFilter,)  # This is optional.
+    show_in_index = False
+
+
+@admin.register(Family)
+class FamilyAdmin(FamilyChildAdmin):
+    base_model = Family
+    show_in_index = True  # makes child model admin visible in main admin site
+    
+
+
+    
+#@admin.register(Membership)    
+#class MembershipAdmin(admin.ModelAdmin):
+#    autocomplete_fields = []
+#    raw_id_fields = ("start_verse","end_verse")
     
 @admin.register(VerseTranscription)
 class VerseTranscriptionChildAdmin(PolymorphicChildModelAdmin):

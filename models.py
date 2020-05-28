@@ -392,6 +392,30 @@ class Manuscript(PolymorphicModel):
         verse_id = reference_verse.id + int(additional_mass)
         return self.verse_class().objects.filter( id=verse_id ).first()
                 
+    def family_ids_at( self, verse ):
+        """ Returns a set of family ids which are affiliated with this manuscript at this verse. """
+        family_ids = set()
+        checked_family_ids=set() 
+        
+        print('in ms.family_ids_at', verse)
+        print("family_ids", family_ids)
+        for affiliation in self.affiliationbase_set.all():
+            families = affiliation.families_at(verse)
+            print("affiliation.families_at(verse)", affiliation.families_at(verse))
+            for family in families:
+                family_ids.add( family.id )
+                if family.id not in checked_family_ids:
+                    family_ids.update( family.afilliated_family_ids_at(verse, checked_family_ids) )
+        return family_ids
+        
+    def families_at(self, verse):
+        return FamilyBase.objects.filter(id__in=self.family_ids_at(verse))
+
+    def is_in_family_at(self, family, verse):
+        ids = self.family_ids_at(verse)
+        print('inside is_in_family_at', family, verse, '=', ids )
+        return family.id in ids 
+        
 
 class ManuscriptImage():
     page = None
@@ -650,20 +674,9 @@ class Verse(PolymorphicModel):
         return None
         
         
-class Group(PolymorphicModel):
-    name = models.CharField(max_length=200)
-    members = models.ManyToManyField(Manuscript, through='Membership')
-    def __str__(self):
-        return self.name    
-
-class Membership(models.Model):
-    manuscript  = models.ForeignKey(Manuscript, on_delete=models.CASCADE)
-    group       = models.ForeignKey(Group, on_delete=models.CASCADE)
-    start_verse = models.ForeignKey(Verse, on_delete=models.CASCADE, related_name='start_verse', blank=True, null=True, default=None)
-    end_verse   = models.ForeignKey(Verse, on_delete=models.CASCADE, related_name='end_verse', blank=True, null=True, default=None)
-    def __str__(self):
-        return "%s in %s (%s)" % (self.manuscript.short_name(), self.group.name, self.start_verse.reference(abbreviation=True, end_verse=self.end_verse) )
         
+        
+
     
 class VerseLocation(models.Model):
     """The 'Location' class joins a manuscript and verse object and associates them with the pixel coordinates on a facsimile image."""
@@ -729,6 +742,129 @@ class VerseTranscriptionBase(PolymorphicModel):
 class VerseTranscription(VerseTranscriptionBase):
     def __str__(self):
         return super(VerseTranscription, self).__str__()
+    
+class FamilyBase(PolymorphicModel):
+    name = models.CharField(max_length=200)
+    def __str__(self):
+        return self.name    
+                
+    def manuscript_ids_at( self, verse, checked_family_ids=None ):
+        """ Returns a set of manuscript ids which are affiliated with this family at this verse. """
+        if checked_family_ids is None:
+            checked_family_ids = set()
+        checked_family_ids.add( self.id )
+        manuscript_ids = set()
+        for affiliation in self.affiliationbase_set.all():
+            manuscript_ids.update( affiliation.manuscript_ids_at(verse) )
+            families = affiliation.families_at(verse)
+            for family in families:
+                if family.id not in checked_family_ids:
+                    manuscript_ids.update( family.manuscript_ids_at(verse, checked_family_ids) )
+        return manuscript_ids
+    
+    def afilliated_family_ids_at( self, verse, checked_family_ids=None ):
+        """ Returns a set of family ids which are affiliated with this family at this verse (including itself). """    
+        if checked_family_ids is None:
+            checked_family_ids = set()
+        
+        checked_family_ids.add( self.id )
+        
+        family_ids = {self.id}
+        for affiliation in self.affiliationbase_set.all():
+            families = affiliation.families_at(verse)
+            for family in families:
+                family_ids.add(family.id)
+                if family.id not in checked_family_ids:
+                    family_ids.update( family.afilliated_family_ids_at(verse, checked_family_ids) )
+        return family_ids
+    def add_manuscript_to_affiliation( self, affiliation, manuscript ):
+        affiliation.save()
+        affiliation.families.add( self )
+        affiliation.manuscripts.add( manuscript )
+        affiliation.save()        
+        return affiliation
+    
+    def add_family_to_affiliation( self, affiliation, family ):
+        affiliation.save()
+        affiliation.families.add( self )
+        affiliation.families.add( family )
+        affiliation.save()        
+        return affiliation
+    
+    def add_manuscript_all(self, manuscript):
+        """ Convenience function to add an AffiliationAll object to relate the group with the manuscript. """ 
+        return self.add_manuscript_to_affiliation( AffiliationAll(), manuscript )
+
+    def add_manuscript_range(self, manuscript, start_verse, end_verse):
+        """ Convenience function to add an AffiliationRange object to relate the group with the manuscript. """     
+        return self.add_manuscript_to_affiliation( AffiliationRange(start_verse=start_verse, end_verse=end_verse), manuscript )
+
+    def add_affiliated_family_range( self, other_family, start_verse, end_verse ):
+        """ Convenience function to add an AffiliationRange object to relate another family with this family. """     
+        return self.add_family_to_affiliation( AffiliationRange(start_verse=start_verse, end_verse=end_verse), other_family )
+
+class Family(FamilyBase):
+    pass
+        
+class AffiliationBase(PolymorphicModel):
+    families = models.ManyToManyField(FamilyBase, help_text="All the families that are affiliated through the relationship defined by this object.")
+    manuscripts = models.ManyToManyField(Manuscript, blank=True, help_text="All the manuscripts that are affiliated to the families through the relationship defined by this object.")
+    
+    def is_active( self, verse ):
+        """ Returns a boolean saying whether or not this affiliation is active for this verse. """        
+        False
+    
+    def manuscript_ids( self ):
+        """ Returns a set with the ids of all the manuscripts with this affiliation at any verse. """    
+        return set( self.manuscripts.all().values_list('id', flat=True) )
+
+    def family_ids( self ):
+        """ Returns a set with the ids of all the families with this affiliation at any verse. """    
+        return set( self.families.all().values_list('id', flat=True) )
+        
+    def manuscript_ids_at( self, verse ):
+        """ Returns a set with the ids of all the manuscripts with this affiliation at a particular verse. """
+        if self.is_active(verse):
+            return self.manuscript_ids()
+        return set()
+        
+    def manuscripts_at(self, verse):
+        """ Returns a Django query set for all the manuscripts with this affiliation at a particular verse. """    
+        return Manuscript.objects.filter( id__in=self.manuscript_ids_at(verse) )
+
+    def family_ids_at( self, verse ):
+        """ Returns a set with the ids of all the families with this affiliation at a particular verse. """    
+        if self.is_active(verse):
+            return self.family_ids()
+        return set()
+            
+    def families_at( self, verse ):
+        """ Returns a Django query set for all the families with this affiliation at a particular verse. """        
+        return Family.objects.filter( id__in=self.family_ids_at(verse) )
+    
+    
+    
+class AffiliationAll(AffiliationBase):
+    """ An Affiliation class which is active throughout every verse of the text. """        
+    def is_active( self, verse ):
+        return True
+        
+class AffiliationRange(AffiliationBase):
+    """ An Affiliation class which is active within a range of verses in the manuscripts. """        
+    start_verse = models.ForeignKey(Verse, on_delete=models.CASCADE, related_name='start_verse')
+    end_verse = models.ForeignKey(Verse, on_delete=models.CASCADE, related_name='end_verse')
+
+    def __str__(self):
+        parent_string = super().__str__()
+        return  "%s from %s to %s" % (parent_string, self.start_verse.reference_abbreviation(), self.end_verse.reference_abbreviation())
+                
+        return "%s %s" % (self.group, ms_names )
+
+    def is_active( self, verse ):
+        """ The affiliation is active within the start and end verses (inclusive). """            
+        return self.start_verse.rank <= verse.rank <= self.end_verse.rank
+        
+            
     
     
 #https://simpleisbetterthancomplex.com/tutorial/2016/11/23/how-to-add-user-profile-to-django-admin.html
