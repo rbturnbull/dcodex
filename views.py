@@ -199,9 +199,9 @@ def comparison(request):
     profile_reference = template.render({'heading': "Reference", 'comparison_texts': manuscript.comparison_texts( verse, reference_mss )}, request)
     renders.append( profile_reference )
     
-    groups = manuscript.groups_at(verse)
-    for group in groups:
-        renders.append( template.render({'heading': group.name, 'comparison_texts': group.transcriptions_at( verse )}, request) )
+    families = manuscript.families_at(verse)
+    for family in families:
+        renders.append( template.render({'heading': family.name, 'comparison_texts': family.transcriptions_at( verse )}, request) )
         
     all_mss = template.render({'heading': "All Transcribed", 'comparison_texts': manuscript.comparison_texts( verse )}, request)
     renders.append( all_mss )    

@@ -786,6 +786,9 @@ class FamilyBase(PolymorphicModel):
         affiliation.families.add( family )
         affiliation.save()        
         return affiliation
+        
+    def transcriptions_at( self, verse ):
+        return VerseTranscriptionBase.objects.filter(verse=verse, manuscript__id__in=self.manuscript_ids_at(verse) )
     
     def add_manuscript_all(self, manuscript):
         """ Convenience function to add an AffiliationAll object to relate the group with the manuscript. """ 
