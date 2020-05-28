@@ -69,32 +69,9 @@ class FamilyTests(TestCase):
         
         family1.add_affiliated_family_range( family2, start_verse=verses[3], end_verse=verses[8] )
         
-        print( "family2.manuscript_ids_at( verses[3] )", family2.manuscript_ids_at( verses[3] ) )
+        gold_values1 = [0,0,0,1,1,1,1,1,1,0]             
+        gold_values2 = [0,0,0,1,1,1,0,0,0,0]  
         
-        print("LOOOOOK")
-        print( "family1.manuscript_ids_at( verses[3] )", family1.manuscript_ids_at( verses[3] ) )
-        print( "family1.manuscript_ids_at( verses[3] )", family1.manuscript_ids_at( verses[3] ) )
-        print( "ms1.family_ids_at( verses[3] )", ms1.family_ids_at( verses[3] ) )
-        print( "ms2.family_ids_at( verses[3] )", ms2.family_ids_at( verses[3] ) )
-             
-        
-        self.assertEquals( ms1.is_in_family_at(family1, verses[0]), False )
-        self.assertEquals( ms2.is_in_family_at(family1, verses[0]), False )
-        self.assertEquals( ms1.is_in_family_at(family1, verses[1]), False )
-        self.assertEquals( ms2.is_in_family_at(family1, verses[1]), False )
-        self.assertEquals( ms1.is_in_family_at(family1, verses[2]), False )
-        self.assertEquals( ms2.is_in_family_at(family1, verses[2]), False )
-        self.assertEquals( ms1.is_in_family_at(family1, verses[3]), True  )
-        self.assertEquals( ms2.is_in_family_at(family1, verses[3]), True  )
-        self.assertEquals( ms1.is_in_family_at(family1, verses[4]), True  )
-        self.assertEquals( ms2.is_in_family_at(family1, verses[4]), True  )
-        self.assertEquals( ms1.is_in_family_at(family1, verses[5]), True  )
-        self.assertEquals( ms2.is_in_family_at(family1, verses[5]), True  )
-        self.assertEquals( ms1.is_in_family_at(family1, verses[6]), True  )
-        self.assertEquals( ms2.is_in_family_at(family1, verses[6]), False )
-        self.assertEquals( ms1.is_in_family_at(family1, verses[7]), True  )
-        self.assertEquals( ms2.is_in_family_at(family1, verses[7]), False )
-        self.assertEquals( ms1.is_in_family_at(family1, verses[8]), True  )
-        self.assertEquals( ms2.is_in_family_at(family1, verses[8]), False )
-        self.assertEquals( ms1.is_in_family_at(family1, verses[9]), False )
-        self.assertEquals( ms2.is_in_family_at(family1, verses[9]), False )
+        for verse, gold1, gold2 in zip( verses, gold_values1, gold_values2 ):
+            self.assertIs( ms1.is_in_family_at(family1, verse), bool(gold1) )
+            self.assertIs( ms2.is_in_family_at(family1, verse), bool(gold2) )

@@ -397,11 +397,8 @@ class Manuscript(PolymorphicModel):
         family_ids = set()
         checked_family_ids=set() 
         
-        print('in ms.family_ids_at', verse)
-        print("family_ids", family_ids)
         for affiliation in self.affiliationbase_set.all():
             families = affiliation.families_at(verse)
-            print("affiliation.families_at(verse)", affiliation.families_at(verse))
             for family in families:
                 family_ids.add( family.id )
                 if family.id not in checked_family_ids:
@@ -413,7 +410,6 @@ class Manuscript(PolymorphicModel):
 
     def is_in_family_at(self, family, verse):
         ids = self.family_ids_at(verse)
-        print('inside is_in_family_at', family, verse, '=', ids )
         return family.id in ids 
         
 
