@@ -190,6 +190,7 @@ def delete_location(request):
 def comparison(request):
     manuscript, verse = get_manuscript_and_verse(request)
     template = loader.get_template('dcodex/comparison.html')
+    ms_hover = loader.get_template('dcodex/ms_hover.html')
 #    $dcodex->comparisonTable("Reference", array($dcodex->getManuscript(18), $dcodex->getManuscript(16)), $verseID, $columns );
 #    $dcodex->comparisonTableForGroups($manuscriptID, $verseID, $columns );
     
@@ -202,6 +203,10 @@ def comparison(request):
     families = manuscript.families_at(verse)
     for family in families:
         renders.append( template.render({'heading': family.name, 'comparison_texts': family.transcriptions_at( verse )}, request) )
+        untranscribed_manuscript_ids = family.untranscribed_manuscript_ids_at( verse ) - {manuscript.id}
+        if len(untranscribed_manuscript_ids) > 0:
+            untranscribed_manuscripts = Manuscript.objects.filter( id__in=untranscribed_manuscript_ids )
+            renders.append( ms_hover.render( {'heading': 'Untranscribed', 'manuscripts': untranscribed_manuscripts, 'verse':verse}, request) )
         
     all_mss = template.render({'heading': "All Transcribed", 'comparison_texts': manuscript.comparison_texts( verse )}, request)
     renders.append( all_mss )    

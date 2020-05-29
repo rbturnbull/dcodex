@@ -1,0 +1,11 @@
+{% load static %}
+<div class='comparison_text_box'>
+    <p class='comparison_manuscript_name' style='font-size: 1.7em;'>{{ heading }}</p>
+    {% for manuscript in manuscripts %}
+        <p class='comparison_manuscript_name' data-manuscript='{{ manuscript.id }}'><a href="/dcodex/ms/{{ manuscript.id }}/{{ verse.url_ref }}/">{{ manuscript.short_name }}</a>
+            <span class=comparison_buttons>
+                <input type=image src="{% static 'dcodex/images/preview.png' %}" class="mshover comparison_button" data-manuscriptid="{{ manuscript.id }}" data-verseid="{{ verse.id }}" />    
+            </span>
+        </p>
+    {% endfor %}
+</div>

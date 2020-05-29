@@ -23,9 +23,35 @@ class FamilyTests(TestCase):
         self.assertTrue( ms.is_in_family_at(family, verse) )
         self.assertFalse( ms.is_in_family_at(family2, verse) )        
     
+    def test_affiliation_verses(self):
+        """
+        Tests the AffiliationVerses class.
+        """
+        
+        ms = Manuscript(name="Test Manuscript")
+        ms.save()        
+        family1 = Family(name="Test Family 1")
+        family1.save()
+        family2 = Family(name="Test Family 2")
+        family2.save()
+
+        verse_count = 10
+        verses = [Verse(rank=i+1) for i in range(verse_count)]
+        for verse in verses:
+            verse.save()
+            
+        affiliation = family1.add_manuscript_at_verses( ms, [verse for verse in verses if verse.rank % 2 == 0] )
+        
+        gold_values = [((i+1) % 2 == 0) for i in range(verse_count)]
+        for verse, gold in zip( verses, gold_values ):
+            self.assertIs( ms.is_in_family_at(family1, verse), gold )
+            self.assertIs( ms.is_in_family_at(family2, verse), False )
+
+    
+    
     def test_affiliation_range(self):
         """
-        manuscript.families_at( verse ) returns the family for any verse a range
+        Tests the AffiliationRange class.
         """
         
         ms = Manuscript(name="Test Manuscript")

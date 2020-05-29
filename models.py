@@ -787,13 +787,39 @@ class FamilyBase(PolymorphicModel):
         affiliation.save()        
         return affiliation
         
-    def transcriptions_at( self, verse ):
-        return VerseTranscriptionBase.objects.filter(verse=verse, manuscript__id__in=self.manuscript_ids_at(verse) )
+    def transcriptions_at( self, verse, manuscript_ids=None ):
+        if manuscript_ids is None:
+            manuscript_ids = self.manuscript_ids_at(verse)
+        return VerseTranscriptionBase.objects.filter(verse=verse, manuscript__id__in=manuscript_ids )
+        
+    def transcribed_manuscript_ids_at( self, verse, manuscript_ids=None ):
+        if manuscript_ids is None:
+            manuscript_ids = self.manuscript_ids_at(verse)
+    
+        transcriptions = self.transcriptions_at( verse, manuscript_ids=manuscript_ids )
+        return set(transcriptions.values_list( 'manuscript__id', flat=True ))
+    
+    def untranscribed_manuscript_ids_at( self, verse ):
+        manuscript_ids = self.manuscript_ids_at(verse)
+        transcribed_manuscript_ids = self.transcribed_manuscript_ids_at( verse, manuscript_ids=manuscript_ids )
+
+        return manuscript_ids - transcribed_manuscript_ids
+        
+    def untranscribed_manuscripts_at( self, verse ):
+        return Manuscript.objects.filter(id__in=self.untranscribed_manuscript_ids_at(verse) )
     
     def add_manuscript_all(self, manuscript):
         """ Convenience function to add an AffiliationAll object to relate the group with the manuscript. """ 
         return self.add_manuscript_to_affiliation( AffiliationAll(), manuscript )
 
+    def add_manuscript_at_verses( self, manuscript, verses ):
+        """ Convenience function to add an AffiliationVerses object to relate the group with the manuscript. """     
+        affiliation = self.add_manuscript_to_affiliation( AffiliationVerses(), manuscript )
+        for verse in verses:
+            if verse and isinstance( verse, Verse ):        
+                affiliation.verses.add( verse )
+        return affiliation
+        
     def add_manuscript_range(self, manuscript, start_verse, end_verse):
         """ Convenience function to add an AffiliationRange object to relate the group with the manuscript. """     
         return self.add_manuscript_to_affiliation( AffiliationRange(start_verse=start_verse, end_verse=end_verse), manuscript )
@@ -806,9 +832,16 @@ class Family(FamilyBase):
     pass
         
 class AffiliationBase(PolymorphicModel):
+    name = models.CharField(max_length=200, blank=True, help_text='A descriptive string for this affilitation.')
     families = models.ManyToManyField(FamilyBase, help_text="All the families that are affiliated through the relationship defined by this object.")
     manuscripts = models.ManyToManyField(Manuscript, blank=True, help_text="All the manuscripts that are affiliated to the families through the relationship defined by this object.")
     
+    def __str__(self):
+        if self.name:
+            return self.name
+            
+        return "Affiliation %d" % self.id
+
     def is_active( self, verse ):
         """ Returns a boolean saying whether or not this affiliation is active for this verse. """        
         False
@@ -847,6 +880,20 @@ class AffiliationAll(AffiliationBase):
     """ An Affiliation class which is active throughout every verse of the text. """        
     def is_active( self, verse ):
         return True
+
+class AffiliationVerses(AffiliationBase):
+    """ An Affiliation class which is active within a list of verses. """        
+    verses = models.ManyToManyField(Verse, related_name='affiliation_verses', help_text="All the verses where this affiliation object is active.")
+
+    def __str__(self):
+        parent_string = super().__str__()
+        return  "%s at %s" % (parent_string, str(self.verses.all()) )
+
+    def is_active( self, verse ):
+        """ This affiliation is active at the verses associated in the 'verses' field of this class. """            
+        return self.verses.filter( id=verse.id ).exists()
+        
+
         
 class AffiliationRange(AffiliationBase):
     """ An Affiliation class which is active within a range of verses in the manuscripts. """        
@@ -856,8 +903,6 @@ class AffiliationRange(AffiliationBase):
     def __str__(self):
         parent_string = super().__str__()
         return  "%s from %s to %s" % (parent_string, self.start_verse.reference_abbreviation(), self.end_verse.reference_abbreviation())
-                
-        return "%s %s" % (self.group, ms_names )
 
     def is_active( self, verse ):
         """ The affiliation is active within the start and end verses (inclusive). """            
