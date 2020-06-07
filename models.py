@@ -829,7 +829,8 @@ class FamilyBase(PolymorphicModel):
         return self.add_family_to_affiliation( AffiliationRange(start_verse=start_verse, end_verse=end_verse), other_family )
 
 class Family(FamilyBase):
-    pass
+    class Meta:
+        verbose_name_plural = 'Families'        
         
 class AffiliationBase(PolymorphicModel):
     name = models.CharField(max_length=200, blank=True, help_text='A descriptive string for this affilitation.')
