@@ -1,0 +1,51 @@
+.comparison_manuscript_name {
+    color: rgba(0, 122, 255, 1.0); 
+    direction: ltr;
+    font-size: 1.3em;
+    position: relative;  
+    text-align: center;
+    cursor: pointer;
+}
+.comparison_manuscript_name:hover .tooltiptext {
+    visibility: visible;
+}
+.comparison_manuscript_name .tooltiptext {
+    font-size: 1.0em;
+	width: auto;
+	padding-left: 15px;
+	padding-right: 15px;
+    left: -20px;
+
+}
+.groupHeading {
+    color: red; 
+    color: rgba(0, 122, 255, 1.0); 
+    font-size: 2.3em;      
+    margin-bottom: 0px;
+    margin-top: 10px;   
+    text-align: center;
+    margin-right: 10px;
+    margin-left: 10px; 
+font-family: 'Noto Sans', sans-serif;
+	font-weight: normal;
+    
+}
+.comparison_text {
+    text-align: center;
+}
+.comparison_buttons {
+    text-align: center;
+}
+.comparison_text_box {
+    background-color: white;
+    color: black;
+    padding: 5px;
+    margin: 5px;
+    float: left;
+    width: 270px;
+}
+
+.comparison_button {
+    height: 15px; 
+    padding-top: 8px;
+}

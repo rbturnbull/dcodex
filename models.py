@@ -9,7 +9,7 @@ import glob
 import logging
 import pandas as pd
 import numpy as np
-import gotoh_scores
+import gotoh_counts
 from .strings import normalize_transcription
 from .distance import similarity_levenshtein, similarity_damerau_levenshtein, similarity_ratcliff_obershelp, similarity_jaro
 from scipy.special import expit
@@ -200,9 +200,9 @@ class Manuscript(PolymorphicModel):
             transcription1 = self.normalized_transcription(verse)
             transcription2 = ms.normalized_transcription(verse)
             if transcription1 and transcription2:
-                counts = gotoh_scores.scores( transcription1, transcription2, *gotoh_param )
+                counts = gotoh_counts.counts( transcription1, transcription2, *gotoh_param )
                 print(verse, counts)
-                total_counts += np.asarray( counts[1:] )
+                total_counts += np.asarray( counts )
         return total_counts
 
     def compare_transcriptions( self, weights, prior_log_odds=0.0, **kwargs ):
@@ -230,13 +230,13 @@ class Manuscript(PolymorphicModel):
             for ms in mss:
                 ms_transcription = ms.transcription( transcription.verse )
                 if ms_transcription:
-                    counts = gotoh_scores.scores( normalized_transcription, ms_transcription.normalize(), *gotoh_param )
+                    counts = gotoh_counts.counts( normalized_transcription, ms_transcription.normalize(), *gotoh_param )
                 else:
-                    counts = (0,0,0,0,0)
-                row[ms.siglum+"_m"] = counts[1]
-                row[ms.siglum+"_d"] = counts[2]
-                row[ms.siglum+"_g"] = counts[3]
-                row[ms.siglum+"_e"] = counts[4]
+                    counts = (0,0,0,0)
+                row[ms.siglum+"_m"] = counts[0]
+                row[ms.siglum+"_d"] = counts[1]
+                row[ms.siglum+"_g"] = counts[2]
+                row[ms.siglum+"_e"] = counts[3]
                 
             df = df.append(row, ignore_index=True)
                     
@@ -758,6 +758,11 @@ class FamilyBase(PolymorphicModel):
                     manuscript_ids.update( family.manuscript_ids_at(verse, checked_family_ids) )
         return manuscript_ids
     
+    def manuscripts_at(self, verse):
+        """ Returns a Django query set for all the manuscripts with this fmaily at this verse. """    
+        return Manuscript.objects.filter( id__in=self.manuscript_ids_at(verse) )
+
+
     def afilliated_family_ids_at( self, verse, checked_family_ids=None ):
         """ Returns a set of family ids which are affiliated with this family at this verse (including itself). """    
         if checked_family_ids is None:
@@ -828,6 +833,21 @@ class FamilyBase(PolymorphicModel):
         """ Convenience function to add an AffiliationRange object to relate another family with this family. """     
         return self.add_family_to_affiliation( AffiliationRange(start_verse=start_verse, end_verse=end_verse), other_family )
 
+    def affiliation_matrix(self, manuscripts, verses):
+        """ 
+        Returns an array of boolean values stating whether or not a manuscript is affliated with this family at any particular verse. 
+        
+        Returns a 2D numpy array of shape (len(manuscripts),len(verses)).
+        """
+        affiliation_matrix = np.zeros( (len(manuscripts),len(verses)), dtype=bool)
+        
+        for verse_index, verse in enumerate(verses):
+            manuscript_ids = self.manuscript_ids_at(verse)
+            for manuscript_index, manuscript in enumerate(manuscripts):
+                affiliation_matrix[manuscript_index][verse_index] = (manuscript.id in manuscript_ids)
+        return affiliation_matrix
+       
+
 class Family(FamilyBase):
     class Meta:
         verbose_name_plural = 'Families'        
@@ -878,9 +898,13 @@ class AffiliationBase(PolymorphicModel):
     
     
 class AffiliationAll(AffiliationBase):
-    """ An Affiliation class which is active throughout every verse of the text. """        
+    """ An Affiliation class which is active throughout every verse of the text except for verses in the 'exclude' field. """        
+    exclude = models.ManyToManyField(Verse, blank=True, related_name='affiliation_exclude_verses', help_text="All the verses where this affiliation object is inactive.")
+
     def is_active( self, verse ):
-        return True
+        return not self.exclude.filter( id=verse.id ).exists()
+        
+
 
 class AffiliationVerses(AffiliationBase):
     """ An Affiliation class which is active within a list of verses. """        
@@ -894,12 +918,12 @@ class AffiliationVerses(AffiliationBase):
         """ This affiliation is active at the verses associated in the 'verses' field of this class. """            
         return self.verses.filter( id=verse.id ).exists()
         
-
         
 class AffiliationRange(AffiliationBase):
     """ An Affiliation class which is active within a range of verses in the manuscripts. """        
     start_verse = models.ForeignKey(Verse, on_delete=models.CASCADE, related_name='start_verse')
     end_verse = models.ForeignKey(Verse, on_delete=models.CASCADE, related_name='end_verse')
+    exclude = models.ManyToManyField(Verse, related_name='affiliationrange_exclude_verses', blank=True, help_text="All the verses in this range where this affiliation object is actually inactive.")
 
     def __str__(self):
         parent_string = super().__str__()
@@ -907,7 +931,7 @@ class AffiliationRange(AffiliationBase):
 
     def is_active( self, verse ):
         """ The affiliation is active within the start and end verses (inclusive). """            
-        return self.start_verse.rank <= verse.rank <= self.end_verse.rank
+        return self.start_verse.rank <= verse.rank <= self.end_verse.rank and not self.exclude.filter( id=verse.id ).exists()
         
             
     

@@ -25,6 +25,11 @@ class AffiliationAllAdmin(AffiliationChildAdmin):
     base_model = AffiliationAll
     show_in_index = True  # makes child model admin visible in main admin site
 
+@admin.register(AffiliationVerses)
+class AffiliationVersesAdmin(AffiliationChildAdmin):
+    base_model = AffiliationVerses
+    show_in_index = True  # makes child model admin visible in main admin site
+
 @admin.register(AffiliationRange)
 class AffiliationRangeAdmin(AffiliationChildAdmin):
     base_model = AffiliationRange
