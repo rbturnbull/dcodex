@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from .models import *
+from dcodex.models import *
 
 # Create your tests here.
 class FamilyTests(TestCase):
