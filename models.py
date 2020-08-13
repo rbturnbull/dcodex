@@ -757,6 +757,23 @@ class FamilyBase(PolymorphicModel):
                 if family.id not in checked_family_ids:
                     manuscript_ids.update( family.manuscript_ids_at(verse, checked_family_ids) )
         return manuscript_ids
+
+
+    def manuscript_and_verse_ids_at( self, verse, checked_family_ids=None ):
+        """ Returns a set of manuscript and verse id pairs which are affiliated with this family at this verse. """
+        if checked_family_ids is None:
+            checked_family_ids = set()
+        checked_family_ids.add( self.id )
+        pairs = set()
+        for affiliation in self.affiliationbase_set.all():
+            pairs_for_affiliation = affiliation.manuscript_and_verse_ids_at(verse)
+            pairs.update( pairs_for_affiliation )
+            families = affiliation.families_at(verse)
+            for family in families:
+                if family.id not in checked_family_ids:
+                    pairs.update( family.manuscript_and_verse_ids_at(verse, checked_family_ids) )
+        
+        return pairs
     
     def manuscripts_at(self, verse):
         """ Returns a Django query set for all the manuscripts with this fmaily at this verse. """    
@@ -793,16 +810,23 @@ class FamilyBase(PolymorphicModel):
         return affiliation
         
     def transcriptions_at( self, verse, manuscript_ids=None ):
-        if manuscript_ids is None:
-            manuscript_ids = self.manuscript_ids_at(verse)
-        return VerseTranscriptionBase.objects.filter(verse=verse, manuscript__id__in=manuscript_ids )
+        transcriptions = []
+        for manuscript_id, verse_id in self.manuscript_and_verse_ids_at(verse):
+            manuscript = Manuscript.objects.get(id=manuscript_id)
+            verse = Verse.objects.get(id=verse_id)
+            transcription = manuscript.transcription(verse)
+            if transcription:
+                transcriptions.append(transcription)
+        return transcriptions
         
     def transcribed_manuscript_ids_at( self, verse, manuscript_ids=None ):
         if manuscript_ids is None:
             manuscript_ids = self.manuscript_ids_at(verse)
     
         transcriptions = self.transcriptions_at( verse, manuscript_ids=manuscript_ids )
-        return set(transcriptions.values_list( 'manuscript__id', flat=True ))
+        if not transcriptions:
+            return set()
+        return {transcription.manuscript.id for transcription in transcriptions}
     
     def untranscribed_manuscript_ids_at( self, verse ):
         manuscript_ids = self.manuscript_ids_at(verse)
@@ -879,6 +903,16 @@ class AffiliationBase(PolymorphicModel):
         """ Returns a set with the ids of all the manuscripts with this affiliation at a particular verse. """
         if self.is_active(verse):
             return self.manuscript_ids()
+        return set()
+        
+    def manuscript_and_verse_ids_at( self, verse ):
+        """ 
+        Returns a set with the ids of all the manuscripts and the corresponding verses with this affiliation at a particular verse. 
+        
+        This is necessary if the affiliation uses indirect links to verses (like in lectionary verses in dcodex_lectionary)
+        """
+        if self.is_active(verse):
+            return {(manuscript_id, verse.id) for manuscript_id in self.manuscript_ids()}
         return set()
         
     def manuscripts_at(self, verse):
