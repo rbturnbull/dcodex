@@ -11,4 +11,9 @@ def manuscript_transcription(manuscript, verse):
     if not transcription:
         return ""
     return transcription.transcription
-    
+
+@register.filter
+def blank_if_none(text):
+    if text:
+        return text
+    return ""

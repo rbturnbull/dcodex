@@ -813,6 +813,7 @@ class FamilyBase(PolymorphicModel):
         transcriptions = []
         for manuscript_id, verse_id in self.manuscript_and_verse_ids_at(verse):
             manuscript = Manuscript.objects.get(id=manuscript_id)
+
             verse = Verse.objects.get(id=verse_id)
             transcription = manuscript.transcription(verse)
             if transcription:

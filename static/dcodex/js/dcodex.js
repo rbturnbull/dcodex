@@ -26,4 +26,15 @@ $.ajaxSetup({
         }
     }
 });
+function load_comparison(verse_id, manuscript_id, div_name) {
+    $( div_name ).load( "/dcodex/ajax/comparison/", { manuscript_id:manuscript_id, verse_id:verse_id }, function() {
+        $(".mshover").hover(function(){
+            $('#msHover').load("/dcodex/ajax/transcription-mini/", { manuscript_id:$(this).data('manuscriptid'), verse_id:$(this).data('verseid') } );
+            $('#msHover').show();
+        }, function() {
+            $('#msHover').hide();	  
+            $('#msHover').html("");
+        });        
+    } );
+}
 

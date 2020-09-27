@@ -40,6 +40,7 @@ def remove_arabic_vocalization( string ):
     string = string.replace('ؤ','و')
     
     string = string.replace('ُ','')
+    string = string.replace('ً','')
     string = string.replace('َ','')
     string = string.replace('ِ','')
     string = string.replace('ً','')
