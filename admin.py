@@ -100,6 +100,7 @@ class VerseTranscriptionBaseParentAdmin(PolymorphicParentModelAdmin):
     list_filter = (PolymorphicChildModelFilter,)  # This is optional.
 
 
+admin.site.register(StandardMarkup)
 admin.site.register(PDF)
 admin.site.register(VerseLocation)
 admin.site.register(Page)

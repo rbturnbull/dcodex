@@ -439,25 +439,27 @@ function shrinkFontToFit( element ) {
 }
 
 function setTranscriptionRTL() {
-    var textarea = $( "#transcription" );	
-    textarea.css('direction', "rtl");		
-    $( "#directionToggle" ).html("LTR");	
+    // TEXT DIRECTION
+    // var textarea = $( "#transcription" );	
+    // textarea.css('direction', "rtl");		
+    // $( "#directionToggle" ).html("LTR");	
 }
 function setTranscriptionLTR() {
-    var textarea = $( "#transcription" );	
-    textarea.css('direction', "ltr");
-    $( "#directionToggle" ).html("RTL");
+    // TEXT DIRECTION
+    // var textarea = $( "#transcription" );	
+    // textarea.css('direction', "ltr");
+    // $( "#directionToggle" ).html("RTL");
 }
 
 $( "#directionToggle" ).click(function(e) {
-    var textarea = $( "#transcription" );
-    var direction = textarea.css('direction');
-    if ( direction == "rtl" ) {
-        setTranscriptionLTR();		
-    }
-    else {
-        setTranscriptionRTL();
-    }    
+    // var textarea = $( "#transcription" );
+    // var direction = textarea.css('direction');
+    // if ( direction == "rtl" ) {
+    //     setTranscriptionLTR();		
+    // }
+    // else {
+    //     setTranscriptionRTL();
+    // }    
 });
 
 function resetTranscriptionFont() {
@@ -469,20 +471,20 @@ function setTranscription( text ) {
 
     $('#transcription').val(text);
     resizeTranscription();
-    setTranscriptionRTL(); // hack for rob's system
+    // setTranscriptionRTL(); // hack for rob's system
     
     if ( text.length == 0 )
         return;
-    if ( isRTL(text) ) {
-//			alert('rtl');
-        setTranscriptionRTL();
-    }
-    else {
-//			alert('ltr');		
-        setTranscriptionLTR();
-    }
-    setTranscriptionRTL(); // hack for rob's system
-    
+//     if ( isRTL(text) ) {
+// //			alert('rtl');
+//         setTranscriptionRTL();
+//     }
+//     else {
+// //			alert('ltr');		
+//         setTranscriptionLTR();
+//     }
+//     setTranscriptionRTL(); // hack for rob's system
+//     setTranscriptionLTR(); // hack for greek
 }
 
 function resizeTranscription( ) {

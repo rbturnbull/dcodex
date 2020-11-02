@@ -9,6 +9,15 @@ body {
     margin-top: 10px;
 }
 
+.ltr {
+    direction: ltr;    
+}
+
+.rtl {
+    direction: rtl;    
+}
+
+
 /* Show the tooltip text when you mouse over the tooltip container */
 .mshover:hover .msbox {
     visibility: visible;
@@ -29,10 +38,8 @@ body {
     bottom: 20px;
     left: 200px; 
     right: 400px; 
-    direction: rtl;
 	box-shadow: 0px 0px 5px #ffffff,0px 0px 5px #ffffff,0px 0px 10px #ffffff;
 	box-shadow: 0px 0px 55px #000;
-
 }
 .popup {
 	display:none;
@@ -67,4 +74,25 @@ body {
 	top: 0px;
 	z-index: 1000;
 	opacity: 0.5;
+}
+
+#sidebar_cards {
+	position: absolute;
+    top: 125px;
+    bottom: 0px;
+    left: 0px;
+    width: 100%;
+	overflow:scroll;
+	z-index: 2;
+}
+.sidebar_card {
+    text-align: center;
+    margin: 5px;
+    padding: 5px;
+    color: #007AFF;
+    background-color: #dddddd;
+    cursor: pointer;    
+}
+.sidebar_card_selected {
+    background-color: yellow;
 }

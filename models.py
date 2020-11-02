@@ -18,13 +18,47 @@ def facsimile_dir():
     return settings.MEDIA_ROOT
 
 
+class TextDirection(models.TextChoices):
+    RIGHT_TO_LEFT = 'R'
+    LEFT_TO_RIGHT = 'L'
+
+
+class Markup(PolymorphicModel):
+    name = models.CharField(max_length=255, blank=True, help_text='A descriptive name for this markup object.')
+
+    def __str__(self):
+        return self.name
+
+    def regularise( self, string ):
+        return normalize_transcription( string )
+
+    def remove_markup(self, string):
+        return remove_markup( string )
+
+    def tokenize( self, string ):
+        string = self.remove_markup(string)
+        string = string.replace("."," .")
+        string = string.replace(":"," :")
+        string = string.replace(","," ,")
+        string = re.sub("\s+"," ", string)
+
+        return string.split()
+
+
+class StandardMarkup(Markup):
+    pass
+
+
 # Create your models here.
 class Manuscript(PolymorphicModel):
-    """ An abstract class used for bringing together all the elements of a document. 
+    """ 
+    An abstract class used for bringing together all the elements of a document. 
     """
-
-    name = models.CharField(max_length=200, blank=True, help_text='A descriptive string for this manuscript.')
+    name = models.CharField(max_length=200, blank=True, help_text='A descriptive name for this manuscript.')
     siglum = models.CharField(max_length=20, blank=True, help_text='A unique short string for this manuscript.')
+    markup = models.ForeignKey(Markup, on_delete=models.SET_DEFAULT, null=True, blank=True, default=None, help_text='The default markup class for this manuscript.')
+    text_direction = models.CharField(max_length=1, choices=TextDirection.choices, default=TextDirection.LEFT_TO_RIGHT )
+
     def __str__(self):
         if self.name and self.siglum:
             if self.name == self.siglum:
@@ -139,6 +173,7 @@ class Manuscript(PolymorphicModel):
         
     def normalized_transcriptions_dict( self ):
         return {transcription.id:transcription.normalize(  ) for transcription in self.transcriptions()}
+
     def transcriptions_range( self, ranges=None, range=None, start=None, end=None ):
         if ranges is None:
             if range is None:
@@ -274,7 +309,10 @@ class Manuscript(PolymorphicModel):
             return pd.Series( values, columns )
         
         return df.apply( compute_posterior, axis=1 )
-                
+
+    def text_direction_css(self):
+        """ The CSS class for text from this manuscript to express the direction. """
+        return "ltr" if self.text_direction == "L" else "rtl"
 
     def location( self, verse, verbose=True ):
         """ Finds (or estimates) the location of a verse in a manuscript.
@@ -716,12 +754,33 @@ class VerseTranscriptionBase(PolymorphicModel):
     manuscript = models.ForeignKey(Manuscript, on_delete=models.CASCADE, help_text='The manuscript this transcription is from.' )
     verse = models.ForeignKey(Verse, on_delete=models.CASCADE, help_text='The verse of this transcription.')
     transcription = models.CharField(max_length=1024, help_text='The unnormalized text of this transcription.') # This should be refactored as 'text' and made a TextField.
-    # Should reference a Markup class
+    markup = models.ForeignKey(Markup, on_delete=models.SET_DEFAULT, null=True, blank=True, default=None, help_text='The markup class for this transcription.')
     
     def __str__(self):
         return "%s in %s: %s" % (self.verse.reference(abbreviation=True), self.manuscript.short_name(), self.transcription )
+
+    def get_markup( self ):
+        if self.markup:
+            return self.markup
+        
+        if self.manuscript.markup:
+            return self.manuscript.markup
+
+        return None
+
     def normalize(self):
-        return normalize_transcription( self.transcription ) # Should be handled by the markup class 
+        markup = self.get_markup()
+        if markup:
+            return markup.regularize( self.transcription )
+        
+        return normalize_transcription( self.transcription )
+
+    def tokenize(self):
+        markup = self.get_markup()
+        if markup:
+            return markup.tokenize( self.transcription )
+        
+        return normalize_transcription( self.transcription ).split(" ")
 
     def similarity( self, comparison_transcription, similarity_func = None ):
         return similarity_func( self.normalize(), comparison_transcription.normalize() )
@@ -795,6 +854,7 @@ class FamilyBase(PolymorphicModel):
                 if family.id not in checked_family_ids:
                     family_ids.update( family.afilliated_family_ids_at(verse, checked_family_ids) )
         return family_ids
+        
     def add_manuscript_to_affiliation( self, affiliation, manuscript ):
         affiliation.save()
         affiliation.families.add( self )
@@ -872,11 +932,29 @@ class FamilyBase(PolymorphicModel):
                 affiliation_matrix[manuscript_index][verse_index] = (manuscript.id in manuscript_ids)
         return affiliation_matrix
        
+    def get_verse_from_string(self, verse_string):
+        """ Gets the Verse class from the manuscripts affliated with this manuscript and returns the verse with this ref. """
+        classes_tried = set()
+        for affiliation in self.affiliationbase_set.all():
+            for manuscript in affiliation.manuscripts.all():
+                verse_class = manuscript.verse_class()
+                if verse_class in classes_tried:
+                    continue
+
+                verse = verse_class.get_from_string( verse_string )
+                if verse:
+                    return verse
+                
+                classes_tried.update( [verse_class] )
+            
+        return None
+
 
 class Family(FamilyBase):
     class Meta:
         verbose_name_plural = 'Families'        
         
+
 class AffiliationBase(PolymorphicModel):
     name = models.CharField(max_length=200, blank=True, help_text='A descriptive string for this affilitation.')
     families = models.ManyToManyField(FamilyBase, help_text="All the families that are affiliated through the relationship defined by this object.")

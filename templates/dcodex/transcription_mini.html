@@ -19,7 +19,7 @@
 </script>
 
 {% if verse_transcription %}
-    <span>{{ verse_transcription.transcription }}</span>
+    <span class="{{ verse_transcription.manuscript.text_direction_css }}">{{ verse_transcription.transcription }}</span>
 {% endif %}
 
 <div id=manuscriptInBox style='position: relative; overflow:hidden;'>
