@@ -1,2 +1,3 @@
 # dcodex
-Software for manuscript analysis
+
+A software framework for manuscript analysis

@@ -1,14 +1,14 @@
 from dcodex.models import *
 import numpy as np
 import pandas as pd
-import Levenshtein
 from collections import Counter
 from matplotlib import pyplot as plt
 import scipy.spatial.distance as ssd
 import scipy.cluster.hierarchy as hcluster
 from collections import defaultdict
-
+import Levenshtein
 from pyxdameraulevenshtein import damerau_levenshtein_distance
+
 import difflib
 
 
