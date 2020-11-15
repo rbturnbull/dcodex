@@ -9,12 +9,12 @@ cycler==0.10.0
 Django==3.1.3
 django-polymorphic==3.0.0
 docutils==0.16
--e git+https://github.com/rbturnbull/gotoh_counts.git@16e8542e27aba130755a539dfd90301a29a16242#egg=gotoh_counts
--e git+https://github.com/rbturnbull/gotoh_counts.git@16e8542e27aba130755a539dfd90301a29a16242#egg=gotoh_counts_rbturnbull
+-e git+https://github.com/rbturnbull/gotoh.git@9887175dfc40601493471b481a69aa3152408d49#egg=gotoh
 idna==2.10
 imagesize==1.2.0
 Jinja2==2.11.2
 kiwisolver==1.3.1
+livereload==2.6.3
 MarkupSafe==1.1.1
 matplotlib==3.3.2
 numpy==1.19.4
@@ -33,6 +33,7 @@ six==1.15.0
 snowballstemmer==2.0.0
 soupsieve==2.0.1
 Sphinx==3.3.0
+sphinx-autobuild==2020.9.1
 sphinx-rtd-theme==0.5.0
 sphinxcontrib-applehelp==1.0.2
 sphinxcontrib-devhelp==1.0.2
@@ -41,4 +42,5 @@ sphinxcontrib-jsmath==1.0.1
 sphinxcontrib-qthelp==1.0.3
 sphinxcontrib-serializinghtml==1.1.4
 sqlparse==0.4.1
+tornado==6.1
 urllib3==1.25.11

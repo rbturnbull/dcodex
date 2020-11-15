@@ -9,7 +9,7 @@ import glob
 import logging
 import pandas as pd
 import numpy as np
-import gotoh_counts
+import gotoh
 from .strings import normalize_transcription
 from .distance import similarity_levenshtein, similarity_damerau_levenshtein, similarity_ratcliff_obershelp, similarity_jaro
 from scipy.special import expit
@@ -235,7 +235,7 @@ class Manuscript(PolymorphicModel):
             transcription1 = self.normalized_transcription(verse)
             transcription2 = ms.normalized_transcription(verse)
             if transcription1 and transcription2:
-                counts = gotoh_counts.counts( transcription1, transcription2, *gotoh_param )
+                counts = gotoh.counts( transcription1, transcription2, *gotoh_param )
                 print(verse, counts)
                 total_counts += np.asarray( counts )
         return total_counts
@@ -265,7 +265,7 @@ class Manuscript(PolymorphicModel):
             for ms in mss:
                 ms_transcription = ms.transcription( transcription.verse )
                 if ms_transcription:
-                    counts = gotoh_counts.counts( normalized_transcription, ms_transcription.normalize(), *gotoh_param )
+                    counts = gotoh.counts( normalized_transcription, ms_transcription.normalize(), *gotoh_param )
                 else:
                     counts = (0,0,0,0)
                 row[ms.siglum+"_m"] = counts[0]
