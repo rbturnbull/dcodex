@@ -10,6 +10,7 @@ requirements = [
     'python-Levenshtein',
     'pyxDamerauLevenshtein', # now an optional install
     'beautifulsoup4',
+    'django-admin-sortable2',
 ]
 
 setup(

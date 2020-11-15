@@ -1,6 +1,7 @@
 from django.contrib import admin
 from polymorphic.admin import PolymorphicParentModelAdmin, PolymorphicChildModelAdmin, PolymorphicChildModelFilter
 
+
 # Register your models here.
 from .models import *
 
@@ -109,7 +110,10 @@ admin.site.register(Page)
 # https://simpleisbetterthancomplex.com/tutorial/2016/11/23/how-to-add-user-profile-to-django-admin.html
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+# UserAdmin = admin.site._registry[User]
 
 class ProfileInline(admin.StackedInline):
     model = Profile
