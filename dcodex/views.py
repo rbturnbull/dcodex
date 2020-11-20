@@ -1,11 +1,14 @@
 from django.http import HttpResponse
-
 from django.shortcuts import get_object_or_404, render
 from django.template import loader
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic.base import TemplateView
 
 from dcodex.models import *
 from dcodex.util import get_request_dict
-from django.contrib.auth.decorators import login_required
+
+
 import logging
 import json
     
@@ -193,6 +196,8 @@ def comparison(request):
     ms_hover = loader.get_template('dcodex/ms_hover.html')
 #    $dcodex->comparisonTable("Reference", array($dcodex->getManuscript(18), $dcodex->getManuscript(16)), $verseID, $columns );
 #    $dcodex->comparisonTableForGroups($manuscriptID, $verseID, $columns );
+    logger = logging.getLogger(__name__)    
+    logger.error("in comparison")
     
     reference_mss = request.user.profile.reference_texts.all()
     
@@ -201,7 +206,7 @@ def comparison(request):
     renders.append( profile_reference )
     
     families = manuscript.families_at(verse)
-    for family in families:
+    for family in families:        
         renders.append( template.render({'heading': family.name, 'comparison_texts': family.transcriptions_at( verse )}, request) )
         untranscribed_manuscript_ids = family.untranscribed_manuscript_ids_at( verse ) - {manuscript.id}
         if len(untranscribed_manuscript_ids) > 0:
@@ -255,3 +260,9 @@ def select_manuscript(request):
 def index(request):
     context = {'siglum': 1 + 3}
     return render(request, 'dcodex/index.html', context)
+
+
+class HomeView(LoginRequiredMixin, TemplateView):
+    template_name = "dcodex/home.html"
+    extra_context = dict(manuscripts=Manuscript.objects.all())
+    

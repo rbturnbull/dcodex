@@ -96,3 +96,8 @@ body {
 .sidebar_card_selected {
     background-color: yellow;
 }
+
+.logo-middle {
+    width: 300px;
+    text-align: center;
+}

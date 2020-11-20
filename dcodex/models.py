@@ -1,3 +1,4 @@
+import datetime
 from django.db import models
 from django.conf import settings
 from polymorphic.models import PolymorphicModel
@@ -49,7 +50,6 @@ class StandardMarkup(Markup):
     pass
 
 
-# Create your models here.
 class Manuscript(PolymorphicModel):
     """ 
     An abstract class used for bringing together all the elements of a document. 
@@ -121,6 +121,54 @@ class Manuscript(PolymorphicModel):
     def transcription( self, verse ):
         return self.transcription_class().objects.filter( manuscript=self, verse=verse ).first()
 
+    def transcriptions(self):
+        return self.transcription_class().objects.filter( manuscript=self )
+
+
+    def tei_header( self, source=""):
+        tei_string = ""
+        tei_string +=  '<teiHeader>\n'
+        tei_string +=  '  <fileDesc>\n'
+
+        tei_string +=  '    <titleStmt>\n'
+        tei_string += f'      <title>Transcription of {self.name}</title>\n'
+        tei_string +=  '    </titleStmt>\n'
+
+        tei_string +=  '    <publicationStmt>\n'
+        tei_string += f'      <p>Generated on {timestamp} using D-Codex.</p>\n'
+        tei_string +=  '    </publicationStmt>\n'
+
+        tei_string +=  '    <sourceDesc>\n'
+        tei_string += f'      <p>{source}</p>\n'
+        tei_string +=  '    </sourceDesc>\n'
+
+        tei_string +=  '  </fileDesc>\n'
+        tei_string += '</teiHeader>\n'
+        return tei_string
+
+    def tei_body( self, source=""):
+        tei_string = ""
+        tei_string += "<text>\n"
+        tei_string += "  <body>\n"
+        for transcription in self.transcriptions():
+            transcription_tei = transcription.transcription # hack
+            verse_tei_id = transcription.verse.tei_id()
+            tei_string += f"    <ab n='{verse_tei_id}'>{transcription.transcription}</ab>\n"
+        tei_string += "  </body>\n"
+        tei_string += "</text>\n"
+        return tei_string
+
+    def tei_string( self, source="" ):
+        tei_string = ""
+
+        timestamp = datetime.datetime.now()
+        tei_string +=  '<TEI version="3.3.0" xmlns="http://www.tei-c.org/ns/1.0">\n'
+        tei_string +=  self.tei_header(source)
+        tei_string +=  self.tei_body(source)
+        tei_string +=  "</TEI>\n"
+
+        return tei_string
+
     def normalized_transcription( self, verse ):
         transcription = self.transcription(verse)
         if transcription:
@@ -149,12 +197,13 @@ class Manuscript(PolymorphicModel):
     def title_dict( self, verse ):
         ref = verse.reference_abbreviation()
         url_ref = verse.url_ref()
-        dict = { 
+        title_dict = { 
             'title': "%s – %s" % (self.siglum, ref), 
             'url': "/dcodex/ms/%s/%s/" % ( self.siglum, url_ref ),
+            # 'url': reverse_lazy( "dcodex-manuscript-verse", dict(request_siglum=self.siglum, request_verse=url_ref) ),
             'verse_url_ref': url_ref,             
         }
-        return dict    
+        return title_dict    
 
     def save_location( self, verse, pdf, page, x, y ):
         location, created = VerseLocation.objects.update_or_create(
@@ -707,8 +756,17 @@ class Verse(PolymorphicModel):
         """            
         return None
         
-        
-        
+    def tei_id( self ):
+        """ 
+        Method to get an id that can be used to reference this verse in TEI.
+
+        Verses are encpasulated in a <ab> tag.
+        The id returned by this function is given as the n attribute in this tag.
+        e.g. <ab n='B04K1V35'>...
+
+        By default, this is the string representation of this verse.
+        """
+        return str(self)
         
 
     

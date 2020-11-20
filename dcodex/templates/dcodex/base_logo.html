@@ -1,0 +1,11 @@
+{% extends 'dcodex/base_sidebars.html' %}
+{% load static %}
+
+{% block middle %}
+    <center>
+        <img src="{% static 'dcodex/images/DCodex-Logo.svg' %}" class='logo-middle' />
+    </center>
+    {% block content %}
+    {% endblock  %}
+
+{% endblock  %}

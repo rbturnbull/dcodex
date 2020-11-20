@@ -394,7 +394,9 @@ function highlightVerseMarker( verse_id, manuscript_id, highlightedCallback = nu
 
 
 function load_comparison(verse_id, manuscript_id) {
+    alert("load_comparison");
     $( "#comparison" ).load( "/dcodex/ajax/comparison/", { manuscript_id:manuscript_id, verse_id:verse_id }, function() {
+        alert("load_comparison loaded");
         $(".mshover").hover(function(){
             $('#msHover').load("/dcodex/ajax/transcription-mini/", { manuscript_id:$(this).data('manuscriptid'), verse_id:$(this).data('verseid') } );
             $('#msHover').show();

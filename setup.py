@@ -11,6 +11,7 @@ requirements = [
     'pyxDamerauLevenshtein', # now an optional install
     'beautifulsoup4',
     'django-admin-sortable2',
+    'lxml',
 ]
 
 setup(
