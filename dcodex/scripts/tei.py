@@ -10,4 +10,4 @@ def run(*args):
         print(f"Cannot understand manuscript siglum '{siglum}.")
         return 
 
-    print(manuscript.tei_string())
+    print(manuscript.tei())

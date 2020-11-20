@@ -14,6 +14,7 @@ import gotoh
 from .strings import normalize_transcription
 from .distance import similarity_levenshtein, similarity_damerau_levenshtein, similarity_ratcliff_obershelp, similarity_jaro
 from scipy.special import expit
+from lxml import etree
 
 def facsimile_dir():
     return settings.MEDIA_ROOT
@@ -146,7 +147,7 @@ class Manuscript(PolymorphicModel):
         tei_string += '</teiHeader>\n'
         return tei_string
 
-    def tei_body( self, source=""):
+    def tei_text( self, source=""):
         tei_string = ""
         tei_string += "<text>\n"
         tei_string += "  <body>\n"
@@ -158,13 +159,36 @@ class Manuscript(PolymorphicModel):
         tei_string += "</text>\n"
         return tei_string
 
-    def tei_string( self, source="" ):
+    def tei_facsimile( self ):
+        tei_string = ""
+        tei_string += "<facsimile>\n"
+        for page in pages:
+            tei_string += f'  <surface ulx="0" uly="0" lrx="{width}" lry="{height}">\n'
+            tei_string += f'    <graphic url="{}"/>\n'
+            for location in locations:
+                tei_string += f'    <graphic url="{}"/>\n'
+
+# <zone
+#     xml:id="cartoonfacs"
+#     ulx="96"
+#     uly="89"
+#     lrx="950"
+#     lry="657">
+#    <desc>Cartoon</desc>
+#   </zone>                
+            tei_string += f'  </surface>\n'
+        
+        tei_string += "</facsimile>\n"
+        return tei_string
+
+    def tei( self, source="" ):
         tei_string = ""
 
         timestamp = datetime.datetime.now()
         tei_string +=  '<TEI version="3.3.0" xmlns="http://www.tei-c.org/ns/1.0">\n'
         tei_string +=  self.tei_header(source)
-        tei_string +=  self.tei_body(source)
+        tei_string +=  self.tei_facsimile(source)
+        tei_string +=  self.tei_text(source)
         tei_string +=  "</TEI>\n"
 
         return tei_string
