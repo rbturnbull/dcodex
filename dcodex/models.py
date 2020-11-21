@@ -11,7 +11,7 @@ import logging
 import pandas as pd
 import numpy as np
 import gotoh
-from .strings import normalize_transcription
+from .strings import normalize_transcription, remove_markup
 from .distance import similarity_levenshtein, similarity_damerau_levenshtein, similarity_ratcliff_obershelp, similarity_jaro
 from scipy.special import expit
 from lxml import etree
@@ -126,72 +126,73 @@ class Manuscript(PolymorphicModel):
         return self.transcription_class().objects.filter( manuscript=self )
 
 
-    def tei_header( self, source=""):
-        tei_string = ""
-        tei_string +=  '<teiHeader>\n'
-        tei_string +=  '  <fileDesc>\n'
-
-        tei_string +=  '    <titleStmt>\n'
-        tei_string += f'      <title>Transcription of {self.name}</title>\n'
-        tei_string +=  '    </titleStmt>\n'
-
-        tei_string +=  '    <publicationStmt>\n'
-        tei_string += f'      <p>Generated on {timestamp} using D-Codex.</p>\n'
-        tei_string +=  '    </publicationStmt>\n'
-
-        tei_string +=  '    <sourceDesc>\n'
-        tei_string += f'      <p>{source}</p>\n'
-        tei_string +=  '    </sourceDesc>\n'
-
-        tei_string +=  '  </fileDesc>\n'
-        tei_string += '</teiHeader>\n'
-        return tei_string
-
-    def tei_text( self, source=""):
-        tei_string = ""
-        tei_string += "<text>\n"
-        tei_string += "  <body>\n"
-        for transcription in self.transcriptions():
-            transcription_tei = transcription.transcription # hack
-            verse_tei_id = transcription.verse.tei_id()
-            tei_string += f"    <ab n='{verse_tei_id}'>{transcription.transcription}</ab>\n"
-        tei_string += "  </body>\n"
-        tei_string += "</text>\n"
-        return tei_string
-
-    def tei_facsimile( self ):
-        tei_string = ""
-        tei_string += "<facsimile>\n"
-        for page in pages:
-            tei_string += f'  <surface ulx="0" uly="0" lrx="{width}" lry="{height}">\n'
-            tei_string += f'    <graphic url="{}"/>\n'
-            for location in locations:
-                tei_string += f'    <graphic url="{}"/>\n'
-
-# <zone
-#     xml:id="cartoonfacs"
-#     ulx="96"
-#     uly="89"
-#     lrx="950"
-#     lry="657">
-#    <desc>Cartoon</desc>
-#   </zone>                
-            tei_string += f'  </surface>\n'
-        
-        tei_string += "</facsimile>\n"
-        return tei_string
-
-    def tei( self, source="" ):
-        tei_string = ""
-
+    def tei_element_header( self ):
         timestamp = datetime.datetime.now()
-        tei_string +=  '<TEI version="3.3.0" xmlns="http://www.tei-c.org/ns/1.0">\n'
-        tei_string +=  self.tei_header(source)
-        tei_string +=  self.tei_facsimile(source)
-        tei_string +=  self.tei_text(source)
-        tei_string +=  "</TEI>\n"
 
-        return tei_string
+        teiHeader = etree.Element("teiHeader")
+        fileDesc  = etree.SubElement(teiHeader, "fileDesc")
+        titleStmt = etree.SubElement(fileDesc, "titleStmt")
+        title     = etree.SubElement(titleStmt, "title")
+        title.text = f"Transcription of {self.name}"
+
+        publicationStmt = etree.SubElement(fileDesc, "publicationStmt")
+        publicationStmtP = etree.SubElement(publicationStmt, "p")
+        publicationStmtP.text = f"Generated on {timestamp} using D-Codex."
+
+        return teiHeader
+
+    def accordance(self):
+        """ Returns a string formatted as an Accordance User Bible """
+        user_bible = ""
+        for transcription in self.transcriptions():
+            transcription_clean = transcription.remove_markup()
+            user_bible += f"{transcription.verse} <color=black></color>{transcription_clean}<br>\n"
+        return user_bible
+
+
+    def tei_element_text( self ):
+        text = etree.Element("text")
+        body  = etree.SubElement(text, "body")
+        for transcription in self.transcriptions():
+            transcription_markup = transcription.transcription # hack
+            verse_tei_id = transcription.verse.tei_id()
+            ab = etree.SubElement(body, "ab", n=verse_tei_id)
+            ab.text = transcription_markup
+
+        return text
+
+    def tei_element_facsimile( self ):
+        facsimile = etree.Element("facsimile")
+        return facsimile
+        for page in pages:
+            surface = etree.SubElement(facsimile, "surface", ulx=0, uly=0, lrx=width, lry=height)                    
+            graphic = etree.SubElement(surface, "graphic", url=url)                    
+            for location in locations:
+                zone = etree.SubElement(surface, "zone", ulx=0, uly=0, lrx=width, lry=height)
+                desc = etree.SubElement(zone, "desc")
+                desc.text = f"Start of {location.verse()}"
+        return facsimile            
+
+    def tei( self ):
+        """ A TEI representation of this manuscript using lxml. """
+        tei = etree.Element("TEI")
+        tei.append( self.tei_element_header() )
+        
+        facsimile = self.tei_element_facsimile()
+        if facsimile is not None:
+            tei.append( facsimile )
+        
+        text = self.tei_element_text()
+        if text is not None:
+            tei.append( text )
+
+        return tei
+
+    def tei_string( self ):
+        """ A TEI representation of this manuscript in a pretty string. """
+
+        tei = self.tei()
+        return etree.tostring(tei, pretty_print=True, encoding=str)
 
     def normalized_transcription( self, verse ):
         transcription = self.transcription(verse)
@@ -848,7 +849,7 @@ class VerseTranscriptionBase(PolymorphicModel):
         if self.manuscript.markup:
             return self.manuscript.markup
 
-        return None
+        return StandardMarkup(name="Default")
 
     def normalize(self):
         markup = self.get_markup()
@@ -856,6 +857,10 @@ class VerseTranscriptionBase(PolymorphicModel):
             return markup.regularize( self.transcription )
         
         return normalize_transcription( self.transcription )
+
+    def remove_markup(self):
+        markup = self.get_markup()
+        return markup.remove_markup( self.transcription )
 
     def tokenize(self):
         markup = self.get_markup()

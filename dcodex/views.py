@@ -4,6 +4,7 @@ from django.template import loader
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.base import TemplateView
+from django.views.generic import DetailView
 
 from dcodex.models import *
 from dcodex.util import get_request_dict
@@ -74,6 +75,33 @@ def thumbnails(request, pdf_filename):
     thumbnails = pdf.thumbnails( )
     
     return render(request, 'dcodex/thumbnails.html', {'thumbnails': thumbnails} )
+
+
+def ManuscriptDetailView(LoginRequiredMixin, DetailView):
+    model = Manuscript
+    slug_field = 'siglum'
+    template_name = "manuscript_detail"
+
+
+@login_required
+def manuscript_tei_view(request, request_siglum ):
+    lookup = dict(id=request_siglum) if request_siglum.isdigit() else dict(siglum=request_siglum)
+    manuscript = get_object_or_404(Manuscript, **lookup)
+
+    response = HttpResponse(manuscript.tei_string(), content_type='application/text charset=utf-8')
+    response['Content-Disposition'] = f'attachment; filename="{request_siglum}.xml"'
+    return response
+
+
+@login_required
+def manuscript_accordance_view(request, request_siglum ):
+    lookup = dict(id=request_siglum) if request_siglum.isdigit() else dict(siglum=request_siglum)
+    manuscript = get_object_or_404(Manuscript, **lookup)
+
+    response = HttpResponse(manuscript.accordance(), content_type='application/text charset=utf-8')
+    response['Content-Disposition'] = f'attachment; filename="{request_siglum}.txt"'
+    return response
+
 
 @login_required
 def pdf_images(request, pdf_filename):

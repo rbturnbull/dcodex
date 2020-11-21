@@ -5,6 +5,8 @@ from . import views
 urlpatterns = [
     path('', views.index, name='home'),
     path('ms/<str:request_siglum>/', views.manuscript_verse_view, name='dcodex-manuscript'),
+    path('ms/<str:request_siglum>/tei/', views.manuscript_tei_view, name='dcodex-manuscript-tei'),
+    path('ms/<str:request_siglum>/accordance/', views.manuscript_accordance_view, name='dcodex-manuscript-accordance'),
     path('ms/<str:request_siglum>/<str:request_verse>/', views.manuscript_verse_view, name='dcodex-manuscript-verse'),
     path('ajax/thumbnails/<str:pdf_filename>/', views.thumbnails, name='dcodex-thumbnails'),
     path('ajax/pdf-images/<str:pdf_filename>/', views.pdf_images, name='dcodex-pdf-images'),
