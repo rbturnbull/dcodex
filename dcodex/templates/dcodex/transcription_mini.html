@@ -7,8 +7,8 @@
 			var y = {{ location.y }} * $('#manuscriptInBox').prop('scrollHeight');
 			var x = {{ location.x }}*$('#manuscriptInBox').prop('scrollWidth');
 			var right = $('#manuscriptInBox').prop('scrollWidth') - x;
-			var margin = (-y+50)
-			var top = y+margin
+			var margin = (-y+50);
+			var top = y+margin;
 	
 			$('#verseMarkerInBox').css('top',top+"px");	
 			$('#verseMarkerInBoxX').css('top',top+"px");	
@@ -24,7 +24,7 @@
 
 <div id=manuscriptInBox style='position: relative; overflow:hidden;'>
 
-    <img src="{{ MEDIA_PREFIX }}{{ location.image_path }}" style='width: 100%;' id=manuscriptInBoxImage />
+    <img src="{{ location.deck_membership.image.filer_image.url }}" style='width: 100%;' id=manuscriptInBoxImage />
 
     <div id='verseMarkerInBox' class='verseMarker' style='background-color: green; height: 1px; width: 100%;'></div>
     <div id='verseMarkerInBoxX' class='verseMarker' style='position: absolute; background-color: green; height: 30px; width: 1px;'></div>

@@ -451,7 +451,8 @@ class Manuscript(PolymorphicModel):
         my_location_value = location_A_value + value_delta
         page = int(my_location_value)
         y = (my_location_value - page) * (1.0-2*textbox_top) + textbox_top
-        image = self.imagedeck[page]
+        # image = self.imagedeck[page]
+        deck_membership = DeckMembership.objects.filter(deck=self.imagedeck, rank=page).first()
         
         if verbose:
             logger = logging.getLogger(__name__)            
@@ -460,7 +461,7 @@ class Manuscript(PolymorphicModel):
             logger.error( "distance_verse_location_A: %s " % str(distance_verse_location_A) )
             logger.error( "distance_locations_B_location_A: %s " % str(distance_locations_B_location_A) )
         
-        return VerseLocation(manuscript=self, verse=verse, image=image, y=y, x=0.0)
+        return VerseLocation(manuscript=self, verse=verse, deck_membership=deck_membership, y=y, x=0.0)
 
     def next_verse(self, verse):
         """ Returns the next verse after the specified verse in this manuscript. """
