@@ -105,6 +105,7 @@ admin.site.register(StandardMarkup)
 admin.site.register(PDF)
 admin.site.register(VerseLocation)
 admin.site.register(Page)
+admin.site.register(FolioRef)
 
 
 # https://simpleisbetterthancomplex.com/tutorial/2016/11/23/how-to-add-user-profile-to-django-admin.html

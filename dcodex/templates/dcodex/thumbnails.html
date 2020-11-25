@@ -1,14 +1,13 @@
 {% load static %}
+{% load thumbnail %}
+{% load dcodex_tags %}
 {% get_media_prefix as MEDIA_PREFIX %}
-{% if thumbnails %}
-    {% for thumbnail in thumbnails %}
-        <div id='thumbnailContainer{{ thumbnail.page }}' class=thumbnailContainer data-page='{{ thumbnail.page }}'>
-            <img data-src='{{ MEDIA_PREFIX }}{{ thumbnail.src }}' src='' class='thumbnail' data-page='{{ thumbnail.page }}' data-folio='{{ thumbnail.folio }}' id='thumbnail{{ thumbnail.page }}' />
-            {% if thumbnail.folio %}
-                <p>{{ thumbnail.folio }} - p{{ thumbnail.page }}</p>
-            {% else %}
-                <p>Page {{ thumbnail.page }}</p>
-            {% endif %}
+
+{% if manuscript %}
+    {% for image_membership in manuscript.image_memberships %}
+        <div id='thumbnailContainer{{ forloop.counter }}' class="thumbnailContainer" data-page='{{ forloop.counter }}' data-mid='{{ image_membership.id }}'>
+            <img data-src='{% thumbnail image_membership.image.filer_image 121x0 %}' src='' class='thumbnail' data-page='{{ forloop.counter }}' data-folio='{{ image_membership.folioref }}' id='thumbnail{{ forloop.counter }}' />
+            <p>{{ manuscript|folio_and_page:forloop.counter }}</p>
         </div>            
     {% endfor %}
 {% else %}

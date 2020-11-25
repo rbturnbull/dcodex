@@ -24,6 +24,11 @@ def get_manuscript(request):
     request_dict = get_request_dict(request)
     return get_object_or_404(Manuscript, id=request_dict.get('manuscript_id'))   
 
+def get_deck_membership(request):
+    request_dict = get_request_dict(request)
+    deckmembershipid       = request_dict['deckmembershipid']
+    return get_object_or_404( DeckMembership, id=deckmembershipid ) 
+
 @login_required
 def get_pdf(request):
     request_dict = get_request_dict(request)
@@ -70,11 +75,11 @@ def manuscript_verse_view(request, request_siglum, request_verse = None):
     return render(request, 'dcodex/manuscript.html', context)
 
 @login_required
-def thumbnails(request, pdf_filename):
-    pdf    = get_object_or_404(PDF, filename=pdf_filename)   
-    thumbnails = pdf.thumbnails( )
+def thumbnails(request, request_siglum):
+    lookup = dict(id=request_siglum) if request_siglum.isdigit() else dict(siglum=request_siglum)
+    manuscript = get_object_or_404(Manuscript, **lookup)
     
-    return render(request, 'dcodex/thumbnails.html', {'thumbnails': thumbnails} )
+    return render(request, 'dcodex/thumbnails.html', {'manuscript': manuscript} )
 
 
 def ManuscriptDetailView(LoginRequiredMixin, DetailView):
@@ -104,21 +109,21 @@ def manuscript_accordance_view(request, request_siglum ):
 
 
 @login_required
-def pdf_images(request, pdf_filename):
-    pdf    = get_object_or_404(PDF, filename=pdf_filename)   
-    images = pdf.images( )
+def ms_images(request, request_siglum):
+    lookup = dict(id=request_siglum) if request_siglum.isdigit() else dict(siglum=request_siglum)
+    manuscript = get_object_or_404(Manuscript, **lookup)
     
-    return render(request, 'dcodex/pdf_images.html', {'images': images} )
+    return render(request, 'dcodex/ms_images.html', {'manuscript': manuscript} )
+
 
 @login_required
 def page_locations_json(request):
     request_dict = get_request_dict(request)
     manuscript = get_manuscript(request)
-    pdf        = get_pdf(request)
-    page       = request_dict['page']
-    
-    locations = VerseLocation.objects.filter( manuscript=manuscript, pdf=pdf, page=page ).all()        
-    
+    deck_membership = get_deck_membership(request)
+
+    locations = VerseLocation.objects.filter( manuscript=manuscript, deck_membership=deck_membership ).all()        
+
     list = [location.values_dict() for location in locations]
     return HttpResponse(json.dumps(list))
     
@@ -149,15 +154,14 @@ def verse_id(request):
 
 @login_required
 def save_location(request):
-    request_dict = get_request_dict(request)
-    pdf = get_pdf(request)
     manuscript, verse = get_manuscript_and_verse(request)
-    
-    page = request_dict.get('page')
+    deck_membership = get_deck_membership(request)
+
+    request_dict = get_request_dict(request)
     x = request_dict.get('x')
     y = request_dict.get('y')
 
-    location = manuscript.save_location( verse, pdf, page, x, y )
+    location = manuscript.save_location( verse, deck_membership, x, y )
     
     return HttpResponse(json.dumps(location.values_dict()))
 
@@ -177,17 +181,13 @@ def save_transcription(request):
 @login_required
 def save_folio_ref(request):
     request_dict = get_request_dict(request)
-    manuscript = get_manuscript(request)
-    pdf = get_pdf(request)
-    
-    page = request_dict.get('page')
+
+    deck_membership = get_deck_membership(request)
     folio = request_dict.get('folio')
     side = request_dict.get('side')
 
-    page, created = Page.objects.update_or_create(
-        manuscript=manuscript, 
-        pdf=pdf, 
-        page=page, 
+    folio_ref, created = FolioRef.objects.update_or_create(
+        deck_membership=deck_membership, 
         defaults={"folio": folio, "side": side}
     )
     return HttpResponse(created)
@@ -195,18 +195,13 @@ def save_folio_ref(request):
 
 @login_required
 def verse_ref_at_position(request):
-
     request_dict = get_request_dict(request)
-
-    manuscript   = get_manuscript( request )
+    manuscript      = get_manuscript( request )
+    deck_membership = get_deck_membership( request )    
+    x               = float(request_dict.get('x'))
+    y               = float(request_dict.get('y'))
     
-    pdf          = get_pdf(request)
-    
-    page         = int(request_dict.get('page'))
-    x            = float(request_dict.get('x'))
-    y            = float(request_dict.get('y'))
-    
-    verse = manuscript.approximate_verse_at_position( pdf, page, x, y )
+    verse = manuscript.approximate_verse_at_position( deck_membership, x, y )
     return render(request, 'dcodex/approx_verse.html', {'verse': verse} )
 
 @login_required
@@ -263,10 +258,10 @@ def transcription_text(request):
 @login_required
 def page_number(request):
     request_dict = get_request_dict(request)
-    pdf = get_pdf(request)
+    manuscript   = get_manuscript( request )
     folio_ref = request_dict['folio_ref']
     
-    return HttpResponse(pdf.page_number(folio_ref) )
+    return HttpResponse(manuscript.page_number(folio_ref) )
 
 @login_required
 def verse_search(request):

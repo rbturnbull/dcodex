@@ -17,3 +17,14 @@ def blank_if_none(text):
     if text:
         return text
     return ""
+
+@register.filter
+def folio_name(manuscript, page_index):
+    return manuscript.folio_name( page_index )
+
+@register.filter
+def folio_and_page(manuscript, page_index):
+    folio_name = manuscript.folio_name( page_index )
+    if folio_name:
+        return f"{folio_name} – p. {page_index}"
+    return f"Page {page_index}"

@@ -78,7 +78,7 @@
 <script>
 $( document ).ready(function() {
     console.log( "loading from manuscript.html" );
-    load_pdf( "{{ location.pdf.filename }}", {{ manuscript.id }} );
+    load_manuscript( {{ manuscript.id }} );
     seekVerse( {{ verse.id }}, {{ manuscript.id }} )
 });
 </script>

@@ -1,23 +1,34 @@
+import os
+import glob
+import logging
 import datetime
+import re
+from lxml import etree
+
+import pandas as pd
+import numpy as np
+from scipy.special import expit
+import gotoh
+
 from django.db import models
 from django.conf import settings
 from polymorphic.models import PolymorphicModel
 from django.shortcuts import render
-import re
 from django.db.models import Max, Min
-import os
-import glob
-import logging
-import pandas as pd
-import numpy as np
-import gotoh
+from imagedeck.models import DeckBase, DeckMembership
+
 from .strings import normalize_transcription, remove_markup
 from .distance import similarity_levenshtein, similarity_damerau_levenshtein, similarity_ratcliff_obershelp, similarity_jaro
-from scipy.special import expit
-from lxml import etree
+
+
+FIRST_SIDE_NAMES  = ['r','a','ا']
+SECOND_SIDE_NAMES = ['v','b','ب']
+
+
 
 def facsimile_dir():
     return settings.MEDIA_ROOT
+
 
 
 class TextDirection(models.TextChoices):
@@ -31,7 +42,7 @@ class Markup(PolymorphicModel):
     def __str__(self):
         return self.name
 
-    def regularise( self, string ):
+    def regularize( self, string ):
         return normalize_transcription( string )
 
     def remove_markup(self, string):
@@ -59,6 +70,7 @@ class Manuscript(PolymorphicModel):
     siglum = models.CharField(max_length=20, blank=True, help_text='A unique short string for this manuscript.')
     markup = models.ForeignKey(Markup, on_delete=models.SET_DEFAULT, null=True, blank=True, default=None, help_text='The default markup class for this manuscript.')
     text_direction = models.CharField(max_length=1, choices=TextDirection.choices, default=TextDirection.LEFT_TO_RIGHT )
+    imagedeck = models.ForeignKey( DeckBase, on_delete=models.SET_DEFAULT, null=True, blank=True, default=None, help_text='The facsimile images for this manuscript.')
 
     def __str__(self):
         if self.name and self.siglum:
@@ -125,6 +137,8 @@ class Manuscript(PolymorphicModel):
     def transcriptions(self):
         return self.transcription_class().objects.filter( manuscript=self )
 
+    def image_memberships(self):
+        return self.imagedeck.deckmembership_set.all()
 
     def tei_element_header( self ):
         timestamp = datetime.datetime.now()
@@ -230,11 +244,11 @@ class Manuscript(PolymorphicModel):
         }
         return title_dict    
 
-    def save_location( self, verse, pdf, page, x, y ):
+    def save_location( self, verse, deck_membership, x, y ):
         location, created = VerseLocation.objects.update_or_create(
             manuscript=self, 
             verse=verse, 
-            defaults={"pdf": pdf, "page": page, 'x':x, 'y':y}
+            defaults=dict(deck_membership=deck_membership, x=x, y=y),
         )
         return location
 
@@ -279,30 +293,30 @@ class Manuscript(PolymorphicModel):
     def location_after( self, verse ):
         return VerseLocation.objects.filter( manuscript=self, verse__id__gt=verse.id ).order_by('verse__id').first()
         
-    def last_location( self, pdf ):
-        return VerseLocation.objects.filter( manuscript=self, pdf=pdf ).order_by('-verse__id').first()
-    def first_location( self, pdf ):
-        return VerseLocation.objects.filter( manuscript=self, pdf=pdf ).order_by('verse__id').first()
+    def last_location( self ):
+        return VerseLocation.objects.filter( manuscript=self ).order_by('-verse__id').first()
+
+    def first_location( self ):
+        return VerseLocation.objects.filter( manuscript=self ).order_by('verse__id').first()
         
-    def location_above( self, pdf, page, y ):
+    def location_above( self, deck_membership, y ):
         # Search on this page
-        location = VerseLocation.objects.filter( manuscript=self, pdf=pdf, page=page, y__lte=y ).order_by('-y').first()
+        location = VerseLocation.objects.filter( manuscript=self, deck_membership=deck_membership, y__lte=y ).order_by('-y').first()
         if location:
             return location
         # Search on previous pages
-        location = VerseLocation.objects.filter( manuscript=self, pdf=pdf, page__lt=page ).order_by('-page','-y').first()
+        location = VerseLocation.objects.filter( manuscript=self, deck_membership__deck=deck_membership.deck, deck_membership__rank__lt=deck_membership.rank ).order_by('-deck_membership__rank','-y').first()
         return location
 
-    def location_below( self, pdf, page, y ):
+    def location_below( self, deck_membership, y ):
         # Search on this page
-        location = VerseLocation.objects.filter( manuscript=self, pdf=pdf, page=page, y__gte=y ).order_by('y').first()
+        location = VerseLocation.objects.filter( manuscript=self, deck_membership=deck_membership, y__gte=y ).order_by('y').first()
         if location:
             return location
-        # Search on previous pages
-        location = VerseLocation.objects.filter( manuscript=self, pdf=pdf, page__gt=page ).order_by('page','y').first()
+        # Search on later pages
+        location = VerseLocation.objects.filter( manuscript=self, deck_membership__deck=deck_membership.deck, deck_membership__rank__gt=deck_membership.rank ).order_by('deck_membership__rank','y').first()
         return location
 
-        
     def gotoh_counts_verses( self, ms, verses, gotoh_param=(0,-1,-1,-1) ):
         total_counts = np.zeros( (4,) )
         for verse in verses:            
@@ -411,20 +425,17 @@ class Manuscript(PolymorphicModel):
                 # No verses have been transcribed, then nothing is known about locations in the manuscript and so return nothing
                 return None
 
-            location_B = self.last_location( pdf=location_A.pdf )
+            location_B = self.last_location(  )
             if location_B is None or location_B.id == location_A.id:
                 return location_A
         else:
             location_B = self.location_after( verse )
             if location_B is None:
-                location_B = location_A;
-                location_A = self.first_location( location_B.pdf )
+                location_B = location_A
+                location_A = self.first_location( )
                 if location_A is None or location_A.id == location_B.id:
                     return location_B
-    
-        if location_A.pdf != location_B.pdf: # Hack for different PDFs. This out to be fixed
-            return location_A
-    
+        
         textbox_top = VerseLocation.textbox_top(self)
 
         location_A_value = location_A.value( textbox_top ) 
@@ -440,7 +451,7 @@ class Manuscript(PolymorphicModel):
         my_location_value = location_A_value + value_delta
         page = int(my_location_value)
         y = (my_location_value - page) * (1.0-2*textbox_top) + textbox_top
-        
+        image = self.imagedeck[page]
         
         if verbose:
             logger = logging.getLogger(__name__)            
@@ -449,8 +460,8 @@ class Manuscript(PolymorphicModel):
             logger.error( "distance_verse_location_A: %s " % str(distance_verse_location_A) )
             logger.error( "distance_locations_B_location_A: %s " % str(distance_locations_B_location_A) )
         
-        
-        return VerseLocation(manuscript=self, pdf=location_A.pdf, verse=verse, page=page, y=y, x=0.0)
+        return VerseLocation(manuscript=self, verse=verse, image=image, y=y, x=0.0)
+
     def next_verse(self, verse):
         """ Returns the next verse after the specified verse in this manuscript. """
         return verse.next()
@@ -462,40 +473,36 @@ class Manuscript(PolymorphicModel):
     def distance_between_verses( self, verse1, verse2 ):
         return verse1.distance_to(verse2)
 
-
-
-    def approximate_verse_at_position( self, pdf, page, x, y ):
+    def approximate_verse_at_position( self, deck_membership, x, y ):
         """ Estimates the verse at a particular location """
-        location_A = self.location_above( pdf, page, y )
+        location_A = self.location_above( deck_membership, y )
         
         # Find two locations to interpolate from
         if location_A is None:
-            location_A = self.location_below( pdf, page, y )
+            location_A = self.location_below( deck_membership, y )
             if location_A is None: 
                 # No verses have been transcribed, then nothing is known about locations in the manuscript and so return nothing
                 return None
 
-            location_B = self.last_location( pdf=location_A.pdf )
+            location_B = self.last_location(  )
             if location_B is None or location_B.id == location_A.id:
                 return location_A
         else:
-            location_B = self.location_below( pdf, page, y )
+            location_B = self.location_below( deck_membership, y )
             if location_B is None:
                 location_B = location_A;
-                location_A = self.first_location( location_B.pdf )
+                location_A = self.first_location(  )
                 if location_A is None or location_A.id == location_B.id:
                     return location_B
-    
-        if location_A.pdf != location_B.pdf: # Hack for different PDFs. This out to be fixed
-            return location_A
+
 
         textbox_top = VerseLocation.textbox_top(self)
 
         location_A_value = location_A.value( textbox_top ) 
         location_B_value = location_B.value( textbox_top ) 
         
-        target_value = page + ( y - textbox_top )/(1.0-2*textbox_top)
-        
+        target_value = deck_membership.index() + 1 + ( y - textbox_top )/(1.0-2*textbox_top)
+
         additional_mass = self.distance_between_verses( location_A.verse, location_B.verse ) * (target_value - location_A_value)/(location_B_value - location_A_value)
         return self.verse_from_mass_difference( location_A.verse, additional_mass )
         
@@ -523,7 +530,69 @@ class Manuscript(PolymorphicModel):
     def is_in_family_at(self, family, verse):
         ids = self.family_ids_at(verse)
         return family.id in ids 
+
+    def closest_prev_folioref_by_page( self, page_index ):
+        return FolioRef.objects.filter( deck_membership__deck=self.imagedeck, deck_membership__rank__lte=page_index ).order_by('-deck_membership__rank').first()
+
+    def closest_prev_folioref_by_folio( self, folio_number ):
+        return FolioRef.objects.filter( deck_membership__deck=self.imagedeck, folio__lte=folio_number ).order_by('-folio').first()
+    
+    def folio_name( self, page_index ):
+        """ 
+        Returns the folio reference string for this page. 
         
+        If there is no FolioRef object associated with this page, then it infers it from the closest previous one.
+        """
+        prev_folioref = self.closest_prev_folioref_by_page( page_index )
+        if not prev_folioref:
+            return ""
+        
+        x = prev_folioref.folio * 2 - 1
+        name_index = 0
+        
+        if prev_folioref.side in SECOND_SIDE_NAMES:
+            x += 1
+            name_index = SECOND_SIDE_NAMES.index(prev_folioref.side)
+        elif prev_folioref.side in FIRST_SIDE_NAMES:
+            name_index = FIRST_SIDE_NAMES.index(prev_folioref.side)
+        
+        y = page_index - prev_folioref.page + x
+        
+        folio_side = FIRST_SIDE_NAMES[name_index] if y % 2 == 1 else  SECOND_SIDE_NAMES[name_index]
+
+        folio_number = (int)((y+1)/2)
+        return f"{folio_number}{folio_side}"        
+
+    def page_number( self, folio_ref ):
+        if folio_ref.isdigit():
+            return int( folio_ref )
+        
+        # Come up with possible names for sides to search for
+        possible_side_names = "".join( FIRST_SIDE_NAMES + SECOND_SIDE_NAMES )
+        
+        # Search for folio number and side
+        m = re.match( "([0-9]*)([%s])" % (possible_side_names), folio_ref )
+        if m:
+            folio_number = int(m.group(1))
+            folio_side   = m.group(2)
+
+            prev_folio = self.closest_prev_folioref_by_folio( folio_number )
+            if not prev_folio:
+                return folio_number
+            
+            x = prev_folio.folio * 2 - 1
+            if prev_folio.side in SECOND_SIDE_NAMES:
+                x += 1
+
+            y = folio_number * 2 - 1        
+            if folio_side in SECOND_SIDE_NAMES:
+                y += 1
+            
+            return prev_folio.page + y - x
+            
+        return None
+
+
 
 class ManuscriptImage():
     page = None
@@ -541,8 +610,6 @@ class PDF(models.Model):
     filename = models.CharField(max_length=200)
     page_count = models.IntegerField(blank=True, null=True, default=None)
     
-    first_side_names  = ['r','a','ا']
-    second_side_names = ['v','b','ب']
 
     def __str__(self):
         return self.filename
@@ -578,60 +645,9 @@ class PDF(models.Model):
             self.save()
         return self.page_count
     
-    def closest_prev_page( self, page_index ):
-        return Page.objects.filter( pdf=self, page__lte=page_index ).order_by('-page').first()
-    def closest_prev_folio( self, folio_number ):
-        return Page.objects.filter( pdf=self, folio__lte=folio_number ).order_by('-folio').first()
-    
-    def folio_name( self, page_index ):
-        prev_page = self.closest_prev_page( page_index )
-        if not prev_page:
-            return ""
-        
-        x = prev_page.folio * 2 - 1
-        name_index = 0
-        
-        if prev_page.side in self.second_side_names:
-            x += 1
-            name_index = self.second_side_names.index(prev_page.side)
-        elif prev_page.side in self.first_side_names:
-            name_index = self.first_side_names.index(prev_page.side)
-        
-        y = page_index - prev_page.page + x
-        
-        folio_side = self.first_side_names[name_index] if y % 2 == 1 else  self.second_side_names[name_index]
 
-        folio_number = (int)((y+1)/2)
-        return "%d%s" % (folio_number, folio_side)
         
-    def page_number( self, folio_ref ):
-        if folio_ref.isdigit():
-            return int( folio_ref )
-        
-        # Come up with possible names for sides to search for
-        possible_side_names = "".join( self.first_side_names + self.second_side_names )
-        
-        # Search for folio number and side
-        m = re.match( "([0-9]*)([%s])" % (possible_side_names), folio_ref )
-        if m:
-            folio_number = int(m.group(1))
-            folio_side   = m.group(2)
 
-            prev_folio = self.closest_prev_folio( folio_number )
-            if not prev_folio:
-                return folio_number
-            
-            x = prev_folio.folio * 2 - 1
-            if prev_folio.side in self.second_side_names:
-                x += 1
-
-            y = folio_number * 2 - 1        
-            if folio_side in self.second_side_names:
-                y += 1
-            
-            return prev_folio.page + y - x
-            
-        return None
 
 
 
@@ -653,6 +669,7 @@ class PDF(models.Model):
             thumbnails.append( ManuscriptImage( page_index, self.image_path(page_index), folio ) )
         return thumbnails
 
+
     def thumbnail_path(self, page_index):
         src = "facsimiles/small/%s-%d.small.jpg" % (self.filename, page_index)
         dir = facsimile_dir()      
@@ -666,6 +683,7 @@ class PDF(models.Model):
     def image_path(self, page_index):
         return "facsimiles/%s-%d.jpg" % (self.filename, page_index)
 
+
 class Page(models.Model):
     manuscript = models.ForeignKey(Manuscript, on_delete=models.CASCADE) # SHOULD THIS BE HERE??
     pdf = models.ForeignKey(PDF, on_delete=models.CASCADE)
@@ -674,9 +692,22 @@ class Page(models.Model):
     side = models.CharField(max_length=20)
     def __str__(self):
         return "%s %d%s (%s p%d)" % (self.manuscript.short_name(), self.folio, self.side, self.pdf.__str__(), self.page )
+
+
+class FolioRef(models.Model):
+    deck_membership = models.OneToOneField(DeckMembership, on_delete=models.CASCADE)
+    folio = models.IntegerField()
+    side = models.CharField(max_length=20)
+
+    def __str__(self):
+        return f"{self.deck_membership.deck} {self.folio}{self.side} ({self.deck_membership.image} p{self.page})"
+
+    def ref(self):
+        return f"{self.folio}{self.side}"
     
-    
-    
+    @property
+    def page(self):
+        return self.deck_membership.rank
     
     
     
@@ -800,12 +831,24 @@ class VerseLocation(models.Model):
     
     manuscript = models.ForeignKey(Manuscript, on_delete=models.CASCADE)
     verse = models.ForeignKey(Verse, on_delete=models.CASCADE)
-    pdf = models.ForeignKey(PDF, on_delete=models.CASCADE)
-    page = models.IntegerField()
+    deck_membership = models.ForeignKey(DeckMembership, default=None, blank=True, null=True, on_delete=models.SET_DEFAULT, help_text="The reference to the facsimile image in the imagedeck for this manuscript.")
+    pdf = models.ForeignKey(PDF, on_delete=models.CASCADE, help_text="DEPRECATED")
+    page = models.IntegerField(help_text="DEPRECATED")
+
     x = models.FloatField(help_text="The number of horizontal pixels from the left of the facsimile image to the the location of the verse, normalized by the height of the image.")
     y = models.FloatField(help_text="The number of vertical pixels from the top of the facsimile image to the the location of the verse, normalized by the height of the image.")
     def __str__(self):
-        return "%s in %s in %s on p%d at (%0.1g, %0.1g)" % (self.verse.reference(abbreviation=True), self.manuscript.short_name(), self.pdf.__str__(), self.page, self.x, self.y )
+        return "%s in '%s' in imagedeck '%s' on p%d at (%0.1g, %0.1g)" % (self.verse.reference(abbreviation=True), self.manuscript.short_name(), self.deck(), self.page_number(), self.x, self.y )
+
+    def deck(self):
+        if self.deck_membership:
+            return self.deck_membership.deck
+        return None
+
+    def page_number(self):
+        if self.deck_membership:
+            return self.deck_membership.index()+1
+        return -1
 
     @classmethod
     def textbox_top(cls, manuscript):
@@ -823,12 +866,23 @@ class VerseLocation(models.Model):
         if textbox_top == None:
             textbox_top = self.textbox_top(self.manuscript)
             
-        return self.page + (self.y - textbox_top)/(1.0-2.0 * textbox_top)        
+        return self.page_number() + (self.y - textbox_top)/(1.0-2.0 * textbox_top)        
         
     def image_path(self):
-        return self.pdf.image_path( self.page )
+        return self.deck_membership.image.url
+
     def values_dict(self):
-        return {'manuscript_id': self.manuscript.id, 'pdf_filename': self.pdf.filename, 'x':self.x, 'y':self.y, 'page':self.page, 'verse_id':self.verse.id, 'ref':self.verse.reference_abbreviation(), 'tooltip':'', 'exact': True if self.pk else False }
+        return {
+            'manuscript_id': self.manuscript.id, 
+            'page': self.deck_membership.rank,  # should this be self.page_number()?
+            'mid': self.deck_membership.id, 
+            'x':self.x, 
+            'y':self.y, 
+            'verse_id':self.verse.id, 
+            'ref':self.verse.reference_abbreviation(), 
+            'tooltip':'', 
+            'exact': True if self.pk else False,
+        }
         
 
 class VerseTranscriptionBase(PolymorphicModel):

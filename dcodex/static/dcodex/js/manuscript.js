@@ -1,5 +1,4 @@
 var current_manuscript_id;
-var current_pdf_filename;
 var currentPage;
 var current_verse_id;
 var pageImageController = null;
@@ -124,7 +123,7 @@ function removeMarkerDisplay( verseID ) {
     verseReference.remove();	
 }
 
-function setup_manuscript_images_lazy_load(pdf_filename, manuscript_id) {
+function setup_manuscript_images_lazy_load(manuscript_id) {
 	pageImageController = $('.pageImage').lazy({
 		chainable: false,
 		appendScroll: $('#manuscript'),
@@ -133,8 +132,8 @@ function setup_manuscript_images_lazy_load(pdf_filename, manuscript_id) {
 			console.log("data-src " + element.data("src"));
 		},
 		afterLoad: function(element) {
-			var page = element.data('page');
-			$.getJSON('/dcodex/ajax/page-locations-json/', { manuscript_id:manuscript_id, pdf_filename:pdf_filename, page:page }, function (data) {
+            var deckmembershipid = element.data('mid');
+			$.getJSON('/dcodex/ajax/page-locations-json/', { manuscript_id:manuscript_id, deckmembershipid:deckmembershipid }, function (data) {
 				$.each(data, function(k, v) {
 					loadVerseMarker(v);								
 				});
@@ -191,8 +190,8 @@ function placeMarkerAt(page, y0) {
     
 }
 
-function load_thumbnails( pdf_filename ) {
-    $('#thumbnails').load("/dcodex/ajax/thumbnails/"+pdf_filename, function() {
+function load_thumbnails( manuscript_id ) {
+    $('#thumbnails').load("/dcodex/ms/"+manuscript_id+"/thumbnails/", function() {
         console.log( "thumbnails loaded" );
         
         $('.thumbnail').lazy({
@@ -213,8 +212,9 @@ function load_thumbnails( pdf_filename ) {
         });         
         $('.thumbnailContainer').dblclick(function(e) {
             $('#tagPageWindow').show();
-            var page = $(this).data('page');		
-            $('#saveTagPage').data('page', page );
+            var mid = $(this).data('mid');		
+            alert(mid);
+            $('#saveTagPage').data('mid', mid );
         });
            
     });
@@ -223,6 +223,7 @@ function load_thumbnails( pdf_filename ) {
 function setup_manuscript_image_click() {
 	$( ".pageContainer" ).click(function(e) {
 		var page = $(this).data('page');
+		var deckmembershipid = $(this).data('mid');
 
         var posX = $(this).position().left,
             posY = $(this).position().top;
@@ -250,6 +251,7 @@ function setup_manuscript_image_click() {
 		$('#markerX').show();		
 //		alert('make vis');
 //		alert(page);
+        $("#marker").data("mid", deckmembershipid);
 		$("#marker").data("page", page);
 		$("#marker").data("y0", y0);		
 		$("#marker").data("x0", x0);		
@@ -257,7 +259,7 @@ function setup_manuscript_image_click() {
 		var height = $('#locationOptions').height();
 		var width = $('#locationOptions').width();
 		
-        $('#approximateVerseFromPosition').load("/dcodex/ajax/verse_ref_at_position/", {'manuscript_id':current_manuscript_id, 'pdf_filename':current_pdf_filename, 'page':page, 'x':x0, 'y':y0 }, function() {
+        $('#approximateVerseFromPosition').load("/dcodex/ajax/verse_ref_at_position/", {'manuscript_id':current_manuscript_id, 'deckmembershipid':deckmembershipid, 'x':x0, 'y':y0 }, function() {
             setLoadVerseLink();
         });
 		
@@ -286,28 +288,24 @@ function setup_manuscript_image_click() {
 		$('#locationOptions').show();
 		$('input[name=locationOptionsY]').val(locationOptionsY);
 		$('input[name=locationOptionsX]').val(locationOptionsX);
-//		$('#approximateVerseFromPosition').load("/ApproximateVerseFromPosition.php?manuscript=manuscriptID&msPDF=pdf&pageNumber="+page+"&y0="+y0, function() {
-			//setLoadVerseLink();
-//		});
 		$('#saveLocation').focus();		
 	});    
 }
 
-function load_pdf_images( pdf_filename, manuscript_id ) {
-    $('#manuscriptImages').load("/dcodex/ajax/pdf-images/"+pdf_filename, function() {
-        console.log( "pdf images loaded" );
-        setup_manuscript_images_lazy_load(pdf_filename, manuscript_id);
+function load_ms_images( manuscript_id ) {
+    $('#manuscriptImages').load("/dcodex/ajax/ms-images/"+manuscript_id, function() {
+        console.log( "ms images loaded" );
+        setup_manuscript_images_lazy_load(manuscript_id);
         setup_manuscript_image_click();
     });
 }
         
 
-function load_pdf( pdf_filename, manuscript_id ) {
-    load_thumbnails( pdf_filename );
-    load_pdf_images( pdf_filename, manuscript_id );
+function load_manuscript( manuscript_id ) {
+    load_thumbnails( manuscript_id );
+    load_ms_images( manuscript_id );
     
     current_manuscript_id = manuscript_id;
-    current_pdf_filename  = pdf_filename;
 }
 
 function highlightVerseMarker( verse_id, manuscript_id, highlightedCallback = null  ) {
@@ -330,19 +328,12 @@ function highlightVerseMarker( verse_id, manuscript_id, highlightedCallback = nu
             // Log the response to the console
             // load data.page
             // Move marker to y0
-            //        return {'manuscript_id': self.manuscript.manuscript_id, 'pdf_filename': self.pdf.filename, 'x':self.x, 'y':self.y, 'page':self.page, 'verse_id':self.verse.id, 'ref':self.verse.reference_abbreviation(), 'tooltip':'', 'exact': True if self.pk else False }
             
             console.log("verse-location-json response: " + data);
             page = data.page;
             y0 = data.y;
-            pdf_filename = data.pdf_filename
+            image = data.image
             
-//            if (pdf_filename == null)
-//                return;
-            if ( current_pdf_filename != data.pdf ) {
-//                location.reload(); // If verse isn't in current PDF then reload everything - should do this via AJAX
-            }
-
             // Load Page if necessary
             //console.log("pageImageController: "+pageImageController);
             pageImage = $('#pageImage'+page);
@@ -394,9 +385,7 @@ function highlightVerseMarker( verse_id, manuscript_id, highlightedCallback = nu
 
 
 function load_comparison(verse_id, manuscript_id) {
-    alert("load_comparison");
     $( "#comparison" ).load( "/dcodex/ajax/comparison/", { manuscript_id:manuscript_id, verse_id:verse_id }, function() {
-        alert("load_comparison loaded");
         $(".mshover").hover(function(){
             $('#msHover').load("/dcodex/ajax/transcription-mini/", { manuscript_id:$(this).data('manuscriptid'), verse_id:$(this).data('verseid') } );
             $('#msHover').show();
@@ -567,12 +556,11 @@ function load_verse_location_popup(verse_id, manuscript_id) {
     $( "#locationOptions" ).load( "/dcodex/ajax/location-popup/", { manuscript_id:manuscript_id, verse_id:verse_id }, function() {
         register_close_buttons();
         $( "#saveLocation" ).click(function(e) {
-            var page = $("#marker").data("page");
+            var mid = $("#marker").data("mid");
             var y = $("#marker").data("y0");
             var x = $("#marker").data("x0");		
             console.log("SaveLocation try: ");
-//            alert("verse_id:"+verse_id+", manuscript_id: "+manuscript_id+", current_pdf_filename: "+current_pdf_filename+" page: "+page+" y:"+y+" x:"+x);
-            $.post('/dcodex/ajax/save-location/', { manuscript_id:manuscript_id, verse_id:current_verse_id, pdf_filename:current_pdf_filename, page:page, y:y, x:x }, function(response) {
+            $.post('/dcodex/ajax/save-location/', { manuscript_id:manuscript_id, verse_id:current_verse_id, deckmembershipid:mid, y:y, x:x }, function(response) {
                 loadVerseMarker(response);
                 highlightVerseMarker(verse_id);	    
                 console.log("SaveLocation Response: "+response);
@@ -710,7 +698,7 @@ $( document ).ready(function() {
 
 		folio_ref = $('#pageNumberInput').val();
 
-		$.post('/dcodex/ajax/page-number/', { pdf_filename:current_pdf_filename, folio_ref:folio_ref }, function(response) {
+		$.post('/dcodex/ajax/page-number/', { manuscript_id:current_manuscript_id, folio_ref:folio_ref }, function(response) {
 			page = parseInt(response);
 			$('#manuscript').scrollTo('#page'+page);
 		});
@@ -744,14 +732,15 @@ $( document ).ready(function() {
 	});
 	
 	$('#saveTagPage').click(function(e) {
-		var page = $(this).data('page');		
+        var deckmembershipid = $(this).data('mid');	
+        alert(deckmembershipid);
 	
 		var folio = $( "#tagPageFolioNumber" ).val();
 		var side = $( "#tagPageFolioLetter" ).val();
 
-		$.post('/dcodex/ajax/save-folio-ref/', { manuscript_id:current_manuscript_id, pdf_filename:current_pdf_filename, page:page, folio:folio, side:side }, function(response) {
+		$.post('/dcodex/ajax/save-folio-ref/', { deckmembershipid:deckmembershipid, folio:folio, side:side }, function(response) {
 			$('#tagPageWindow').hide();	
-			load_thumbnails(current_pdf_filename)
+			load_thumbnails(current_manuscript_id)
 		});
 
 		return false;
