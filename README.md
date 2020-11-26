@@ -39,12 +39,13 @@ urlpatterns += [
 
 The base DCodex app (i.e. this repository) is designed to be used with other apps to give the details for the types of manuscripts being used as well as the textual units. For example, see
 
-* [https://github.com/rbturnbull/dcodex_bible](dcodex_bible)
-* [https://github.com/rbturnbull/dcodex_lectionary](dcodex_lectionary)
-* [https://github.com/rbturnbull/dcodex_chrysostom](dcodex_chrysostom)
-* [https://github.com/rbturnbull/dcodex_ashurnasirpal](dcodex_ashurnasirpal)
+* [dcodex_bible][https://github.com/rbturnbull/dcodex_bible]
+* [dcodex_lectionary][https://github.com/rbturnbull/dcodex_lectionary]
+* [dcodex_chrysostom][https://github.com/rbturnbull/dcodex_chrysostom]
+* [dcodex_ashurnasirpal][https://github.com/rbturnbull/dcodex_ashurnasirpal]
 
 There are other DCodex packages to extend the functionality of DCodex such as:
 
-* [https://github.com/rbturnbull/dcodex_collation](dcodex_collation)
-* [https://github.com/rbturnbull/dcodex_variants](dcodex_variants)
+* [dcodex_collation][https://github.com/rbturnbull/dcodex_collation]
+* [dcodex_variants][https://github.com/rbturnbull/dcodex_variants]
+
