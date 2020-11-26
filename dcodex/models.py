@@ -175,13 +175,15 @@ class Manuscript(PolymorphicModel):
 
         return text
 
+    def deck_memberships(self):
+        return self.imagedeck.deckmembership_set.all()
+
     def tei_element_facsimile( self ):
         facsimile = etree.Element("facsimile")
-        return facsimile
-        for page in pages:
+        for deck_memberships in self.deck_memberships():
             surface = etree.SubElement(facsimile, "surface", ulx=0, uly=0, lrx=width, lry=height)                    
             graphic = etree.SubElement(surface, "graphic", url=url)                    
-            for location in locations:
+            for location in VerseLocation.object.filter(deck_membership=deck_membership, manuscript=self):
                 zone = etree.SubElement(surface, "zone", ulx=0, uly=0, lrx=width, lry=height)
                 desc = etree.SubElement(zone, "desc")
                 desc.text = f"Start of {location.verse()}"
@@ -833,8 +835,8 @@ class VerseLocation(models.Model):
     manuscript = models.ForeignKey(Manuscript, on_delete=models.CASCADE)
     verse = models.ForeignKey(Verse, on_delete=models.CASCADE)
     deck_membership = models.ForeignKey(DeckMembership, default=None, blank=True, null=True, on_delete=models.SET_DEFAULT, help_text="The reference to the facsimile image in the imagedeck for this manuscript.")
-    pdf = models.ForeignKey(PDF, on_delete=models.CASCADE, help_text="DEPRECATED")
-    page = models.IntegerField(help_text="DEPRECATED")
+    pdf = models.ForeignKey(PDF, on_delete=models.SET_DEFAULT, default=None, null=True, blank=True, help_text="DEPRECATED")
+    page = models.IntegerField(default=None, null=True, blank=True, help_text="DEPRECATED")
 
     x = models.FloatField(help_text="The number of horizontal pixels from the left of the facsimile image to the the location of the verse, normalized by the height of the image.")
     y = models.FloatField(help_text="The number of vertical pixels from the top of the facsimile image to the the location of the verse, normalized by the height of the image.")
