@@ -5,11 +5,13 @@ from . import views
 urlpatterns = [
     path('', views.index, name='home'),
     path('ms/<str:request_siglum>/', views.manuscript_verse_view, name='dcodex-manuscript'),
-    path('ms/<str:request_siglum>/tei/', views.manuscript_tei_view, name='dcodex-manuscript-tei'),
-    path('ms/<str:request_siglum>/accordance/', views.manuscript_accordance_view, name='dcodex-manuscript-accordance'),
     path('ms/<str:request_siglum>/thumbnails/', views.thumbnails, name='dcodex-thumbnails'),
     path('ms/<str:request_siglum>/<str:request_verse>/', views.manuscript_verse_view, name='dcodex-manuscript-verse'),
     
+    path('ms/tei/<str:request_siglum>/', views.manuscript_tei_view, name='dcodex-manuscript-tei'),
+    path('ms/accordance/<str:request_siglum>/', views.manuscript_accordance_view, name='dcodex-manuscript-accordance'),
+    path('ms/latex/<str:request_siglum>/', views.manuscript_latex_view, name='dcodex-manuscript-latex'),
+
     path('ajax/ms-images/<str:request_siglum>/', views.ms_images, name='dcodex-ms-images'),
     path('ajax/page-locations-json/', views.page_locations_json, name='dcodex-page-locations-json'),
     path('ajax/verse-location-json/', views.verse_location_json, name='dcodex-verse-location-json'),

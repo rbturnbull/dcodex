@@ -99,6 +99,16 @@ def manuscript_tei_view(request, request_siglum ):
 
 
 @login_required
+def manuscript_latex_view(request, request_siglum ):
+    lookup = dict(id=request_siglum) if request_siglum.isdigit() else dict(siglum=request_siglum)
+    manuscript = get_object_or_404(Manuscript, **lookup)
+
+    response = HttpResponse(manuscript.latex(), content_type='application/text charset=utf-8')
+    response['Content-Disposition'] = f'attachment; filename="{request_siglum}.tex"'
+    return response
+
+
+@login_required
 def manuscript_accordance_view(request, request_siglum ):
     lookup = dict(id=request_siglum) if request_siglum.isdigit() else dict(siglum=request_siglum)
     manuscript = get_object_or_404(Manuscript, **lookup)

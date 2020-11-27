@@ -17,8 +17,8 @@ from django.shortcuts import render
 from django.db.models import Max, Min
 from imagedeck.models import DeckBase, DeckMembership
 
-from .strings import normalize_transcription, remove_markup
-from .distance import similarity_levenshtein, similarity_damerau_levenshtein, similarity_ratcliff_obershelp, similarity_jaro
+from .markup import normalize_transcription, remove_markup, Markup, StandardMarkup
+from ..distance import similarity_levenshtein, similarity_damerau_levenshtein, similarity_ratcliff_obershelp, similarity_jaro
 
 
 FIRST_SIDE_NAMES  = ['r','a','ا']
@@ -34,32 +34,6 @@ def facsimile_dir():
 class TextDirection(models.TextChoices):
     RIGHT_TO_LEFT = 'R'
     LEFT_TO_RIGHT = 'L'
-
-
-class Markup(PolymorphicModel):
-    name = models.CharField(max_length=255, blank=True, help_text='A descriptive name for this markup object.')
-
-    def __str__(self):
-        return self.name
-
-    def regularize( self, string ):
-        return normalize_transcription( string )
-
-    def remove_markup(self, string):
-        return remove_markup( string )
-
-    def tokenize( self, string ):
-        string = self.remove_markup(string)
-        string = string.replace("."," .")
-        string = string.replace(":"," :")
-        string = string.replace(","," ,")
-        string = re.sub("\s+"," ", string)
-
-        return string.split()
-
-
-class StandardMarkup(Markup):
-    pass
 
 
 class Manuscript(PolymorphicModel):
@@ -91,6 +65,9 @@ class Manuscript(PolymorphicModel):
     class Meta:
         ordering = ['siglum', 'name']
         
+    def is_rtl(self):
+        return self.text_direction == "R"
+
     @classmethod
     def verse_class(cls):
         return Verse
@@ -163,6 +140,9 @@ class Manuscript(PolymorphicModel):
             user_bible += f"{transcription.verse} <color=black></color>{transcription_clean}<br>\n"
         return user_bible
 
+    def latex(self):
+        """ Returns a LaTeX representation of this manuscript as a string. """
+        raise NotImplementedError
 
     def tei_element_text( self ):
         text = etree.Element("text")
@@ -180,13 +160,18 @@ class Manuscript(PolymorphicModel):
 
     def tei_element_facsimile( self ):
         facsimile = etree.Element("facsimile")
-        for deck_memberships in self.deck_memberships():
-            surface = etree.SubElement(facsimile, "surface", ulx=0, uly=0, lrx=width, lry=height)                    
-            graphic = etree.SubElement(surface, "graphic", url=url)                    
-            for location in VerseLocation.object.filter(deck_membership=deck_membership, manuscript=self):
-                zone = etree.SubElement(surface, "zone", ulx=0, uly=0, lrx=width, lry=height)
+        for deck_membership in self.deck_memberships():
+            width = deck_membership.image.get_width()
+            height = deck_membership.image.get_height()
+            surface = etree.SubElement(facsimile, "surface", ulx="0", uly="0", lrx=str(width), lry=str(height) )                   
+            filename = str(deck_membership.image)
+            graphic = etree.SubElement(surface, "graphic", url=filename)                    
+            for location in VerseLocation.objects.filter(deck_membership=deck_membership, manuscript=self):
+                x_pixel = int(location.x*width)
+                y_pixel = int(location.y*width)
+                zone = etree.SubElement(surface, "zone", ulx=str(x_pixel), uly=str(y_pixel), lrx=str(x_pixel+1), lry=str(y_pixel+1))
                 desc = etree.SubElement(zone, "desc")
-                desc.text = f"Start of {location.verse()}"
+                desc.text = f"Start of {location.verse}"
         return facsimile            
 
     def tei( self ):
@@ -907,6 +892,10 @@ class VerseTranscriptionBase(PolymorphicModel):
             return self.manuscript.markup
 
         return StandardMarkup(name="Default")
+
+    def latex(self):
+        markup = self.get_markup()
+        return markup.latex( self.transcription )
 
     def normalize(self):
         markup = self.get_markup()
