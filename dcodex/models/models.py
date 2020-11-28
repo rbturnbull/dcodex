@@ -130,6 +130,10 @@ class Manuscript(PolymorphicModel):
         publicationStmtP = etree.SubElement(publicationStmt, "p")
         publicationStmtP.text = f"Generated on {timestamp} using D-Codex."
 
+        sourceDesc = etree.SubElement(fileDesc, "sourceDesc")
+        sourceDescP = etree.SubElement(sourceDesc, "p")
+        sourceDescP.text = str(self)
+
         return teiHeader
 
     def accordance(self):
@@ -148,15 +152,40 @@ class Manuscript(PolymorphicModel):
         text = etree.Element("text")
         body  = etree.SubElement(text, "body")
         for transcription in self.transcriptions():
-            transcription_markup = transcription.transcription # hack
             verse_tei_id = transcription.verse.tei_id()
-            ab = etree.SubElement(body, "ab", n=verse_tei_id)
-            ab.text = transcription_markup
+            tei_text = transcription.tei()
+            # ab = etree.SubElement(body, "ab", n=verse_tei_id)
+            ab = etree.fromstring( f'<ab n="{verse_tei_id}">{tei_text}</ab>' )
+            body.append(ab)
 
         return text
 
     def deck_memberships(self):
         return self.imagedeck.deckmembership_set.all()
+
+    def transcriptions_df( self ):
+        data = [ (transcription.verse.url_ref(), transcription.transcription) for transcription in self.transcriptions()]
+        df = pd.DataFrame( data, columns=["Verse", "Transcription"])
+        return df
+
+    def transcriptions_csv( self, filename ):
+        df = self.transcriptions_df()
+        df.to_csv( filename )
+        return df
+
+    def read_transcriptions_csv( self, filename ):
+        df = pd.read_csv( filename )
+        for index, row in df.iterrows():
+            verse = self.verse_class().get_from_string( row['Verse'] )
+            if verse:
+                self.save_transcription( verse, row['Transcription'] )
+
+    @classmethod
+    def create_from_csv( cls, siglum, filename, name=None):
+        name = name or siglum
+        ms, _ = cls.objects.update_or_create( siglum=siglum, defaults=dict(name=name) )
+        ms.read_transcriptions_csv(filename)
+        return ms
 
     def tei_element_facsimile( self ):
         facsimile = etree.Element("facsimile")
@@ -166,12 +195,12 @@ class Manuscript(PolymorphicModel):
             surface = etree.SubElement(facsimile, "surface", ulx="0", uly="0", lrx=str(width), lry=str(height) )                   
             filename = str(deck_membership.image)
             graphic = etree.SubElement(surface, "graphic", url=filename)                    
-            for location in VerseLocation.objects.filter(deck_membership=deck_membership, manuscript=self):
+            for location in VerseLocation.objects.filter(deck_membership=deck_membership, manuscript=self).order_by('verse__id'):
                 x_pixel = int(location.x*width)
                 y_pixel = int(location.y*width)
                 zone = etree.SubElement(surface, "zone", ulx=str(x_pixel), uly=str(y_pixel), lrx=str(x_pixel+1), lry=str(y_pixel+1))
-                desc = etree.SubElement(zone, "desc")
-                desc.text = f"Start of {location.verse}"
+                note = etree.SubElement(zone, "note", type="verseLoc")
+                note.text = f"{location.verse}"
         return facsimile            
 
     def tei( self ):
@@ -581,8 +610,8 @@ class Manuscript(PolymorphicModel):
         return None
 
 
-
 class ManuscriptImage():
+    """ DEPRECATED """
     page = None
     folio = None
     src = None
@@ -593,8 +622,9 @@ class ManuscriptImage():
     def __hash__(self):
         return hash((self.page, self.src, self.folio))
     
-# TODO Refactor as 'Facsimile' class and add 'PDFFacsimile' class using qpdf and ImageMagick.
 class PDF(models.Model):
+    """ DEPRECATED """
+
     filename = models.CharField(max_length=200)
     page_count = models.IntegerField(blank=True, null=True, default=None)
     
@@ -808,9 +838,9 @@ class Verse(PolymorphicModel):
         The id returned by this function is given as the n attribute in this tag.
         e.g. <ab n='B04K1V35'>...
 
-        By default, this is the string representation of this verse.
+        By default, this is the url_ref representation of this verse.
         """
-        return str(self)
+        return self.url_ref()
         
 
     
@@ -897,6 +927,10 @@ class VerseTranscriptionBase(PolymorphicModel):
         markup = self.get_markup()
         return markup.latex( self.transcription )
 
+    def tei(self):
+        markup = self.get_markup()
+        return markup.tei( self.transcription )
+
     def normalize(self):
         markup = self.get_markup()
         if markup:
@@ -920,10 +954,13 @@ class VerseTranscriptionBase(PolymorphicModel):
 
     def similarity_levenshtein( self, comparison_transcription ):
         return self.similarity( comparison_transcription, similarity_levenshtein )
+
     def similarity_damerau_levenshtein( self, comparison_transcription ):
         return self.similarity( comparison_transcription, similarity_damerau_levenshtein )
+
     def similarity_ratcliff_obershelp( self, comparison_transcription ):
         return self.similarity( comparison_transcription, similarity_ratcliff_obershelp )
+
     def similarity_jaro( self, comparison_transcription ):
         return self.similarity( comparison_transcription, similarity_jaro )
         
