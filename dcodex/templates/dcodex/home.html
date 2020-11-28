@@ -1,0 +1,40 @@
+{% extends 'dcodex/base_logo.html' %}
+{% load thumbnail %}
+
+{% block content %}
+
+<div class="container">
+
+    {% if manuscripts_with_decks.count %}
+        <h2>Manuscripts</h2>
+        <div class="row">
+            {% for manuscript in manuscripts_with_decks %}
+
+                <div class="col">
+                    <a href='{{ manuscript.get_absolute_url }}'>
+                    <div class="card text-center"  data-toggle="tooltip" data-placement="top" title="{{ manuscript.name }}">
+                        <center>
+                        <img class="card-img-top" src="{% thumbnail manuscript.imagedeck.primary_image.filer_image 121x0 %}" alt="Manuscript Image"  style="width: 121px; margin-left: 10px; margin-right: 10px; padding-left: 10px; padding-right: 10px; padding-top: 5px;">
+                        </center>
+                        <div class="card-body">
+                            <h5 class="card-title" >{{ manuscript.short_name }}</h5>
+                        </div>
+                    </div>
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+
+    {% if manuscripts_without_decks.count %}
+        <h2>Manuscripts without facsimile images</h2>
+        {% for manuscript in manuscripts_without_decks %}
+            <ul>
+                <li><a href='{{ manuscript.get_absolute_url }}'>{{ manuscript }}</a></li>
+            </ul>
+        {% endfor %}
+    {% endif %}
+</div>
+
+{% endblock content %}

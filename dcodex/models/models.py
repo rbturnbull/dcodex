@@ -11,6 +11,7 @@ from scipy.special import expit
 import gotoh
 
 from django.db import models
+from django.urls import reverse_lazy
 from django.conf import settings
 from polymorphic.models import PolymorphicModel
 from django.shortcuts import render
@@ -56,12 +57,18 @@ class Manuscript(PolymorphicModel):
         if self.siglum:
             return self.siglum
         return str(self.id)
+
     def short_name(self):
         if self.siglum:
             return self.siglum
         if self.name:
             return self.name
         return str(self.id)
+
+    def get_absolute_url(self):
+        return reverse_lazy("dcodex-manuscript", kwargs={"request_siglum": self.short_name() })
+    
+    
     class Meta:
         ordering = ['siglum', 'name']
         
@@ -178,6 +185,7 @@ class Manuscript(PolymorphicModel):
         for index, row in df.iterrows():
             verse = self.verse_class().get_from_string( row['Verse'] )
             if verse:
+                print(verse)
                 self.save_transcription( verse, row['Transcription'] )
 
     @classmethod
@@ -426,7 +434,7 @@ class Manuscript(PolymorphicModel):
         """
         
         if not verse:
-            return VerseLocation.objects.filter( manuscript=self ).order_by('-verse__id').first()                    
+            return VerseLocation.objects.filter( manuscript=self ).order_by('verse__id').first()                    
             
         location_A = self.location_before_or_equal( verse )
         

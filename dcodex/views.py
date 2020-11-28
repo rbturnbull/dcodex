@@ -297,5 +297,8 @@ def index(request):
 
 class HomeView(LoginRequiredMixin, TemplateView):
     template_name = "dcodex/home.html"
-    extra_context = dict(manuscripts=Manuscript.objects.all())
+    extra_context = dict(
+        manuscripts_with_decks=Manuscript.objects.exclude(imagedeck=None),
+        manuscripts_without_decks=Manuscript.objects.filter(imagedeck=None),
+    )
     

@@ -39,3 +39,7 @@ function load_comparison(verse_id, manuscript_id, div_name) {
     } );
 }
 
+$(function () {
+    $('[data-toggle="tooltip"]').tooltip()
+  })
+  
