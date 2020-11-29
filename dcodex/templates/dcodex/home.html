@@ -5,7 +5,7 @@
 
 <div class="container">
 
-    {% if manuscripts_with_decks.count %}
+    {% if manuscripts_with_decks %}
         <h2>Manuscripts</h2>
         <div class="row">
             {% for manuscript in manuscripts_with_decks %}
@@ -27,7 +27,7 @@
     {% endif %}
 
 
-    {% if manuscripts_without_decks.count %}
+    {% if manuscripts_without_decks %}
         <h2>Manuscripts without facsimile images</h2>
         {% for manuscript in manuscripts_without_decks %}
             <ul>

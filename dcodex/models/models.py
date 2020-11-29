@@ -47,6 +47,14 @@ class Manuscript(PolymorphicModel):
     text_direction = models.CharField(max_length=1, choices=TextDirection.choices, default=TextDirection.LEFT_TO_RIGHT )
     imagedeck = models.ForeignKey( DeckBase, on_delete=models.SET_DEFAULT, null=True, blank=True, default=None, help_text='The facsimile images for this manuscript.')
 
+    def has_view_permission(self, user):
+        perm_code = f"{self._meta.app_label}.view_{self._meta.model_name}"
+        return user.has_perm(perm_code, self)
+
+    def has_change_permission(self, user):
+        perm_code = f"{self._meta.app_label}.change_{self._meta.model_name}"
+        return user.has_perm(perm_code, self)
+
     def __str__(self):
         if self.name and self.siglum:
             if self.name == self.siglum:

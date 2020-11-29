@@ -1,14 +1,26 @@
 from django.contrib import admin
 from polymorphic.admin import PolymorphicParentModelAdmin, PolymorphicChildModelAdmin, PolymorphicChildModelFilter
 
+from guardian.admin import GuardedModelAdminMixin
 
-# Register your models here.
+
 from .models import *
 
 #class MembershipInline(admin.TabularInline):
 #    model = Membership
 #    extra = 0
 #    raw_id_fields = ("start_verse","end_verse")
+
+class ManuscriptChildAdmin(GuardedModelAdminMixin, PolymorphicChildModelAdmin):
+    """ Base admin class for all child models of Manuscript """
+    base_model = Manuscript
+
+@admin.register(Manuscript)
+class ManuscriptParentAdmin(PolymorphicParentModelAdmin):
+    """ The parent model admin """
+    base_model = Manuscript  # Optional, explicitly set here.
+    child_models = ()
+    list_filter = (PolymorphicChildModelFilter,)  # This is optional.
 
 
 class AffiliationChildAdmin(PolymorphicChildModelAdmin):

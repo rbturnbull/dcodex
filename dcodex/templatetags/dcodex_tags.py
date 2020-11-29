@@ -28,3 +28,11 @@ def folio_and_page(manuscript, page_index):
     if folio_name:
         return f"{folio_name} – p. {page_index}"
     return f"Page {page_index}"
+
+@register.simple_tag( takes_context=True )
+def has_view_permission( context, manuscript):
+    return manuscript.has_view_permission( context['user'] )
+
+@register.simple_tag( takes_context=True )
+def has_change_permission( context, manuscript ):
+    return manuscript.has_change_permission( context['user'] )    
