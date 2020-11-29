@@ -1,7 +1,7 @@
 from django.contrib import admin
 from polymorphic.admin import PolymorphicParentModelAdmin, PolymorphicChildModelAdmin, PolymorphicChildModelFilter
 
-from guardian.admin import GuardedModelAdminMixin
+from guardian.admin import GuardedModelAdminMixin, GuardedModelAdmin
 
 
 from .models import *
@@ -11,9 +11,14 @@ from .models import *
 #    extra = 0
 #    raw_id_fields = ("start_verse","end_verse")
 
-class ManuscriptChildAdmin(GuardedModelAdminMixin, PolymorphicChildModelAdmin):
-    """ Base admin class for all child models of Manuscript """
+# class ManuscriptChildAdmin(GuardedModelAdminMixin, PolymorphicChildModelAdmin):
+#     """ Base admin class for all child models of Manuscript """
+#     base_model = Manuscript
+
+class ManuscriptChildAdmin(GuardedModelAdmin):
     base_model = Manuscript
+    search_fields = ['siglum', 'name']
+
 
 @admin.register(Manuscript)
 class ManuscriptParentAdmin(PolymorphicParentModelAdmin):
