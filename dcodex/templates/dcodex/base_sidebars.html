@@ -19,6 +19,7 @@
             {% block middle %}{% endblock %}
         </div>
         <div id=right_sidebar>
+            {% block navigation %}{% endblock %}
             {% block right_sidebar %}{% endblock %}
         </div>
         
@@ -38,11 +39,7 @@
         <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
         <script src="{% static 'dcodex/js/dcodex.js' %}"></script>
         <script src="{% static 'dcodex/js/sidebars.js' %}"></script>
-<script type="text/javascript">
-    $(function () {
-        $("[rel='tooltip']").tooltip();
-    });
-</script>
+        <script src="https://use.fontawesome.com/releases/v5.10.2/js/all.js"></script>
 
         {% block javascript %}{% endblock %}
     </body>

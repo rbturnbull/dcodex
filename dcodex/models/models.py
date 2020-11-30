@@ -159,7 +159,7 @@ class Manuscript(PolymorphicModel):
             user_bible += f"{transcription.verse} <color=black></color>{transcription_clean}<br>\n"
         return user_bible
 
-    def latex(self):
+    def latex(self, baseurl=None):
         """ Returns a LaTeX representation of this manuscript as a string. """
         raise NotImplementedError
 

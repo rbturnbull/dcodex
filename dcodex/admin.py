@@ -20,12 +20,12 @@ class ManuscriptChildAdmin(GuardedModelAdmin):
     search_fields = ['siglum', 'name']
 
 
-@admin.register(Manuscript)
-class ManuscriptParentAdmin(PolymorphicParentModelAdmin):
-    """ The parent model admin """
-    base_model = Manuscript  # Optional, explicitly set here.
-    child_models = ()
-    list_filter = (PolymorphicChildModelFilter,)  # This is optional.
+# @admin.register(Manuscript)
+# class ManuscriptParentAdmin(PolymorphicParentModelAdmin):
+#     """ The parent model admin """
+#     base_model = Manuscript  # Optional, explicitly set here.
+#     child_models = ()
+#     list_filter = (PolymorphicChildModelFilter,)  # This is optional.
 
 
 class AffiliationChildAdmin(PolymorphicChildModelAdmin):

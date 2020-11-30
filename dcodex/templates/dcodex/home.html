@@ -1,6 +1,8 @@
 {% extends 'dcodex/base_logo.html' %}
 {% load thumbnail %}
 
+{% block title %}D-Codex Home{% endblock title %}
+
 {% block content %}
 
 <div class="container">
@@ -14,7 +16,7 @@
                     <a href='{{ manuscript.get_absolute_url }}'>
                     <div class="card text-center"  data-toggle="tooltip" data-placement="top" title="{{ manuscript.name }}">
                         <center>
-                        <img class="card-img-top" src="{% thumbnail manuscript.imagedeck.primary_image.filer_image 121x0 %}" alt="Manuscript Image"  style="width: 121px; margin-left: 10px; margin-right: 10px; padding-left: 10px; padding-right: 10px; padding-top: 5px;">
+                        <img class="card-img-top" src="{% thumbnail manuscript.imagedeck.primary_image.filer_image 200x250 crop %}" alt="Manuscript Image"  style="width: 200px; margin-left: 10px; margin-right: 10px; padding-left: 10px; padding-right: 10px; padding-top: 5px;">
                         </center>
                         <div class="card-body">
                             <h5 class="card-title" >{{ manuscript.short_name }}</h5>
