@@ -67,9 +67,15 @@ def manuscript_verse_view(request, request_siglum, request_verse = None):
         
 
     location = manuscript.location( verse )
-    if verse is None:
+    if verse is None and location:
         verse = location.verse
-    transcription = manuscript.transcription( verse )
+
+    if verse:
+        transcription = manuscript.transcription( verse )
+    else:
+        transcription = manuscript.first_transcription()
+        if transcription:
+            verse = transcription.verse
     
     context = {
         'manuscript': manuscript,

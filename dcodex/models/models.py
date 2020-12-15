@@ -41,8 +41,8 @@ class Manuscript(PolymorphicModel):
     """ 
     An abstract class used for bringing together all the elements of a document. 
     """
-    name = models.CharField(max_length=200, blank=True, help_text='A descriptive name for this manuscript.')
-    siglum = models.CharField(max_length=20, blank=True, help_text='A unique short string for this manuscript.')
+    name = models.CharField(max_length=255, blank=True, help_text='A descriptive name for this manuscript.')
+    siglum = models.CharField(max_length=255, blank=True, help_text='A unique short string for this manuscript.')
     markup = models.ForeignKey(Markup, on_delete=models.SET_DEFAULT, null=True, blank=True, default=None, help_text='The default markup class for this manuscript.')
     text_direction = models.CharField(max_length=1, choices=TextDirection.choices, default=TextDirection.LEFT_TO_RIGHT )
     imagedeck = models.ForeignKey( DeckBase, on_delete=models.SET_DEFAULT, null=True, blank=True, default=None, help_text='The facsimile images for this manuscript.')
@@ -130,7 +130,8 @@ class Manuscript(PolymorphicModel):
         return self.transcription_class().objects.filter( manuscript=self )
 
     def image_memberships(self):
-        return self.imagedeck.deckmembership_set.all()
+        if self.imagedeck:
+            return self.imagedeck.deckmembership_set.all()
 
     def tei_element_header( self ):
         timestamp = datetime.datetime.now()
@@ -287,6 +288,9 @@ class Manuscript(PolymorphicModel):
     def transcriptions( self ):
         return self.transcription_class().objects.filter( manuscript=self ).order_by( 'verse__rank' )
                 
+    def first_transcription( self ):
+        return self.transcriptions().first()
+
     def verse_ids_with_locations(self):
         # See https://docs.djangoproject.com/en/3.0/ref/models/querysets/#values-list
         return VerseLocation.objects.filter( manuscript=self ).values_list('verse__id', flat=True)
