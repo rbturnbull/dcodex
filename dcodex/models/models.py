@@ -47,6 +47,13 @@ class Manuscript(PolymorphicModel):
     text_direction = models.CharField(max_length=1, choices=TextDirection.choices, default=TextDirection.LEFT_TO_RIGHT )
     imagedeck = models.ForeignKey( DeckBase, on_delete=models.SET_DEFAULT, null=True, blank=True, default=None, help_text='The facsimile images for this manuscript.')
 
+    def get_markup(self):
+        if self.markup:
+            return self.markup
+
+        return StandardMarkup(name="Default")
+
+
     def has_view_permission(self, user):
         perm_code = f"{self._meta.app_label}.view_{self._meta.model_name}"
         return user.has_perm(perm_code, self)
@@ -938,10 +945,7 @@ class VerseTranscriptionBase(PolymorphicModel):
         if self.markup:
             return self.markup
         
-        if self.manuscript.markup:
-            return self.manuscript.markup
-
-        return StandardMarkup(name="Default")
+        return self.manuscript.get_markup()
 
     def latex(self):
         markup = self.get_markup()
