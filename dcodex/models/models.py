@@ -845,6 +845,33 @@ class Verse(PolymorphicModel):
         return [cls.get_from_string( verse_as_string1 ), cls.get_from_string( verse_as_string2 ) ]
 
     @classmethod
+    def queryset_from_strings( cls, verse_as_string1="", verse_as_string2="" ):
+        """
+        Convenience function that returns a queryset of verses with the endpoints given as strings.
+        
+        If second verse string is empty then it includes all the verses after the first verse.
+        """
+        verses = cls.objects.all()
+
+        start_verse = None
+        if verse_as_string1:
+            start_verse = cls.get_from_string( verse_as_string1 )
+            if start_verse:
+                verses = verses.filter( rank__gte=start_verse.rank )
+
+        end_verse = None        
+        if verse_as_string2:
+            end_verse = cls.get_from_string( verse_as_string2 )
+        
+        if start_verse and not end_verse:
+            end_verse = start_verse
+
+        if end_verse:
+            verses = verses.filter( rank__lte=end_verse.rank )
+
+        return verses
+
+    @classmethod
     def get_from_dict( cls, dictionary ):
         """ Locates a `dcodex.Verse` object instance from a Python dictionary.
         

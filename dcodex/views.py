@@ -52,8 +52,6 @@ def get_manuscript( request, request_siglum=None, change=False ):
 
 
 def manuscript_verse_view(request, request_siglum, request_verse = None):
-    logger = logging.getLogger(__name__)    
-
     manuscript = get_manuscript(request, request_siglum)
 
     if request_verse == None:
@@ -241,8 +239,6 @@ def comparison(request):
     ms_hover = loader.get_template('dcodex/ms_hover.html')
 #    $dcodex->comparisonTable("Reference", array($dcodex->getManuscript(18), $dcodex->getManuscript(16)), $verseID, $columns );
 #    $dcodex->comparisonTableForGroups($manuscriptID, $verseID, $columns );
-    logger = logging.getLogger(__name__)    
-    logger.error("in comparison")
     
     reference_mss = request.user.profile.reference_texts.all() if hasattr( request.user, 'profile' ) else ""
     
