@@ -1023,7 +1023,26 @@ class FamilyBase(PolymorphicModel):
     name = models.CharField(max_length=200)
     def __str__(self):
         return self.name    
-                
+
+
+    def manuscript_ids( self, checked_family_ids=None ):
+        """ Returns a set of manuscript ids which are affiliated with this family at any verse. """
+        if checked_family_ids is None:
+            checked_family_ids = set()
+        checked_family_ids.add( self.id )
+        manuscript_ids = set()
+        for affiliation in self.affiliationbase_set.all():
+            manuscript_ids.update( affiliation.manuscript_ids() )
+            families = affiliation.families.all()
+            for family in families:
+                if family.id not in checked_family_ids:
+                    manuscript_ids.update( family.manuscript_ids(checked_family_ids) )
+        return manuscript_ids
+
+    def manuscripts(self):
+        """ Returns a Django query set for all the manuscripts with this family at any verse. """    
+        return Manuscript.objects.filter( id__in=self.manuscript_ids() )
+
     def manuscript_ids_at( self, verse, checked_family_ids=None ):
         """ Returns a set of manuscript ids which are affiliated with this family at this verse. """
         if checked_family_ids is None:
