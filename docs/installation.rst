@@ -1,31 +1,49 @@
 Installation
 ============================================
 
-dcodex cookie-cutter
+dcodex-cookiecutter
 --------------------
 
-Instructions coming soon.
+To generate a new dcodex project, it is simplest to use the dcodex-cookiecutter project. First, download the `cookiecutter` module:
+
+.. code-block:: bash
+
+    pip install cookiecutter
+
+Then, run cookiecutter against the dcodex-cookiecutter repository:
+
+.. code-block:: bash
+
+    cookiecutter https://github.com/rbturnbull/dcodex-cookiecutter
+
+
+
+
+
 
 
 Package Installation
 --------------------
 
-
-Currently the only way to install dcodex is through the repository:
+To install dcodex into a Django project without using dcodex-cookiecutter, first install the module with pip:
 
 .. code-block:: bash
 
     pip install git+https://github.com/rbturnbull/dcodex.git
 
-Then add dcodex to your ``INSTALLED_APPS`` in your settings:
+Then add dcodex and its dependencies to your ``INSTALLED_APPS`` in your settings:
 
 .. code-block:: python
-   :emphasize-lines: 3
 
-    INSTALLED_APPS = [
-        ...
+    INSTALLED_APPS += [
+        # dcodex dependencies
+        "adminsortable2",
+        'easy_thumbnails',
+        'filer',
+        'mptt',
+        'imagedeck',
+        # dcodex apps
         "dcodex",
-        ...
     ]
 
 See also the insallation instructions for other dcodex modules.

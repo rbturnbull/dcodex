@@ -13,6 +13,7 @@ dcodex
    installation
    architecture
    core
+   deployment
 
 
 Indices and tables
