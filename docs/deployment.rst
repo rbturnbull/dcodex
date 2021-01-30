@@ -28,7 +28,7 @@ This will start a wizard to setup in EC2 instance. In the wizard, you can follow
 * Next it will ask you to 'Add Tags'. That isn't necessary at this stage.
 * Next it will ask you to 'Configure Security Group'. You need click the 'Add Rule' button to add the HTTP and then the HTTPS protocols. It should automatically select the correct ports (i.e. 80 and 443).
 * Then it will show you a summary of your decisions and let you review your choices. You are now able to click the 'Launch' button.
-* If you haven't created an instance previously, it will prompt you to download a new key pair. Save it in your ~/.ssh directory. Make sure you keep it secret and never check it in to a repository.
+* If you haven't created an instance previously, it will prompt you to download a new key pair. Save it in your ~/.ssh directory. Make sure you keep it secret and never check it in to a repository. This key needs to be only readable by you so you may need to change the permissions. e.g. :code:`chmod 600 ~/.ssh/<name of key>.pem`.
 * You can now click the 'Launch Instances' button. The instance will then be launched. It may take a short time to fire up.
 
 
@@ -71,8 +71,87 @@ Now we need to create an Identity and Access Management (IAM) role for the EC2 i
 * Give this role a name such as :code:`S3_Access` and then click 'Create role'.
 
 We now need to give add this role to the EC2 instance:
+
 * Go back to the EC2 dashboard and select the checkbox for the instance you created.
 * On the 'Actions' dropdown bar, choose 'Security' and then 'Modify IAM role'.
 * Choose the IAM role you recently created (called :code:`S3_Access` or whatever you called it) and then click 'Save'.
 
-6. 
+6. Configuration
+^^^^^^^^^^^^^^^^^^^^
+
+When you ran dcodex-cookiecutter to generate a D-Codex project, if would have created a folder at :code:`.envs/.production`. 
+This includes environment variables used to configure your project in production.
+By default, this will be ignored by git and it should never be added to a respository.
+You need to add the name of your S3 bucket there.
+Find the line with :code:`DJANGO_AWS_STORAGE_BUCKET_NAME` and add the name of your bucket: ::
+
+    DJANGO_AWS_STORAGE_BUCKET_NAME=my_bucket_name
+
+
+7. Install Docker on your EC2 Instance
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+You can now log in to your EC2 instance like this: ::
+
+    $ ssh -i ~/.ssh/<name of key>.pem ec2-user@<your domain name>
+
+.. note::
+
+    The username for everyone is exactly :code:`ec2-user`.
+
+You can make this simpler for next time by adding an entry in your :code:`~/.ssh/config`: ::
+
+    Host ec2instance
+            HostName your domain name>
+            User ec2-user
+            IdentityFile ~/.ssh/<name of key>.pem
+
+You can set the name of the 'host' (here :code:`ec2instance`) to be any shortcut you like. Then you should be able to simply log in with the command: ::
+
+    ssh ec2instance
+
+Install Docker with the following commands: ::
+
+    sudo yum update -y
+    sudo yum install -y docker
+    sudo service docker start
+    sudo yum install -y python3-devel
+    sudo pip3 install docker-compose
+
+This command will enable you to use Docker without needed to sudo: ::
+
+    sudo usermod -aG docker ec2-user
+
+.. note::
+
+    For this to work, you might need to log out and log back in again.
+
+
+Test your installation with the following command: ::
+
+    docker ps
+
+
+8. Copy the files
+^^^^^^^^^^^^^^^^^^^
+
+Now you can copy your files ot the EC3 instance using rsync. Just go to the project you created using dcodex-cookiecutter and run the command ::
+
+    rsync -av . ec2instance:~/app/
+
+.. note ::
+    
+    Here :code:`ec2instance` is the shortcut host in your :code:`~/.ssh/config` file.
+
+9. Deploy!
+
+Now you can ssh back in to your EC2 instance and go to your new :code:`app` directory: ::
+
+    ssh ec2instance
+    cd app
+
+From here you should finally be able to deploy your D-Codex project: ::
+
+    docker-compose -f production.yml up -d --no-deps --build
+
+Your project should be accessible through your domain now! If you have any questions, please get in touch.

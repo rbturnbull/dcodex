@@ -19,7 +19,9 @@ More information about the general project configuration options can be found on
 
 Answer the prompts with your own desired options. For example:
 
-**Warning**: After this point, change 'Robert Turnbull', 'dcodex_family_13', etc to your own information.
+.. note::
+
+    After this point, change 'Robert Turnbull', 'dcodex_f13', etc to your own information.
 
 ::
 
@@ -140,8 +142,9 @@ Create a git repo and push it there::
 
     $ git init
     $ git add .
-    $ git commit -m "Initial commit for dcodex_f13"
-    $ git remote add origin git@github.com:rbturnbull/dcodex_f13.git
-    $ git push -u origin master
+    $ git commit -m "Initial commit"
+    $ git branch -M main
+    $ git remote add origin https://github.com/rbturnbull/dcodex_f13.git
+    $ git push -u origin main
 
 
