@@ -12,7 +12,8 @@ Instructions coming soon. For now, see https://cookiecutter-django.readthedocs.i
 Deployment on AWS
 --------------------
 
-These instructions are correct as of the beginning of 2021. AWS might change their interface from time to time. Hopefully these instructions should still make sense even if some of the elements change over time. If you have suggestions on how to update or supplement these instructions, please let us know! 
+These instructions are correct as of the beginning of 2021. AWS might change their interface from time to time. Hopefully these instructions should still make sense even if some of the elements change over time. If you have suggestions on how to update or supplement these instructions, please let us know!
+Additional instructions for setting up a cookiecutter-django project on AWS can be found on `Ben Lindsay's blog <https://benjlindsay.com/posts/deploying-a-cookiecutter-django-site-on-aws>`_.
 
 1. Start an EC2 Instance
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^

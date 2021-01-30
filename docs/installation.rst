@@ -1,26 +1,6 @@
 Installation
 ============================================
 
-dcodex-cookiecutter
---------------------
-
-To generate a new dcodex project, it is simplest to use the dcodex-cookiecutter project. First, download the `cookiecutter` module:
-
-.. code-block:: bash
-
-    pip install cookiecutter
-
-Then, run cookiecutter against the dcodex-cookiecutter repository:
-
-.. code-block:: bash
-
-    cookiecutter https://github.com/rbturnbull/dcodex-cookiecutter
-
-
-
-
-
-
 
 Package Installation
 --------------------

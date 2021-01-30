@@ -10,6 +10,7 @@ dcodex
    :maxdepth: 2
    :caption: Contents:
 
+   cookiecutter
    installation
    architecture
    core

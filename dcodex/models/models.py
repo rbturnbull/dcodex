@@ -782,6 +782,7 @@ class Verse(PolymorphicModel):
         if end_verse != None:
             return "%s–%s" % (self.reference( abbreviation=abbreviation ), end_verse.reference( abbreviation=abbreviation ) )
         return "%d" % (self.pk)
+        
     def url_ref(self):
         """ Returns a unique reference for this verse as a string that is appropriate to use in a URL. The default implementation is to use the unabbreviated reference string and remove spaces."""
         return self.reference_abbreviation().replace(" ", '')

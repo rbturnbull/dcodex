@@ -7,7 +7,7 @@ Documentation to come. For now, contact me to get a pre-publication version of m
 
 # Installation
 
-For a brand new DCodex site, it is easiest to install using [dcodex-cookiecutter](https://github.com/rbturnbull/dcodex-cookiecutter).
+For a brand new D-Codex site, it is easiest to install using [dcodex-cookiecutter](https://github.com/rbturnbull/dcodex-cookiecutter).
 
 To install dcodex as a plugin in a Django site already set up. Install with pip:
 ```

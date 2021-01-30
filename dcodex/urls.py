@@ -30,6 +30,6 @@ urlpatterns = [
     path('ajax/title-json/', views.title_json, name='dcodex-title-json'),   
     path('ajax/verse_ref_at_position/', views.verse_ref_at_position, name='dcodex-verse_ref_at_position'),   
     
-    
+    path('plot-rolling-similarity', views.PlotRollingSimilarity.as_view(), name='plot-rolling-similarity')
 ]
 

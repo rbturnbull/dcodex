@@ -2,7 +2,7 @@ from django.test import TestCase
 
 from dcodex.models import *
 
-# Create your tests here.
+
 class FamilyTests(TestCase):
     def test_affiliation_all(self):
         """

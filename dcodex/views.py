@@ -4,11 +4,12 @@ from django.template import loader
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.base import TemplateView
-from django.views.generic import DetailView
+from django.views.generic import DetailView, FormView
 from django.core.exceptions import PermissionDenied
 from dcodex.models import *
 from dcodex.util import get_request_dict
 
+from .forms import PlotRollingAverageForm
 
 import logging
 import json
@@ -306,4 +307,12 @@ class HomeView(TemplateView):
         context["manuscripts_without_decks"] = filter_manuscripts_viewable(Manuscript.objects.filter(imagedeck=None), self.request.user)
         return context
     
+
+class PlotRollingSimilarity(FormView):
+    template_name = 'dcodex/form.html'
+    form_class = PlotRollingAverageForm
+
+    def form_valid(self, form):
+        svg_data = form.get_svg_data()
+        return HttpResponse(svg_data, content_type="image/svg+xml")
     
