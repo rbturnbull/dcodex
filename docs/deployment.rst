@@ -87,6 +87,11 @@ Find the line with :code:`DJANGO_AWS_STORAGE_BUCKET_NAME` and add the name of yo
 
     DJANGO_AWS_STORAGE_BUCKET_NAME=my_bucket_name
 
+.. note::
+
+    You don't have to set the :code:`DJANGO_AWS_ACCESS_KEY_ID` and :code:`DJANGO_AWS_SECRET_ACCESS_KEY` variables because you set up the IAM Role in the previous step.
+    For further information, see the note in `django-cookiecutter <https://cookiecutter-django.readthedocs.io/en/latest/deployment-with-docker.html#optional-use-aws-iam-role-for-ec2-instance>`_ and `django-storages <https://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html>`_.
+
 
 7. Install Docker on your EC2 Instance
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -154,4 +159,10 @@ From here you should finally be able to deploy your D-Codex project: ::
 
     docker-compose -f production.yml up -d --no-deps --build
 
-Your project should be accessible through your domain now! If you have any questions, please get in touch.
+Then you can migrate your database: ::
+
+    docker-compose -f production.yml run --rm django python manage.py migrate
+
+Your project should be accessible through your domain now! If there is an error, you can check the logs like this:
+
+    docker-compose -f production.yml logs
