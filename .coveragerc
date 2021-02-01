@@ -1,0 +1,11 @@
+[run]
+branch = False
+source = dcodex
+omit = 
+    */venv/*
+    */migrations/*
+    manage.py
+    */.virtualenvs/*
+
+[report]
+precision = 2    

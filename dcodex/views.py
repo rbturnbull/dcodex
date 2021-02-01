@@ -8,6 +8,7 @@ from django.views.generic import DetailView, FormView
 from django.core.exceptions import PermissionDenied
 from dcodex.models import *
 from dcodex.util import get_request_dict
+from django.http import Http404
 
 from .forms import PlotRollingAverageForm
 
@@ -79,9 +80,12 @@ def manuscript_verse_view(request, request_siglum, request_verse = None):
     # If no verse has been selected, then just find the first verse in the class of verses for this manuscript
     if not verse:
         verse = manuscript.verse_class().objects.first()
+        if not verse:
+            raise Http404(f"Verse ({request_verse}) does not exist.")
+
 
     if not verse:
-        raise Http404("Verse ({request_verse}) does not exist.")
+        raise Http404(f"Verse ({request_verse}) does not exist.")
 
     context = {
         'manuscript': manuscript,

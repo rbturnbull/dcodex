@@ -49,3 +49,17 @@ There are other DCodex packages to extend the functionality of DCodex such as:
 * [dcodex_collation](https://github.com/rbturnbull/dcodex_collation)
 * [dcodex_variants](https://github.com/rbturnbull/dcodex_variants)
 
+
+# Tests and Coverage
+
+To run the tests use the following command:
+
+```
+./runtests.py
+```
+
+To check the coverage:
+```
+coverage run -m runtests
+coverage report
+```
