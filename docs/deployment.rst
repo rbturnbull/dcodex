@@ -163,6 +163,12 @@ Then you can migrate your database: ::
 
     docker-compose -f production.yml run --rm django python manage.py migrate
 
+If the D-Codex apps you are using need any database fixtures installed, then  you can to that now. e.g. To import the basic Bible verses into dcodex-bible, run this command::
+
+    docker-compose -f production.yml run --rm django python manage.py import_bibleverses
+
 Your project should be accessible through your domain now! If there is an error, you can check the logs like this:
 
     docker-compose -f production.yml logs
+
+Please let me know if you have issues and I will try to help.

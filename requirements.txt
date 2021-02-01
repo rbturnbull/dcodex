@@ -5,11 +5,11 @@ beautifulsoup4==4.9.3
 certifi==2020.6.20
 chardet==3.0.4
 cycler==0.10.0
--e git+https://github.com/rbturnbull/dcodex@27b1618b5eb66321ec1f955fdbc99ae3e3ab78d1#egg=dcodex
 Django==3.1.3
 django-polymorphic==3.0.0
 docutils==0.16
 -e git+https://github.com/rbturnbull/gotoh.git@9887175dfc40601493471b481a69aa3152408d49#egg=gotoh
+-e git+https://gitlab.unimelb.edu.au/rturnbull/django-imagedeck.git#egg=django-imagedeck
 idna==2.10
 imagesize==1.2.0
 Jinja2==2.11.2

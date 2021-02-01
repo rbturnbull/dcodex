@@ -76,6 +76,13 @@ def manuscript_verse_view(request, request_siglum, request_verse = None):
         if transcription:
             verse = transcription.verse
     
+    # If no verse has been selected, then just find the first verse in the class of verses for this manuscript
+    if not verse:
+        verse = manuscript.verse_class().objects.first()
+
+    if not verse:
+        raise Http404("Verse ({request_verse}) does not exist.")
+
     context = {
         'manuscript': manuscript,
         'verse': verse,
