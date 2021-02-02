@@ -5,7 +5,7 @@ import io
 
 class PlotRollingAverageForm(forms.Form):
     manuscript = forms.ModelChoiceField(queryset=Manuscript.objects.all(), empty_label=None)
-    comparison_manuscripts = forms.ModelMultipleChoiceField( queryset=Manuscript.objects.all(), required=True )
+    comparison_manuscripts = forms.ModelMultipleChoiceField( queryset=Manuscript.objects.all(), widget=forms.CheckboxSelectMultiple, required=True )
 
     def get_svg_data(self):
         # send email using the self.cleaned_data dictionary
