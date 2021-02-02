@@ -21,6 +21,8 @@ class PlotRollingAverageForm(forms.Form):
         plot_rolling_average(
             manuscript=manuscript,
             mss_sigla=mss_sigla,
+            csv_filename="test.csv",
         )
 
         plt.savefig(f, format='svg', bbox_inches='tight')
+        return f.getvalue() 

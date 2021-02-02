@@ -92,20 +92,22 @@ def plot_rolling_average(
     ###### Major Grid Lines ######
     major_tick_locations = [min]    
     major_tick_annotations = [verse_min.reference_abbreviation().replace(" ","\n")]
-    for chapter_beginning in chapter_beginnings:
-        if chapter_beginning.chapter % major_chapter_markers == 0 or chapter_beginning.chapter == 1:
-            major_tick_locations.append( chapter_beginning.id )
-            ref = "%d:%d" % (chapter_beginning.chapter, chapter_beginning.verse) if chapter_beginning.chapter > 1 else chapter_beginning.reference_abbreviation().replace(" ","\n")
-            major_tick_annotations.append( ref )
+    # for chapter_beginning in chapter_beginnings:
+    #     if chapter_beginning.chapter % major_chapter_markers == 0 or chapter_beginning.chapter == 1:
+    #         major_tick_locations.append( chapter_beginning.id )
+    #         ref = "%d:%d" % (chapter_beginning.chapter, chapter_beginning.verse) if chapter_beginning.chapter > 1 else chapter_beginning.reference_abbreviation().replace(" ","\n")
+    #         major_tick_annotations.append( ref )
     major_tick_locations.append( verse_max.id )
     major_tick_annotations.append( verse_max.reference_abbreviation().replace(" ","\n") )
     plt.xticks(major_tick_locations, major_tick_annotations )
     
-    linewidth = 2 if major_chapter_markers > minor_chapter_markers else 1
+    # linewidth = 2 if major_chapter_markers > minor_chapter_markers else 1
+    linewidth = 1
     ax.xaxis.grid(True, which='major', color='#666666', linestyle='-', alpha=0.4, linewidth=linewidth)
     
     ###### Minor Grid Lines ######
-    minor_ticks = [x.id for x in chapter_beginnings if x.id not in major_tick_locations and x.chapter % minor_chapter_markers == 0]
+    # minor_ticks = [x.id for x in chapter_beginnings if x.id not in major_tick_locations and x.chapter % minor_chapter_markers == 0]
+    minor_ticks = []
     ax.xaxis.set_minor_locator(FixedLocator(minor_ticks))
     ax.xaxis.grid(True, which='minor', color='#666666', linestyle='-', alpha=0.2, linewidth=1,)
 
