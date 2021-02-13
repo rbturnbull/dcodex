@@ -378,14 +378,14 @@ body {
 .pageContainer{
 	position: relative;
 }
-#thumbnails {
+#thumbnail-scroll {
 	position: absolute;
     top: 125px;
     bottom: 0px;
     left: 0px;
     width: 100%;
 	overflow:scroll;
-	z-index: 2;
+    z-index: 2;
 }
 #middle {
 	position: absolute;

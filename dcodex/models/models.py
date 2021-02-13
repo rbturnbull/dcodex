@@ -16,7 +16,7 @@ from django.conf import settings
 from polymorphic.models import PolymorphicModel
 from django.shortcuts import render
 from django.db.models import Max, Min
-from imagedeck.models import DeckBase, DeckMembership
+from imagedeck.models import DeckBase, DeckMembership, ImageDeckModelMixin
 
 from .markup import normalize_transcription, remove_markup, Markup, StandardMarkup
 from ..distance import similarity_levenshtein, similarity_damerau_levenshtein, similarity_ratcliff_obershelp, similarity_jaro
@@ -37,7 +37,7 @@ class TextDirection(models.TextChoices):
     LEFT_TO_RIGHT = 'L'
 
 
-class Manuscript(PolymorphicModel):
+class Manuscript(ImageDeckModelMixin, PolymorphicModel):
     """ 
     An abstract class used for bringing together all the elements of a document. 
     """
@@ -45,7 +45,7 @@ class Manuscript(PolymorphicModel):
     siglum = models.CharField(max_length=255, blank=True, help_text='A unique short string for this manuscript.')
     markup = models.ForeignKey(Markup, on_delete=models.SET_DEFAULT, null=True, blank=True, default=None, help_text='The default markup class for this manuscript.')
     text_direction = models.CharField(max_length=1, choices=TextDirection.choices, default=TextDirection.LEFT_TO_RIGHT )
-    imagedeck = models.ForeignKey( DeckBase, on_delete=models.SET_DEFAULT, null=True, blank=True, default=None, help_text='The facsimile images for this manuscript.')
+    # imagedeck = models.ForeignKey( DeckBase, on_delete=models.SET_DEFAULT, null=True, blank=True, default=None, help_text='The facsimile images for this manuscript.')
 
     def get_markup(self):
         if self.markup:
@@ -530,14 +530,14 @@ class Manuscript(PolymorphicModel):
 
             location_B = self.last_location(  )
             if location_B is None or location_B.id == location_A.id:
-                return location_A
+                return location_A.verse
         else:
             location_B = self.location_below( deck_membership, y )
             if location_B is None:
-                location_B = location_A;
+                location_B = location_A
                 location_A = self.first_location(  )
                 if location_A is None or location_A.id == location_B.id:
-                    return location_B
+                    return location_B.verse
 
 
         textbox_top = VerseLocation.textbox_top(self)
@@ -910,8 +910,9 @@ class VerseLocation(models.Model):
 
     x = models.FloatField(help_text="The number of horizontal pixels from the left of the facsimile image to the the location of the verse, normalized by the height of the image.")
     y = models.FloatField(help_text="The number of vertical pixels from the top of the facsimile image to the the location of the verse, normalized by the height of the image.")
+
     def __str__(self):
-        return "%s in '%s' in imagedeck '%s' on p%d at (%0.1g, %0.1g)" % (self.verse.reference(abbreviation=True), self.manuscript.short_name(), self.deck(), self.page_number(), self.x, self.y )
+        return "%s in '%s' in image deck '%s' on p%d at (%0.1g, %0.1g)" % (self.verse.reference(abbreviation=True), self.manuscript.short_name(), self.deck(), self.page_number(), self.x, self.y )
 
     def deck(self):
         if self.deck_membership:

@@ -10,7 +10,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         for manuscript in Manuscript.objects.filter(imagedeck=None):
-            print(f"Manuscript {manuscript} has no imagedeck")
+            print(f"Manuscript {manuscript} has no image deck")
             pdfs = PDF.objects.filter(verselocation__manuscript=manuscript).distinct()
             print(pdfs)
             if not pdfs:

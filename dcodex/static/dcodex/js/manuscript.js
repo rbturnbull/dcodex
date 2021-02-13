@@ -213,7 +213,6 @@ function load_thumbnails( manuscript_id ) {
         $('.thumbnailContainer').dblclick(function(e) {
             $('#tagPageWindow').show();
             var mid = $(this).data('mid');		
-            alert(mid);
             $('#saveTagPage').data('mid', mid );
         });
            
@@ -733,7 +732,6 @@ $( document ).ready(function() {
 	
 	$('#saveTagPage').click(function(e) {
         var deckmembershipid = $(this).data('mid');	
-        alert(deckmembershipid);
 	
 		var folio = $( "#tagPageFolioNumber" ).val();
 		var side = $( "#tagPageFolioLetter" ).val();

@@ -19,9 +19,40 @@
             <input type="submit" value="⤵︎︎" name=load id=goToPage >
         </form>
     </center>
-    <div id=thumbnails>
+    <div id=thumbnail-scroll>
+        <div id="thumbnails">
+        </div>
+        <div style="margin: 20px;">
+            {% if request.user.is_staff %} {# TODO should check permissions on manuscripts #}
+                <div class="row" >
+                    <button type="button" class="btn btn-outline-light btn-upload-images">
+                        <i class="fas fa-upload"></i> Upload Facsimiles
+                    </button>  
+                </div>
+            
+                <input id="fileupload" type="file" name="file" multiple
+                        style="display: none;"
+                        data-url="{{ manuscript.get_image_upload_url }}"
+                        data-form-data='{"csrfmiddlewaretoken": "{{ csrf_token }}"}'>
+            {% endif %}        
+        </div>
     </div>
 </div>
+<div class="modal fade" id="modal-progress" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Uploading...</h4>
+        </div>
+        <div class="modal-body">
+          <div class="progress">
+            <div class="progress-bar" role="progressbar" style="width: 0%;">0%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 <div id=middle>
 	<div id=manuscript>
         <div id=manuscriptHeader></div>
@@ -81,5 +112,54 @@ $( document ).ready(function() {
     load_manuscript( {{ manuscript.id }} );
     seekVerse( {{ verse.id }}, {{ manuscript.id }} )
 });
+
+$(function () {
+    /* 1. OPEN THE FILE EXPLORER WINDOW */
+    $(".btn-upload-images").click(function () {
+      $("#fileupload").click();
+    });
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    /* 2. INITIALIZE THE FILE UPLOAD COMPONENT */
+    $("#fileupload").fileupload({
+      dataType: 'json',
+      sequentialUploads: true,
+
+      start: function (e) {
+        $("#modal-progress").modal("show");
+        console.log("modal-progress show");
+      },
+
+      stop: function (e) {
+        console.log("stopping upload");
+        $('#modal-progress').on('shown.bs.modal', function () {
+            $("#modal-progress").modal("hide");
+            console.log("modal-progress hide");
+            location.reload(); // Reload to show the images. It would be better to do this with javascript as I attempt to do below. TODO Fix
+        });
+      },
+
+      progressall: function (e, data) {
+        var progress = parseInt(data.loaded / data.total * 100, 10);
+        var strProgress = progress + "%";
+        $(".progress-bar").css({"width": strProgress});
+        $(".progress-bar").text(strProgress);
+      },
+
+      done: function (e, data) {  /* 3. PROCESS THE RESPONSE FROM THE SERVER */
+        if (data.result.is_valid) {
+          $("#images").append(
+            "<a href='" + data.result.url + "'><img src='" + data.result.thumbnail_url + "' class='img-thumbnail rounded' style='width: 250px;'></a>"
+          )
+        }
+        else {
+            console.log("Upload unsuccessful.")
+        }
+      }
+    });
+  
+  });
 </script>
 {% endblock %}

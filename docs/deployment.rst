@@ -148,7 +148,12 @@ Now you can copy your files ot the EC3 instance using rsync. Just go to the proj
     
     Here :code:`ec2instance` is the shortcut host in your :code:`~/.ssh/config` file.
 
+.. note ::
+
+    You might want to exclude transferring your local media files directory since these will be going to the S3 bucket. You can also exclude your git history in .git.
+
 9. Deploy!
+^^^^^^^^^^^^^^^
 
 Now you can ssh back in to your EC2 instance and go to your new :code:`app` directory: ::
 
