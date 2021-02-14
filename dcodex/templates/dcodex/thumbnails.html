@@ -1,12 +1,11 @@
 {% load static %}
-{% load thumbnail %}
 {% load dcodex_tags %}
 {% get_media_prefix as MEDIA_PREFIX %}
 
 {% if manuscript %}
     {% for image_membership in manuscript.image_memberships %}
         <div id='thumbnailContainer{{ forloop.counter }}' class="thumbnailContainer" data-page='{{ forloop.counter }}' data-mid='{{ image_membership.id }}'>
-            <img data-src='{% thumbnail image_membership.image.filer_image 121x0 %}' src='' class='thumbnail' data-page='{{ forloop.counter }}' data-folio='{{ image_membership.folioref }}' id='thumbnail{{ forloop.counter }}' />
+            <img data-src='{{ image_membership.thumbnail }}' src='' class='thumbnail' data-page='{{ forloop.counter }}' data-folio='{{ image_membership.folioref }}' id='thumbnail{{ forloop.counter }}' />
             <p>{{ manuscript|folio_and_page:forloop.counter }}</p>
         </div>            
     {% endfor %}
