@@ -2,7 +2,6 @@ from dcodex.models import *
 import numpy as np
 import pandas as pd
 from collections import Counter
-from matplotlib import pyplot as plt
 import scipy.spatial.distance as ssd
 import scipy.cluster.hierarchy as hcluster
 from collections import defaultdict
@@ -128,6 +127,8 @@ def distance_matrix_csv( filename, manuscripts, verses, distance_func = Levensht
 
 
 def dendrogram_from_distance_matrix( filename, np_matrix, labels ):
+    from matplotlib import pyplot as plt
+
     distance_vec = ssd.squareform(np_matrix)    # converts square symmetric distrance matrix to vector
     fig = plt.figure(figsize=(20, 25))
 
