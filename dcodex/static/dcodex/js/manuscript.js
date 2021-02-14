@@ -25,15 +25,15 @@ function setCurrentPage( page ) {
 
     // Check if page is visible
 //		alert( "scroll top" + $('#thumbnails').scrollTop() + " thumbnail.offset().top" + thumbnail.offset().top + " $('#thumbnails').height() " + $('#thumbnails').height() );
-    if (thumbnail.offset().top + thumbnail.height() < 0 || thumbnail.offset().top > $('#thumbnails').height() ) {
+    // if (thumbnail.offset().top + thumbnail.height() < 0 || thumbnail.offset().top > $('#thumbnails').height() ) {
     
-        if ( Math.abs( currentPage - page ) < 4 ) {
-            $('#thumbnails').scrollTo(thumbnail, 300);							
-        }
-        else {
-            $('#thumbnails').scrollTo(thumbnail);				
-        }
-    }
+    //     if ( Math.abs( currentPage - page ) < 4 ) {
+    //         $('#thumbnails').scrollTo(thumbnail, 300);							
+    //     }
+    //     else {
+    //         $('#thumbnails').scrollTo(thumbnail);				
+    //     }
+    // }
         
     currentPage = page;
 }
@@ -194,8 +194,8 @@ function load_thumbnails( manuscript_id ) {
     $('#thumbnails').load("/dcodex/ms/"+manuscript_id+"/thumbnails/", function() {
         console.log( "thumbnails loaded" );
         
-        $('.thumbnail').lazy({
-            appendScroll: $('#thumbnails'),
+        $('.thumbnail').Lazy({
+            appendScroll: $('#thumbnail-scroll'),
             beforeLoad: function(element) {
             },
             afterLoad: function(element) {

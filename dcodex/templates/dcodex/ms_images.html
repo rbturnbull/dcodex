@@ -1,5 +1,6 @@
+{% load imagedeck %}
 {% for image_membership in manuscript.image_memberships %}
     <div id="page{{ forloop.counter }}" class=pageContainer data-page='{{ forloop.counter }}' data-mid='{{image_membership.id}}'>
-        <img data-src='{{ image_membership.image.filer_image.url }}' src='' class='pageImage' data-page='{{ forloop.counter }}'  data-mid='{{image_membership.id}}' id='pageImage{{ forloop.counter }}' />
+        <img data-src='{{ image_membership|url_with_width:1500 }}' src='' class='pageImage' data-page='{{ forloop.counter }}'  data-mid='{{image_membership.id}}' id='pageImage{{ forloop.counter }}' />
     </div>    
 {% endfor %}
