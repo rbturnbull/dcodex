@@ -37,7 +37,7 @@ class TextDirection(models.TextChoices):
     LEFT_TO_RIGHT = 'L'
 
 
-class Manuscript(ImageDeckModelMixin, PolymorphicModel):
+class Manuscript(PolymorphicModel, ImageDeckModelMixin):
     """ 
     An abstract class used for bringing together all the elements of a document. 
     """
