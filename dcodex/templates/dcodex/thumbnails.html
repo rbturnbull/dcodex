@@ -9,6 +9,13 @@
             <p>{{ manuscript|folio_and_page:forloop.counter }}</p>
         </div>            
     {% endfor %}
+    {% if not manuscript.image_memberships.count %}
+        <script>
+            $("#manuscriptHeader").css("height","100%");
+            $("#transcriptionEntry").css("height","100%");
+            $("#transcription").css("height","700px");
+        </script>
+    {% endif %}
 {% else %}
     <p>No thumbnails available.</p>
 {% endif %}
