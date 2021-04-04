@@ -14,6 +14,9 @@ requirements = [
     'django-admin-sortable2',
     'lxml',
     "regex",
+    "django-filer",
+    'django-imagedeck @ git+https://gitlab.unimelb.edu.au/rturnbull/django-imagedeck.git#egg=django-imagedeck',
+    'gotoh @ git+https://github.com/rbturnbull/gotoh.git#egg=gotoh',
 ]
 
 setup(
