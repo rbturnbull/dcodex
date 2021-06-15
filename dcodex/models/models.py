@@ -11,7 +11,7 @@ from scipy.special import expit
 import gotoh
 
 from django.db import models
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.conf import settings
 from polymorphic.models import PolymorphicModel
 from django.shortcuts import render
@@ -970,6 +970,9 @@ class VerseTranscriptionBase(PolymorphicModel):
     def __str__(self):
         return "%s in %s: %s" % (self.verse.reference(abbreviation=True), self.manuscript.short_name(), self.transcription )
 
+    def get_absolute_url(self):
+        return reverse( "dcodex-manuscript-verse", kwargs=dict(request_siglum=self.manuscript.siglum, request_verse=self.verse.url_ref()) )    
+
     def get_markup( self ):
         if self.markup:
             return self.markup
@@ -1017,10 +1020,12 @@ class VerseTranscriptionBase(PolymorphicModel):
     def similarity_jaro( self, comparison_transcription ):
         return self.similarity( comparison_transcription, similarity_jaro )
         
+
 class VerseTranscription(VerseTranscriptionBase):
     def __str__(self):
         return super(VerseTranscription, self).__str__()
     
+
 class FamilyBase(PolymorphicModel):
     name = models.CharField(max_length=200)
     def __str__(self):
