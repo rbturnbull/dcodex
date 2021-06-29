@@ -119,6 +119,7 @@ class VerseTranscriptionBaseParentAdmin(PolymorphicParentModelAdmin):
 
 
 admin.site.register(StandardMarkup)
+admin.site.register(MinimalMarkup)
 admin.site.register(SimpleArabicMarkup)
 
 admin.site.register(PDF)

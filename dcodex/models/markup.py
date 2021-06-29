@@ -72,6 +72,15 @@ class Markup(PolymorphicModel):
         return string
 
 
+class MinimalMarkup(Markup):
+    def remove_markup(self, string):
+        return string
+
+    def regularize( self, string ):
+        return string
+
+
+
 class StandardMarkup(Markup):
     pass
 

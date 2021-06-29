@@ -2,6 +2,7 @@ import os
 import glob
 import logging
 import datetime
+from collections import Counter
 import re
 from lxml import etree
 
@@ -635,6 +636,13 @@ class Manuscript(PolymorphicModel, ImageDeckModelMixin):
             return prev_folio.page + y - x
             
         return None
+    
+    def character_counter(self, regularize=False):
+        characters = Counter()
+        for transcription in self.transcriptions():
+            text = transcription.transcription if not regularize else transcription.normalize()
+            characters.update(list(text))
+        return characters        
 
 
 class ManuscriptImage():
