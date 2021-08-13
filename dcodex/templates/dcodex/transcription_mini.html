@@ -1,4 +1,4 @@
-{% load static %}
+{% load static imagedeck %}
 {% get_media_prefix as MEDIA_PREFIX %}
 <script type="text/javascript">
 //    alert("Outside the jQuery ready");
@@ -24,7 +24,7 @@
 
 <div id=manuscriptInBox style='position: relative; overflow:hidden;'>
 
-    <img src="{{ location.deck_membership.image.filer_image.url }}" style='width: 100%;' id=manuscriptInBoxImage />
+    <img src="{{ location.deck_membership.image|url_with_width:800 }}" style='width: 100%;' id=manuscriptInBoxImage />
 
     <div id='verseMarkerInBox' class='verseMarker' style='background-color: green; height: 1px; width: 100%;'></div>
     <div id='verseMarkerInBoxX' class='verseMarker' style='position: absolute; background-color: green; height: 30px; width: 1px;'></div>

@@ -28,5 +28,5 @@ gotoh = {git = "https://github.com/rbturnbull/gotoh.git"}
 coverage = "^5.5"
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
+requires = ["setuptools >= 40.6.0", "poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
