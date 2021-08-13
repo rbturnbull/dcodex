@@ -1,5 +1,6 @@
 # dcodex
 
+![pipline](https://github.com/rbturnbull/dcodex/actions/workflows/pipeline.yml/badge.svg)
 
 This is an alpha release of D-Codex: A software framework for manuscript analysis.
 
