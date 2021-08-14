@@ -507,7 +507,7 @@ class Manuscript(PolymorphicModel, ImageDeckModelMixin):
         y = (my_location_value - page) * (1.0-2*textbox_top) + textbox_top
         # image = self.imagedeck[page]
 
-        deck_membership_queryset = DeckMembership.objects.filter(deck=self.imagedeck)
+        deck_membership_queryset = self.imagedeck.memberships()
         max_page = deck_membership_queryset.aggregate(Max('rank'))['rank__max']
         if page < 0:
             page = 0

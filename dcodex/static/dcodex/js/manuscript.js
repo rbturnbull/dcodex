@@ -17,25 +17,22 @@ function setLoadVerseLink() {
 function setCurrentPage( page ) {
     if ( currentPage == page ) 
         return;
+    currentPage = page;
 
     $('.thumbnailContainer').removeClass('thumbnailCurrent');
     var thumbnail = $('#thumbnailContainer'+page);
     thumbnail.addClass('thumbnailCurrent');
 
-
     // Check if page is visible
-//		alert( "scroll top" + $('#thumbnails').scrollTop() + " thumbnail.offset().top" + thumbnail.offset().top + " $('#thumbnails').height() " + $('#thumbnails').height() );
-    // if (thumbnail.offset().top + thumbnail.height() < 0 || thumbnail.offset().top > $('#thumbnails').height() ) {
-    
-    //     if ( Math.abs( currentPage - page ) < 4 ) {
-    //         $('#thumbnails').scrollTo(thumbnail, 300);							
-    //     }
-    //     else {
-    //         $('#thumbnails').scrollTo(thumbnail);				
-    //     }
-    // }
+    if (thumbnail.offset().top < 0 || thumbnail.offset().top > $('#thumbnail-scroll').height() ) {
+        if ( Math.abs( currentPage - page ) < 4 ) {
+            $('#thumbnail-scroll').scrollTo(thumbnail, 300);							
+        }
+        else {
+            $('#thumbnail-scroll').scrollTo(thumbnail);				
+        }
+    }
         
-    currentPage = page;
 }
 
 function loadVerseMarker(dict) {
