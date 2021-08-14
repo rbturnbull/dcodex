@@ -287,7 +287,7 @@ class Manuscript(PolymorphicModel, ImageDeckModelMixin):
 
     def save_location( self, verse, deck_membership, x, y ):
         location, created = VerseLocation.objects.update_or_create(
-            manuscript=self, 
+            manuscript=self,
             verse=verse, 
             defaults=dict(deck_membership=deck_membership, x=x, y=y),
         )
@@ -446,17 +446,21 @@ class Manuscript(PolymorphicModel, ImageDeckModelMixin):
         """ The CSS class for text from this manuscript to express the direction. """
         return "ltr" if self.text_direction == "L" else "rtl"
 
-    def location( self, verse, verbose=True ):
-        """ Finds (or estimates) the location of a verse in a manuscript.
+    def location( self, verse, verbose=False ):
+        """ 
+        Finds (or estimates) the location of a verse in a manuscript.
         
         If the location is already tagged in the manuscript, the saved location is returned from the database. 
-        If not, then it estimates the location of the verse via interpolation or extrapolation 
+        If not, then it estimates the location of the verse via interpolation or extrapolation.
         """
         
         if not verse:
             return VerseLocation.objects.filter( manuscript=self ).order_by('verse__id').first()                    
             
         location_A = self.location_before_or_equal( verse )
+        if verbose:
+            logger = logging.getLogger(__name__)            
+            logger.error( "Location A: %s " % str(location_A) )
         
         # If this location is already saved then return it
         if location_A and verse.id == location_A.verse.id:
@@ -480,6 +484,10 @@ class Manuscript(PolymorphicModel, ImageDeckModelMixin):
                 if location_A is None or location_A.id == location_B.id:
                     return location_B
         
+        if verbose:
+            logger.error( "Location A: %s " % str(location_A) )
+            logger.error( "Location B: %s " % str(location_B) )            
+
         textbox_top = VerseLocation.textbox_top(self)
 
         location_A_value = location_A.value( textbox_top ) 
@@ -489,6 +497,8 @@ class Manuscript(PolymorphicModel, ImageDeckModelMixin):
         distance_locations_B_location_A = self.distance_between_verses( location_A.verse, location_B.verse )
 
         if distance_locations_B_location_A == 0:
+            if verbose:
+                logger.error( f"{distance_locations_B_location_A =}")
             return location_A
         value_delta = (distance_verse_location_A)*(location_B_value - location_A_value)/(distance_locations_B_location_A)
     
@@ -496,14 +506,24 @@ class Manuscript(PolymorphicModel, ImageDeckModelMixin):
         page = int(my_location_value)
         y = (my_location_value - page) * (1.0-2*textbox_top) + textbox_top
         # image = self.imagedeck[page]
-        deck_membership = DeckMembership.objects.filter(deck=self.imagedeck, rank=page).first()
-        
+
+        deck_membership_queryset = DeckMembership.objects.filter(deck=self.imagedeck)
+        max_page = deck_membership_queryset.aggregate(Max('rank'))['rank__max']
+        if page < 0:
+            page = 0
+            y = 0.0
+        elif page >= max_page:
+            page = max_page
+            y = 1.0
+
+        deck_membership = deck_membership_queryset.filter(rank__gte=page).first()
+        if deck_membership is None:
+            deck_membership = deck_membership_queryset.filter(rank__lte=page).last()
+
         if verbose:
             logger = logging.getLogger(__name__)            
-            logger.error( "Location A: %s " % str(location_A) )
-            logger.error( "Location B: %s " % str(location_B) )
-            logger.error( "distance_verse_location_A: %s " % str(distance_verse_location_A) )
-            logger.error( "distance_locations_B_location_A: %s " % str(distance_locations_B_location_A) )
+            logger.error( f"{distance_verse_location_A =}" )
+            logger.error( f"{distance_locations_B_location_A =}" )
         
         return VerseLocation(manuscript=self, verse=verse, deck_membership=deck_membership, y=y, x=0.0)
 
@@ -766,7 +786,9 @@ class FolioRef(models.Model):
     
     
 class Verse(PolymorphicModel):
-    """ An abstract class used for the smallest textual unit appropriate for the manuscript type. 
+    """ 
+    An abstract class used for the smallest textual unit appropriate for the manuscript type. 
+    
     Each Verse object ought only occur once per manuscript. 
     For each possible verse, there must be an instance of a child-class of Verse saved in the database. 
     """
