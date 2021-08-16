@@ -18,6 +18,7 @@ import json
 def get_verse(request, manuscript):
     request_dict = get_request_dict(request)
     verse_id = request_dict.get('verse_id')
+    logging.error(f"in get_verse. {verse_id =}")
     return manuscript.verse_from_id( verse_id )
 
 def get_deck_membership(request):

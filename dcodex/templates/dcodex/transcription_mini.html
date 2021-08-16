@@ -1,18 +1,18 @@
 {% load static imagedeck %}
 {% get_media_prefix as MEDIA_PREFIX %}
 <script type="text/javascript">
-//    alert("Outside the jQuery ready");
 	$(document).ready(function() {	
-		$('#manuscriptInBoxImage').load(function() {
+		$('#manuscriptInBoxImage').on('load', function() {
 			var y = {{ location.y }} * $('#manuscriptInBox').prop('scrollHeight');
-			var x = {{ location.x }}*$('#manuscriptInBox').prop('scrollWidth');
-			var right = $('#manuscriptInBox').prop('scrollWidth') - x;
+			var x = {{ location.x }} * $('#manuscriptInBox').prop('scrollWidth');
 			var margin = (-y+50);
 			var top = y+margin;
 	
 			$('#verseMarkerInBox').css('top',top+"px");	
 			$('#verseMarkerInBoxX').css('top',top+"px");	
-			$('#verseMarkerInBoxX').css('right',right+"px");
+			$('#verseMarkerInBoxX').css('left',x+"px");
+			console.log($('#verseMarkerInBoxX').css('right'));
+
 			$('#manuscriptInBoxImage').css('margin-top',margin+"px");
 		});
     });
