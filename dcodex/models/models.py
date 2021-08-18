@@ -197,19 +197,25 @@ class Manuscript(PolymorphicModel, ImageDeckModelMixin):
         df.to_csv( filename )
         return df
 
-    def read_transcriptions_csv( self, filename ):
+    def read_transcriptions_csv( self, filename, verse_column='Verse', transcription_column='Transcription' ):
         df = pd.read_csv( filename )
         for index, row in df.iterrows():
-            verse = self.verse_class().get_from_string( row['Verse'] )
+            verse = self.verse_class().get_from_string( row[verse_column] )
             if verse:
                 print(verse)
-                self.save_transcription( verse, row['Transcription'] )
+                self.save_transcription( verse, row[transcription_column] )
 
     @classmethod
-    def create_from_csv( cls, siglum, filename, name=None):
-        name = name or siglum
-        ms, _ = cls.objects.update_or_create( siglum=siglum, defaults=dict(name=name) )
-        ms.read_transcriptions_csv(filename)
+    def create_from_csv( cls, siglum, filename, name=None, **kwargs):
+        ms, _ = cls.objects.update_or_create( siglum=siglum )
+        if name:
+            ms.name = name
+            ms.save()
+        if not ms.name:
+            ms.name = siglum
+            ms.save()
+        
+        ms.read_transcriptions_csv(filename, **kwargs)
         return ms
 
     def tei_element_facsimile( self ):
