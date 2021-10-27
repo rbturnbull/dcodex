@@ -1,6 +1,8 @@
 # dcodex
 
 ![pipline](https://github.com/rbturnbull/dcodex/actions/workflows/pipeline.yml/badge.svg)
+[<img src="https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/rbturnbull/49262550cc8b0fb671d46df58de213d4/raw/django-authanon-coverage.json">](<https://rbturnbull.github.io/django-authanon/>)
+[<img src="https://img.shields.io/badge/code%20style-black-000000.svg">](<https://github.com/psf/black>)
 
 This is an alpha release of D-Codex: A software framework for manuscript analysis.
 

@@ -7,38 +7,70 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('imagedeck', '0009_auto_20201122_2300'),
-        ('dcodex', '0029_manuscript_text_direction'),
+        ("imagedeck", "0009_auto_20201122_2300"),
+        ("dcodex", "0029_manuscript_text_direction"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='manuscript',
-            name='imagedeck',
-            field=models.ForeignKey(blank=True, default=None, help_text='The facsimile images for this manuscript.', null=True, on_delete=django.db.models.deletion.SET_DEFAULT, to='imagedeck.DeckBase'),
+            model_name="manuscript",
+            name="imagedeck",
+            field=models.ForeignKey(
+                blank=True,
+                default=None,
+                help_text="The facsimile images for this manuscript.",
+                null=True,
+                on_delete=django.db.models.deletion.SET_DEFAULT,
+                to="imagedeck.DeckBase",
+            ),
         ),
         migrations.AddField(
-            model_name='verselocation',
-            name='deck_membership',
-            field=models.ForeignKey(blank=True, default=None, help_text='The reference to the facsimile image in the imagedeck for this manuscript.', null=True, on_delete=django.db.models.deletion.SET_DEFAULT, to='imagedeck.DeckMembership'),
+            model_name="verselocation",
+            name="deck_membership",
+            field=models.ForeignKey(
+                blank=True,
+                default=None,
+                help_text="The reference to the facsimile image in the imagedeck for this manuscript.",
+                null=True,
+                on_delete=django.db.models.deletion.SET_DEFAULT,
+                to="imagedeck.DeckMembership",
+            ),
         ),
         migrations.AlterField(
-            model_name='verselocation',
-            name='page',
-            field=models.IntegerField(help_text='DEPRECATED'),
+            model_name="verselocation",
+            name="page",
+            field=models.IntegerField(help_text="DEPRECATED"),
         ),
         migrations.AlterField(
-            model_name='verselocation',
-            name='pdf',
-            field=models.ForeignKey(help_text='DEPRECATED', on_delete=django.db.models.deletion.CASCADE, to='dcodex.PDF'),
+            model_name="verselocation",
+            name="pdf",
+            field=models.ForeignKey(
+                help_text="DEPRECATED",
+                on_delete=django.db.models.deletion.CASCADE,
+                to="dcodex.PDF",
+            ),
         ),
         migrations.CreateModel(
-            name='FolioRef',
+            name="FolioRef",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('folio', models.IntegerField()),
-                ('side', models.CharField(max_length=20)),
-                ('deck_membership', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='imagedeck.DeckMembership')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("folio", models.IntegerField()),
+                ("side", models.CharField(max_length=20)),
+                (
+                    "deck_membership",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="imagedeck.DeckMembership",
+                    ),
+                ),
             ],
         ),
     ]

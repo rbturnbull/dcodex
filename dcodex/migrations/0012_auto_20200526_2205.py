@@ -6,18 +6,20 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dcodex', '0011_groupmembershipall_groupmembershiprange'),
+        ("dcodex", "0011_groupmembershipall_groupmembershiprange"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='groupmembershipbase',
-            name='manuscripts',
-            field=models.ManyToManyField(blank=True, to='dcodex.Manuscript'),
+            model_name="groupmembershipbase",
+            name="manuscripts",
+            field=models.ManyToManyField(blank=True, to="dcodex.Manuscript"),
         ),
         migrations.AlterField(
-            model_name='groupmembershipbase',
-            name='overlapping_groups',
-            field=models.ManyToManyField(blank=True, related_name='overlapping_groups', to='dcodex.GroupBase'),
+            model_name="groupmembershipbase",
+            name="overlapping_groups",
+            field=models.ManyToManyField(
+                blank=True, related_name="overlapping_groups", to="dcodex.GroupBase"
+            ),
         ),
     ]

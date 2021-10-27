@@ -7,19 +7,29 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dcodex', '0032_auto_20201126_2325'),
+        ("dcodex", "0032_auto_20201126_2325"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='SimpleArabicMarkup',
+            name="SimpleArabicMarkup",
             fields=[
-                ('markup_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='dcodex.Markup')),
+                (
+                    "markup_ptr",
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to="dcodex.Markup",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
-                'base_manager_name': 'objects',
+                "abstract": False,
+                "base_manager_name": "objects",
             },
-            bases=('dcodex.markup',),
+            bases=("dcodex.markup",),
         ),
     ]

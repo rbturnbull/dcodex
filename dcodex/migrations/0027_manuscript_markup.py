@@ -7,13 +7,20 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dcodex', '0026_auto_20201004_1045'),
+        ("dcodex", "0026_auto_20201004_1045"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='manuscript',
-            name='markup',
-            field=models.ForeignKey(blank=True, default=None, help_text='The default markup class for this manuscript.', null=True, on_delete=django.db.models.deletion.SET_DEFAULT, to='dcodex.Markup'),
+            model_name="manuscript",
+            name="markup",
+            field=models.ForeignKey(
+                blank=True,
+                default=None,
+                help_text="The default markup class for this manuscript.",
+                null=True,
+                on_delete=django.db.models.deletion.SET_DEFAULT,
+                to="dcodex.Markup",
+            ),
         ),
     ]

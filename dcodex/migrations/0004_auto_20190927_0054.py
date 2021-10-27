@@ -6,12 +6,12 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dcodex', '0003_auto_20190920_1333'),
+        ("dcodex", "0003_auto_20190920_1333"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='manuscript',
-            options={'ordering': ['siglum', 'name']},
+            name="manuscript",
+            options={"ordering": ["siglum", "name"]},
         ),
     ]

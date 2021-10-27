@@ -6,11 +6,11 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dcodex', '0014_delete_groupmembershiprange'),
+        ("dcodex", "0014_delete_groupmembershiprange"),
     ]
 
     operations = [
         migrations.DeleteModel(
-            name='GroupMembershipAll',
+            name="GroupMembershipAll",
         ),
     ]

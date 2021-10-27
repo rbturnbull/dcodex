@@ -7,32 +7,66 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dcodex', '0010_groupmembershipbase'),
+        ("dcodex", "0010_groupmembershipbase"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='GroupMembershipAll',
+            name="GroupMembershipAll",
             fields=[
-                ('groupmembershipbase_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='dcodex.GroupMembershipBase')),
+                (
+                    "groupmembershipbase_ptr",
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to="dcodex.GroupMembershipBase",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
-                'base_manager_name': 'objects',
+                "abstract": False,
+                "base_manager_name": "objects",
             },
-            bases=('dcodex.groupmembershipbase',),
+            bases=("dcodex.groupmembershipbase",),
         ),
         migrations.CreateModel(
-            name='GroupMembershipRange',
+            name="GroupMembershipRange",
             fields=[
-                ('groupmembershipbase_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='dcodex.GroupMembershipBase')),
-                ('end_verse', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='end_verse', to='dcodex.Verse')),
-                ('start_verse', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='start_verse', to='dcodex.Verse')),
+                (
+                    "groupmembershipbase_ptr",
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to="dcodex.GroupMembershipBase",
+                    ),
+                ),
+                (
+                    "end_verse",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="end_verse",
+                        to="dcodex.Verse",
+                    ),
+                ),
+                (
+                    "start_verse",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="start_verse",
+                        to="dcodex.Verse",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
-                'base_manager_name': 'objects',
+                "abstract": False,
+                "base_manager_name": "objects",
             },
-            bases=('dcodex.groupmembershipbase',),
+            bases=("dcodex.groupmembershipbase",),
         ),
     ]

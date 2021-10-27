@@ -7,20 +7,37 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dcodex', '0020_affiliationbase_name'),
+        ("dcodex", "0020_affiliationbase_name"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='AffiliationVerses',
+            name="AffiliationVerses",
             fields=[
-                ('affiliationbase_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='dcodex.AffiliationBase')),
-                ('verses', models.ManyToManyField(help_text='All the verses where this affiliation object is active.', related_name='affiliation_verses', to='dcodex.Verse')),
+                (
+                    "affiliationbase_ptr",
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to="dcodex.AffiliationBase",
+                    ),
+                ),
+                (
+                    "verses",
+                    models.ManyToManyField(
+                        help_text="All the verses where this affiliation object is active.",
+                        related_name="affiliation_verses",
+                        to="dcodex.Verse",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
-                'base_manager_name': 'objects',
+                "abstract": False,
+                "base_manager_name": "objects",
             },
-            bases=('dcodex.affiliationbase',),
+            bases=("dcodex.affiliationbase",),
         ),
     ]

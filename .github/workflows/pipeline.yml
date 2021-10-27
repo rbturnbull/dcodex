@@ -22,7 +22,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install poetry
         poetry install
-    - name: Coverage
+    - name: Tests
       run: |
-        poetry run coverage run ./runtests.py
-        poetry run coverage report
+        poetry run ./runtests.py
+

@@ -1,1 +1,1 @@
-default_app_config = 'dcodex.apps.DcodexConfig'
+default_app_config = "dcodex.apps.DcodexConfig"

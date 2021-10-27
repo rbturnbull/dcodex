@@ -7,81 +7,163 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('contenttypes', '0002_remove_content_type_name'),
-        ('dcodex', '0018_delete_groupbase'),
+        ("contenttypes", "0002_remove_content_type_name"),
+        ("dcodex", "0018_delete_groupbase"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='AffiliationBase',
+            name="AffiliationBase",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
-                'base_manager_name': 'objects',
+                "abstract": False,
+                "base_manager_name": "objects",
             },
         ),
         migrations.CreateModel(
-            name='FamilyBase',
+            name="FamilyBase",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=200)),
-                ('polymorphic_ctype', models.ForeignKey(editable=False, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='polymorphic_dcodex.familybase_set+', to='contenttypes.ContentType')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=200)),
+                (
+                    "polymorphic_ctype",
+                    models.ForeignKey(
+                        editable=False,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="polymorphic_dcodex.familybase_set+",
+                        to="contenttypes.ContentType",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
-                'base_manager_name': 'objects',
+                "abstract": False,
+                "base_manager_name": "objects",
             },
         ),
         migrations.CreateModel(
-            name='AffiliationAll',
+            name="AffiliationAll",
             fields=[
-                ('affiliationbase_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='dcodex.AffiliationBase')),
+                (
+                    "affiliationbase_ptr",
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to="dcodex.AffiliationBase",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
-                'base_manager_name': 'objects',
+                "abstract": False,
+                "base_manager_name": "objects",
             },
-            bases=('dcodex.affiliationbase',),
+            bases=("dcodex.affiliationbase",),
         ),
         migrations.CreateModel(
-            name='Family',
+            name="Family",
             fields=[
-                ('familybase_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='dcodex.FamilyBase')),
+                (
+                    "familybase_ptr",
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to="dcodex.FamilyBase",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
-                'base_manager_name': 'objects',
+                "abstract": False,
+                "base_manager_name": "objects",
             },
-            bases=('dcodex.familybase',),
+            bases=("dcodex.familybase",),
         ),
         migrations.AddField(
-            model_name='affiliationbase',
-            name='families',
-            field=models.ManyToManyField(help_text='All the families that are affiliated through the relationship defined by this object.', to='dcodex.FamilyBase'),
+            model_name="affiliationbase",
+            name="families",
+            field=models.ManyToManyField(
+                help_text="All the families that are affiliated through the relationship defined by this object.",
+                to="dcodex.FamilyBase",
+            ),
         ),
         migrations.AddField(
-            model_name='affiliationbase',
-            name='manuscripts',
-            field=models.ManyToManyField(blank=True, help_text='All the manuscripts that are affiliated to the families through the relationship defined by this object.', to='dcodex.Manuscript'),
+            model_name="affiliationbase",
+            name="manuscripts",
+            field=models.ManyToManyField(
+                blank=True,
+                help_text="All the manuscripts that are affiliated to the families through the relationship defined by this object.",
+                to="dcodex.Manuscript",
+            ),
         ),
         migrations.AddField(
-            model_name='affiliationbase',
-            name='polymorphic_ctype',
-            field=models.ForeignKey(editable=False, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='polymorphic_dcodex.affiliationbase_set+', to='contenttypes.ContentType'),
+            model_name="affiliationbase",
+            name="polymorphic_ctype",
+            field=models.ForeignKey(
+                editable=False,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="polymorphic_dcodex.affiliationbase_set+",
+                to="contenttypes.ContentType",
+            ),
         ),
         migrations.CreateModel(
-            name='AffiliationRange',
+            name="AffiliationRange",
             fields=[
-                ('affiliationbase_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='dcodex.AffiliationBase')),
-                ('end_verse', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='end_verse', to='dcodex.Verse')),
-                ('start_verse', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='start_verse', to='dcodex.Verse')),
+                (
+                    "affiliationbase_ptr",
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to="dcodex.AffiliationBase",
+                    ),
+                ),
+                (
+                    "end_verse",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="end_verse",
+                        to="dcodex.Verse",
+                    ),
+                ),
+                (
+                    "start_verse",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="start_verse",
+                        to="dcodex.Verse",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
-                'base_manager_name': 'objects',
+                "abstract": False,
+                "base_manager_name": "objects",
             },
-            bases=('dcodex.affiliationbase',),
+            bases=("dcodex.affiliationbase",),
         ),
     ]

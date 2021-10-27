@@ -6,18 +6,26 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dcodex', '0033_simplearabicmarkup'),
+        ("dcodex", "0033_simplearabicmarkup"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='manuscript',
-            name='name',
-            field=models.CharField(blank=True, help_text='A descriptive name for this manuscript.', max_length=255),
+            model_name="manuscript",
+            name="name",
+            field=models.CharField(
+                blank=True,
+                help_text="A descriptive name for this manuscript.",
+                max_length=255,
+            ),
         ),
         migrations.AlterField(
-            model_name='manuscript',
-            name='siglum',
-            field=models.CharField(blank=True, help_text='A unique short string for this manuscript.', max_length=255),
+            model_name="manuscript",
+            name="siglum",
+            field=models.CharField(
+                blank=True,
+                help_text="A unique short string for this manuscript.",
+                max_length=255,
+            ),
         ),
     ]

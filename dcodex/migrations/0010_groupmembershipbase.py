@@ -7,23 +7,51 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('contenttypes', '0002_remove_content_type_name'),
-        ('dcodex', '0009_group'),
+        ("contenttypes", "0002_remove_content_type_name"),
+        ("dcodex", "0009_group"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='GroupMembershipBase',
+            name="GroupMembershipBase",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('group', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='dcodex.GroupBase')),
-                ('manuscripts', models.ManyToManyField(to='dcodex.Manuscript')),
-                ('overlapping_groups', models.ManyToManyField(related_name='overlapping_groups', to='dcodex.GroupBase')),
-                ('polymorphic_ctype', models.ForeignKey(editable=False, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='polymorphic_dcodex.groupmembershipbase_set+', to='contenttypes.ContentType')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "group",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="dcodex.GroupBase",
+                    ),
+                ),
+                ("manuscripts", models.ManyToManyField(to="dcodex.Manuscript")),
+                (
+                    "overlapping_groups",
+                    models.ManyToManyField(
+                        related_name="overlapping_groups", to="dcodex.GroupBase"
+                    ),
+                ),
+                (
+                    "polymorphic_ctype",
+                    models.ForeignKey(
+                        editable=False,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="polymorphic_dcodex.groupmembershipbase_set+",
+                        to="contenttypes.ContentType",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
-                'base_manager_name': 'objects',
+                "abstract": False,
+                "base_manager_name": "objects",
             },
         ),
     ]

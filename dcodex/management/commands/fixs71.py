@@ -7,7 +7,6 @@ from dcodex.models import VerseLocation, Page, FolioRef
 
 
 class Command(BaseCommand):
-
     def handle(self, *args, **options):
         # deck = Deck.objects.get(name="S71+")
         # for membership in deck.deckmembership_set.all():
@@ -41,8 +40,8 @@ class Command(BaseCommand):
         deck = Deck.objects.get(name="L")
         for membership in deck.deckmembership_set.all():
             filename = str(membership.image)
-            rank_regex="(\d+)"
-            integer_matches = re.findall(rank_regex, str(filename) )
+            rank_regex = "(\d+)"
+            integer_matches = re.findall(rank_regex, str(filename))
             rank = int(integer_matches[-1]) if integer_matches else None
 
             if "14.pdf" in filename:
@@ -65,4 +64,3 @@ class Command(BaseCommand):
 
         #         membership.rank = rank
         #         membership.save()
-

@@ -1,9 +1,11 @@
 [tool.poetry]
 name = "dcodex"
-version = "1.0.2"
+version = "1.0.3"
 description = "A software framework for manuscript analysis"
 authors = ["Robert Turnbull <robert.turnbull@unimelb.edu.au>"]
-license = "Apache 2.0"
+license = "Apache-2.0"
+readme = "README.md"
+repository = "https://github.com/rbturnbull/dcodex"
 
 [tool.poetry.dependencies]
 python = ">=3.8,<3.10"
@@ -26,6 +28,7 @@ gotoh = {git = "https://github.com/rbturnbull/gotoh.git"}
 
 [tool.poetry.dev-dependencies]
 coverage = "^5.5"
+black = "^21.9b0"
 
 [build-system]
 requires = ["setuptools >= 40.6.0", "poetry-core>=1.0.0"]

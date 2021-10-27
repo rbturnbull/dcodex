@@ -6,13 +6,17 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dcodex', '0028_auto_20201004_1050'),
+        ("dcodex", "0028_auto_20201004_1050"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='manuscript',
-            name='text_direction',
-            field=models.CharField(choices=[('R', 'Right To Left'), ('L', 'Left To Right')], default='L', max_length=1),
+            model_name="manuscript",
+            name="text_direction",
+            field=models.CharField(
+                choices=[("R", "Right To Left"), ("L", "Left To Right")],
+                default="L",
+                max_length=1,
+            ),
         ),
     ]

@@ -7,14 +7,20 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('imagedeck', '0009_auto_20201122_2300'),
-        ('dcodex', '0034_auto_20201215_0315'),
+        ("imagedeck", "0009_auto_20201122_2300"),
+        ("dcodex", "0034_auto_20201215_0315"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='manuscript',
-            name='imagedeck',
-            field=models.ForeignKey(blank=True, default=None, null=True, on_delete=django.db.models.deletion.SET_DEFAULT, to='imagedeck.deckbase'),
+            model_name="manuscript",
+            name="imagedeck",
+            field=models.ForeignKey(
+                blank=True,
+                default=None,
+                null=True,
+                on_delete=django.db.models.deletion.SET_DEFAULT,
+                to="imagedeck.deckbase",
+            ),
         ),
     ]

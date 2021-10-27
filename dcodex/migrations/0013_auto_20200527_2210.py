@@ -7,18 +7,26 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dcodex', '0012_auto_20200526_2205'),
+        ("dcodex", "0012_auto_20200526_2205"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='groupmembershipbase',
-            name='group',
-            field=models.ForeignKey(help_text='The group that the manuscripts are members of.', on_delete=django.db.models.deletion.CASCADE, to='dcodex.GroupBase'),
+            model_name="groupmembershipbase",
+            name="group",
+            field=models.ForeignKey(
+                help_text="The group that the manuscripts are members of.",
+                on_delete=django.db.models.deletion.CASCADE,
+                to="dcodex.GroupBase",
+            ),
         ),
         migrations.AlterField(
-            model_name='groupmembershipbase',
-            name='manuscripts',
-            field=models.ManyToManyField(blank=True, help_text='All the manuscripts that are related to the group using this membership object.', to='dcodex.Manuscript'),
+            model_name="groupmembershipbase",
+            name="manuscripts",
+            field=models.ManyToManyField(
+                blank=True,
+                help_text="All the manuscripts that are related to the group using this membership object.",
+                to="dcodex.Manuscript",
+            ),
         ),
     ]

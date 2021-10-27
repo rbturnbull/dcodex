@@ -6,18 +6,26 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dcodex', '0027_manuscript_markup'),
+        ("dcodex", "0027_manuscript_markup"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='markup',
-            name='name',
-            field=models.CharField(blank=True, help_text='A descriptive name for this markup object.', max_length=255),
+            model_name="markup",
+            name="name",
+            field=models.CharField(
+                blank=True,
+                help_text="A descriptive name for this markup object.",
+                max_length=255,
+            ),
         ),
         migrations.AlterField(
-            model_name='manuscript',
-            name='name',
-            field=models.CharField(blank=True, help_text='A descriptive name for this manuscript.', max_length=200),
+            model_name="manuscript",
+            name="name",
+            field=models.CharField(
+                blank=True,
+                help_text="A descriptive name for this manuscript.",
+                max_length=200,
+            ),
         ),
     ]

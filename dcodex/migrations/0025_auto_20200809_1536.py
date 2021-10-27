@@ -6,21 +6,31 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dcodex', '0024_auto_20200809_1431'),
+        ("dcodex", "0024_auto_20200809_1431"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='affiliationall',
-            name='exclude',
-            field=models.ManyToManyField(blank=True, help_text='All the verses where this affiliation object is inactive.', related_name='affiliation_exclude_verses', to='dcodex.Verse'),
+            model_name="affiliationall",
+            name="exclude",
+            field=models.ManyToManyField(
+                blank=True,
+                help_text="All the verses where this affiliation object is inactive.",
+                related_name="affiliation_exclude_verses",
+                to="dcodex.Verse",
+            ),
         ),
         migrations.AlterField(
-            model_name='affiliationrange',
-            name='exclude',
-            field=models.ManyToManyField(blank=True, help_text='All the verses in this range where this affiliation object is actually inactive.', related_name='affiliationrange_exclude_verses', to='dcodex.Verse'),
+            model_name="affiliationrange",
+            name="exclude",
+            field=models.ManyToManyField(
+                blank=True,
+                help_text="All the verses in this range where this affiliation object is actually inactive.",
+                related_name="affiliationrange_exclude_verses",
+                to="dcodex.Verse",
+            ),
         ),
         migrations.DeleteModel(
-            name='AffiliationExcludeVerses',
+            name="AffiliationExcludeVerses",
         ),
     ]

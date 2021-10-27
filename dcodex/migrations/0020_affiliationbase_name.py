@@ -6,13 +6,17 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dcodex', '0019_auto_20200527_2213'),
+        ("dcodex", "0019_auto_20200527_2213"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='affiliationbase',
-            name='name',
-            field=models.CharField(blank=True, help_text='A descriptive string for this affilitation.', max_length=200),
+            model_name="affiliationbase",
+            name="name",
+            field=models.CharField(
+                blank=True,
+                help_text="A descriptive string for this affilitation.",
+                max_length=200,
+            ),
         ),
     ]

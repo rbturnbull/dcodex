@@ -6,12 +6,12 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dcodex', '0021_affiliationverses'),
+        ("dcodex", "0021_affiliationverses"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='family',
-            options={'verbose_name_plural': 'Families'},
+            name="family",
+            options={"verbose_name_plural": "Families"},
         ),
     ]

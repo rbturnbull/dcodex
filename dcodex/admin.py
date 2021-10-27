@@ -1,12 +1,16 @@
 from django.contrib import admin
-from polymorphic.admin import PolymorphicParentModelAdmin, PolymorphicChildModelAdmin, PolymorphicChildModelFilter
+from polymorphic.admin import (
+    PolymorphicParentModelAdmin,
+    PolymorphicChildModelAdmin,
+    PolymorphicChildModelFilter,
+)
 
 from guardian.admin import GuardedModelAdminMixin, GuardedModelAdmin
 
 
 from .models import *
 
-#class MembershipInline(admin.TabularInline):
+# class MembershipInline(admin.TabularInline):
 #    model = Membership
 #    extra = 0
 #    raw_id_fields = ("start_verse","end_verse")
@@ -15,9 +19,10 @@ from .models import *
 #     """ Base admin class for all child models of Manuscript """
 #     base_model = Manuscript
 
+
 class ManuscriptChildAdmin(GuardedModelAdmin):
     base_model = Manuscript
-    search_fields = ['siglum', 'name']
+    search_fields = ["siglum", "name"]
 
 
 # @admin.register(Manuscript)
@@ -33,7 +38,9 @@ class AffiliationChildAdmin(PolymorphicChildModelAdmin):
 
     # By using these `base_...` attributes instead of the regular ModelAdmin `form` and `fieldsets`,
     # the additional fields of the child models are automatically added to the admin form.
-#    base_form = 
+
+
+#    base_form =
 #    base_fieldsets = (
 #    )
 
@@ -43,20 +50,25 @@ class AffiliationAllAdmin(AffiliationChildAdmin):
     base_model = AffiliationAll
     show_in_index = True  # makes child model admin visible in main admin site
 
+
 @admin.register(AffiliationVerses)
 class AffiliationVersesAdmin(AffiliationChildAdmin):
     base_model = AffiliationVerses
     show_in_index = True  # makes child model admin visible in main admin site
 
+
 @admin.register(AffiliationRange)
 class AffiliationRangeAdmin(AffiliationChildAdmin):
     base_model = AffiliationRange
-    raw_id_fields = ("start_verse","end_verse",)    
-    
+    raw_id_fields = (
+        "start_verse",
+        "end_verse",
+    )
+
     show_in_index = True  # makes child model admin visible in main admin site
 
-    
-@admin.register(AffiliationBase)    
+
+@admin.register(AffiliationBase)
 class AffiliationBaseAdmin(PolymorphicParentModelAdmin):
     base_model = AffiliationBase
     child_models = (AffiliationAll,)
@@ -69,11 +81,14 @@ class FamilyChildAdmin(PolymorphicChildModelAdmin):
 
     # By using these `base_...` attributes instead of the regular ModelAdmin `form` and `fieldsets`,
     # the additional fields of the child models are automatically added to the admin form.
-#    base_form = 
+
+
+#    base_form =
 #    base_fieldsets = (
 #    )
 
-@admin.register(FamilyBase)    
+
+@admin.register(FamilyBase)
 class FamilyBaseAdmin(PolymorphicParentModelAdmin):
     base_model = FamilyBase
     child_models = (Family,)
@@ -85,36 +100,36 @@ class FamilyBaseAdmin(PolymorphicParentModelAdmin):
 class FamilyAdmin(FamilyChildAdmin):
     base_model = Family
     show_in_index = True  # makes child model admin visible in main admin site
-    
 
 
-    
-#@admin.register(Membership)    
-#class MembershipAdmin(admin.ModelAdmin):
+# @admin.register(Membership)
+# class MembershipAdmin(admin.ModelAdmin):
 #    autocomplete_fields = []
 #    raw_id_fields = ("start_verse","end_verse")
-    
+
+
 @admin.register(VerseTranscription)
 class VerseTranscriptionChildAdmin(PolymorphicChildModelAdmin):
     base_model = VerseTranscription
     show_in_index = True  # makes child model admin visible in main admin site
-    search_fields = ('manuscript__siglum', 'transcription')
+    search_fields = ("manuscript__siglum", "transcription")
 
     # By using these `base_...` attributes instead of the regular ModelAdmin `form` and `fieldsets`,
     # the additional fields of the child models are automatically added to the admin form.
-    '''
+    """
     base_form = ...
     base_fieldsets = (
         ...
     )
-    '''
+    """
 
 
-#@admin.register(VerseTranscriptionBase)
+# @admin.register(VerseTranscriptionBase)
 class VerseTranscriptionBaseParentAdmin(PolymorphicParentModelAdmin):
-    """ The parent model admin """
+    """The parent model admin"""
+
     base_model = VerseTranscriptionBase
-    child_models = (VerseTranscription)
+    child_models = VerseTranscription
     list_filter = (PolymorphicChildModelFilter,)  # This is optional.
 
 
@@ -136,14 +151,16 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 # UserAdmin = admin.site._registry[User]
 
+
 class ProfileInline(admin.StackedInline):
     model = Profile
     can_delete = False
-    verbose_name_plural = 'Profile'
-    fk_name = 'user'
+    verbose_name_plural = "Profile"
+    fk_name = "user"
+
 
 class CustomUserAdmin(UserAdmin):
-    inlines = (ProfileInline, )
+    inlines = (ProfileInline,)
 
     def get_inline_instances(self, request, obj=None):
         if not obj:

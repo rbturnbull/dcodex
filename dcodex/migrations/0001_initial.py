@@ -9,123 +9,304 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('contenttypes', '0002_remove_content_type_name'),
+        ("contenttypes", "0002_remove_content_type_name"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Group',
+            name="Group",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=200)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=200)),
             ],
             options={
-                'abstract': False,
-                'base_manager_name': 'objects',
+                "abstract": False,
+                "base_manager_name": "objects",
             },
         ),
         migrations.CreateModel(
-            name='Manuscript',
+            name="Manuscript",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(blank=True, max_length=200)),
-                ('siglum', models.CharField(blank=True, max_length=20)),
-                ('polymorphic_ctype', models.ForeignKey(editable=False, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='polymorphic_dcodex.manuscript_set+', to='contenttypes.ContentType')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(blank=True, max_length=200)),
+                ("siglum", models.CharField(blank=True, max_length=20)),
+                (
+                    "polymorphic_ctype",
+                    models.ForeignKey(
+                        editable=False,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="polymorphic_dcodex.manuscript_set+",
+                        to="contenttypes.ContentType",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
-                'base_manager_name': 'objects',
+                "abstract": False,
+                "base_manager_name": "objects",
             },
         ),
         migrations.CreateModel(
-            name='PDF',
+            name="PDF",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('filename', models.CharField(max_length=200)),
-                ('page_count', models.IntegerField(blank=True, default=None, null=True)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("filename", models.CharField(max_length=200)),
+                (
+                    "page_count",
+                    models.IntegerField(blank=True, default=None, null=True),
+                ),
             ],
             options={
-                'verbose_name_plural': 'PDFs',
+                "verbose_name_plural": "PDFs",
             },
         ),
         migrations.CreateModel(
-            name='Verse',
+            name="Verse",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('rank', models.IntegerField()),
-                ('polymorphic_ctype', models.ForeignKey(editable=False, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='polymorphic_dcodex.verse_set+', to='contenttypes.ContentType')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("rank", models.IntegerField()),
+                (
+                    "polymorphic_ctype",
+                    models.ForeignKey(
+                        editable=False,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="polymorphic_dcodex.verse_set+",
+                        to="contenttypes.ContentType",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
-                'base_manager_name': 'objects',
+                "abstract": False,
+                "base_manager_name": "objects",
             },
         ),
         migrations.CreateModel(
-            name='VerseTranscriptionBase',
+            name="VerseTranscriptionBase",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('transcription', models.CharField(max_length=1024)),
-                ('manuscript', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='dcodex.Manuscript')),
-                ('polymorphic_ctype', models.ForeignKey(editable=False, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='polymorphic_dcodex.versetranscriptionbase_set+', to='contenttypes.ContentType')),
-                ('verse', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='dcodex.Verse')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("transcription", models.CharField(max_length=1024)),
+                (
+                    "manuscript",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="dcodex.Manuscript",
+                    ),
+                ),
+                (
+                    "polymorphic_ctype",
+                    models.ForeignKey(
+                        editable=False,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="polymorphic_dcodex.versetranscriptionbase_set+",
+                        to="contenttypes.ContentType",
+                    ),
+                ),
+                (
+                    "verse",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="dcodex.Verse"
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
-                'base_manager_name': 'objects',
+                "abstract": False,
+                "base_manager_name": "objects",
             },
         ),
         migrations.CreateModel(
-            name='VerseTranscription',
+            name="VerseTranscription",
             fields=[
-                ('versetranscriptionbase_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='dcodex.VerseTranscriptionBase')),
+                (
+                    "versetranscriptionbase_ptr",
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to="dcodex.VerseTranscriptionBase",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
-                'base_manager_name': 'objects',
+                "abstract": False,
+                "base_manager_name": "objects",
             },
-            bases=('dcodex.versetranscriptionbase',),
+            bases=("dcodex.versetranscriptionbase",),
         ),
         migrations.CreateModel(
-            name='VerseLocation',
+            name="VerseLocation",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('page', models.IntegerField()),
-                ('x', models.FloatField()),
-                ('y', models.FloatField()),
-                ('manuscript', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='dcodex.Manuscript')),
-                ('pdf', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='dcodex.PDF')),
-                ('verse', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='dcodex.Verse')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("page", models.IntegerField()),
+                ("x", models.FloatField()),
+                ("y", models.FloatField()),
+                (
+                    "manuscript",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="dcodex.Manuscript",
+                    ),
+                ),
+                (
+                    "pdf",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="dcodex.PDF"
+                    ),
+                ),
+                (
+                    "verse",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="dcodex.Verse"
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Page',
+            name="Page",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('page', models.IntegerField()),
-                ('folio', models.IntegerField()),
-                ('side', models.CharField(max_length=20)),
-                ('manuscript', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='dcodex.Manuscript')),
-                ('pdf', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='dcodex.PDF')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("page", models.IntegerField()),
+                ("folio", models.IntegerField()),
+                ("side", models.CharField(max_length=20)),
+                (
+                    "manuscript",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="dcodex.Manuscript",
+                    ),
+                ),
+                (
+                    "pdf",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="dcodex.PDF"
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Membership',
+            name="Membership",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('end_verse', models.ForeignKey(blank=True, default=None, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='end_verse', to='dcodex.Verse')),
-                ('group', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='dcodex.Group')),
-                ('manuscript', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='dcodex.Manuscript')),
-                ('start_verse', models.ForeignKey(blank=True, default=None, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='start_verse', to='dcodex.Verse')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "end_verse",
+                    models.ForeignKey(
+                        blank=True,
+                        default=None,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="end_verse",
+                        to="dcodex.Verse",
+                    ),
+                ),
+                (
+                    "group",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="dcodex.Group"
+                    ),
+                ),
+                (
+                    "manuscript",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="dcodex.Manuscript",
+                    ),
+                ),
+                (
+                    "start_verse",
+                    models.ForeignKey(
+                        blank=True,
+                        default=None,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="start_verse",
+                        to="dcodex.Verse",
+                    ),
+                ),
             ],
         ),
         migrations.AddField(
-            model_name='group',
-            name='members',
-            field=models.ManyToManyField(through='dcodex.Membership', to='dcodex.Manuscript'),
+            model_name="group",
+            name="members",
+            field=models.ManyToManyField(
+                through="dcodex.Membership", to="dcodex.Manuscript"
+            ),
         ),
         migrations.AddField(
-            model_name='group',
-            name='polymorphic_ctype',
-            field=models.ForeignKey(editable=False, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='polymorphic_dcodex.group_set+', to='contenttypes.ContentType'),
+            model_name="group",
+            name="polymorphic_ctype",
+            field=models.ForeignKey(
+                editable=False,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="polymorphic_dcodex.group_set+",
+                to="contenttypes.ContentType",
+            ),
         ),
     ]
