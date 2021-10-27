@@ -24,7 +24,7 @@ lxml = "^4.6.3"
 regex = "^2021.8.3"
 django-filer = "^2.0.2"
 django-imagedeck = {git = "https://gitlab.unimelb.edu.au/rturnbull/django-imagedeck.git"}
-gotoh = {git = "https://github.com/rbturnbull/gotoh.git"}
+gotoh = "^0.1.1"
 
 [tool.poetry.dev-dependencies]
 coverage = "^5.5"
