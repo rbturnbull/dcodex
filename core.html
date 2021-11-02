@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Core Models &mdash; dcodex 1.0.3 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Deployment" href="deployment.html" />
+    <link rel="prev" title="Architecture" href="architecture.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> dcodex
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="dependencies.html">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generation.html">Project Generation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Core Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#verse">Verse</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#manuscript">Manuscript</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#transcription-and-markup">Transcription and Markup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#location">Location</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#family-and-affiliation">Family and Affiliation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="deployment.html">Deployment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development.html">Development</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">dcodex</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Core Models</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/core.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="core-models">
+<h1>Core Models<a class="headerlink" href="#core-models" title="Permalink to this headline"></a></h1>
+<section id="verse">
+<h2>Verse<a class="headerlink" href="#verse" title="Permalink to this headline"></a></h2>
+<p>A key design feature of D-Codex is that it is base on the smallest textual unit appropriate for the manuscript type.
+This abstract class is called a <code class="docutils literal notranslate"><span class="pre">Verse</span></code>. Each <code class="docutils literal notranslate"><span class="pre">Verse</span></code> object ought only occur once per manuscript.
+For each possible verse, there must be an instance of a child-class of Verse saved in the database.
+Sub-classes of <code class="docutils literal notranslate"><span class="pre">Verse</span></code> are required to complete a method to return a reference string for each verse, such as ‘Matthew 1:1’
+(with an option for an abbreviated form, e.g. ‘Mt 1:1’). There also needs to be a method to have a unique string to be used in a URL.
+The default implementation of this is simply the reference string with white space removed.
+This string must uniquely match with only that instance of Verse in the child-class.
+Furthermore, a class method must be defined which is able to locate any verse from a string.
+Another similar method is required to locate a <code class="docutils literal notranslate"><span class="pre">Verse</span></code> instance from a Python dictionary.
+The keys for the dictionary are determined by the child class.
+As a minimum this method must be able to interpret the unique reference string (with any abbreviation option if appropriate).
+This function is used to find verses embedded in a URL.
+Care needs to be taken when defining a sub-class of <code class="docutils literal notranslate"><span class="pre">Verse</span></code> that the uniqueness property is respected.
+This property means that D-Codex is not a suitable software package for all texts, but only those with a standard versification system.</p>
+</section>
+<section id="manuscript">
+<h2>Manuscript<a class="headerlink" href="#manuscript" title="Permalink to this headline"></a></h2>
+<p>The abstract class that brings together all the elements in a document is called the <code class="docutils literal notranslate"><span class="pre">Manuscript</span></code> class.
+In the base Manuscript class, a descriptive name can be set (e.g. ‘Codex Sinaiticus Arabicus’) and a siglum (e.g. ‘CSA’).
+The siglum is used in the URLs for webpages to do with the manuscript and must be unique.
+A child class needs to specify a method to return the appropriate <code class="docutils literal notranslate"><span class="pre">Verse</span></code> class and also the <code class="docutils literal notranslate"><span class="pre">Transcription</span></code> class.
+The <code class="docutils literal notranslate"><span class="pre">Manuscript</span></code> class is responsible for navigation in the manuscript.
+This involves needing to be able to take any verse and find the next or previous verse.
+It also needs to implement a method to find distance between the start of one verse and the start of another.
+Helper functions are implemented in the base class to do many common tasks at the manuscript level (such as to create a list of all transcriptions).</p>
+</section>
+<section id="transcription-and-markup">
+<h2>Transcription and Markup<a class="headerlink" href="#transcription-and-markup" title="Permalink to this headline"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">Transcription</span></code> class stores the text of a transcribed verse and associates it with the manuscript and verse instances.
+It can also have a reference to a <code class="docutils literal notranslate"><span class="pre">Markup</span></code> object. The <code class="docutils literal notranslate"><span class="pre">Markup</span></code> class is responsible for four tasks:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>Providing a widget text box for transcribing the text of the verse in the user interface.</p></li>
+<li><p>Regularising the transcription text for string comparison.</p></li>
+<li><p>Displaying the text cleanly in HTML.</p></li>
+<li><p>Converting to TEI XML markup.</p></li>
+</ol>
+</div></blockquote>
+<p>A default markup object can be assigned to a manuscript and specific markup objects can be assigned to individual verses.
+Though ideally, one would wish for a consistent markup scheme for any particular manuscript, there are situations where multiple markup schemes could be operating.</p>
+</section>
+<section id="location">
+<h2>Location<a class="headerlink" href="#location" title="Permalink to this headline"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">Location</span></code> class joins a manuscript and verse object and associates them with the pixel coordinates on a
+facsimile image which corresponds to the beginning of the verse. DCodex stores these values as a
+proportion of the width or height of the image and so the values are between 0 and 1.
+For left-to-right languages, this means to the top-left of the first character in the verse, and for right-to-left languages such as Arabic,
+his means the top-right of the first character.</p>
+<p>Not all the locations of each verse need to be transcribed.
+Once the location of at least two verses is transcribed, D-Codex can estimate the location of any other verse.
+To do this, we refer to two quantities: the textual mass between two verses and the spatial distance between the locations of the two verses.</p>
+</section>
+<section id="family-and-affiliation">
+<h2>Family and Affiliation<a class="headerlink" href="#family-and-affiliation" title="Permalink to this headline"></a></h2>
+<p>One challenge with working with complex manuscript traditions is the presence of block-mixture.
+D-Codex has a powerful and extensible means of defining the relationship between the texts of manuscripts at certain points.
+Manuscripts can be grouped in an instance of a <code class="docutils literal notranslate"><span class="pre">Family</span></code> class. Each <code class="docutils literal notranslate"><span class="pre">Family</span></code> object must be given a string as a name.
+Manuscripts can be members of the <code class="docutils literal notranslate"><span class="pre">Family</span></code> group by means of an instance of an <code class="docutils literal notranslate"><span class="pre">Affiliation</span></code> class.
+The abstract <code class="docutils literal notranslate"><span class="pre">AffiliationBase</span></code> object combines a list of families as well as a list of manuscripts.
+Each subclass of <code class="docutils literal notranslate"><span class="pre">AffiliationBase</span></code> must provide a method defining whether or not the affiliation is <em>active</em> at any particular verse.
+If the affiliation is active then all the manuscripts in that affiliation are regarded as members of the list of associated families at any particular verse.</p>
+<p>The most basic subclass of <code class="docutils literal notranslate"><span class="pre">AffiliationBase</span></code> is <code class="docutils literal notranslate"><span class="pre">AffiliationAll</span></code> which simply states that the affiliation is active for all verses.
+All manuscripts in this affiliation will be always associated with all families listed in it.</p>
+<p>Another subclass of <cite>AffiliationBase</cite> is <code class="docutils literal notranslate"><span class="pre">AffiliationVerses</span></code> to which the user can give a list of verses at which the affiliation is active and elsewhere it is not.
+A similar subclass is <cite>AffiliationRange`</cite> where the user can give a starting verse and an ending verse and the affiliation is active within this range (inclusively).</p>
+<p>Not every affiliation object needs to have manuscripts listed in it, meaning that the affiliation object would just be applying to the families associated with it.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="architecture.html" class="btn btn-neutral float-left" title="Architecture" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="deployment.html" class="btn btn-neutral float-right" title="Deployment" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Robert Turnbull.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

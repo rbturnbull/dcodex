@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Deployment &mdash; dcodex 1.0.3 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Development" href="development.html" />
+    <link rel="prev" title="Core Models" href="core.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> dcodex
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="dependencies.html">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generation.html">Project Generation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="core.html">Core Models</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Deployment</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#deployment-on-docker">Deployment on Docker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#deployment-on-aws">Deployment on AWS</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#start-an-ec2-instance">1. Start an EC2 Instance</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#create-an-elastic-ip">2. Create an Elastic IP</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#set-up-a-domain-name">3. Set up a domain name</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#create-an-s3-bucket">4. Create an S3 bucket</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#create-an-iam-role">5. Create an IAM role</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#configuration">6. Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#install-docker-on-your-ec2-instance">7. Install Docker on your EC2 Instance</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#copy-the-files">8. Copy the files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#deploy">9. Deploy!</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="development.html">Development</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">dcodex</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Deployment</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/deployment.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="deployment">
+<h1>Deployment<a class="headerlink" href="#deployment" title="Permalink to this headline"></a></h1>
+<p>These instructions assume that you’ve set up your D-Codex project with dcodex-cookiecutter.</p>
+<section id="deployment-on-docker">
+<h2>Deployment on Docker<a class="headerlink" href="#deployment-on-docker" title="Permalink to this headline"></a></h2>
+<p>Instructions coming soon. For now, see <a class="reference external" href="https://cookiecutter-django.readthedocs.io/en/latest/deployment-with-docker.html">https://cookiecutter-django.readthedocs.io/en/latest/deployment-with-docker.html</a></p>
+</section>
+<section id="deployment-on-aws">
+<h2>Deployment on AWS<a class="headerlink" href="#deployment-on-aws" title="Permalink to this headline"></a></h2>
+<p>These instructions are correct as of the beginning of 2021. AWS might change their interface from time to time. Hopefully these instructions should still make sense even if some of the elements change over time. If you have suggestions on how to update or supplement these instructions, please let us know!
+Additional instructions for setting up a cookiecutter-django project on AWS can be found on <a class="reference external" href="https://benjlindsay.com/posts/deploying-a-cookiecutter-django-site-on-aws">Ben Lindsay’s blog</a>.</p>
+<section id="start-an-ec2-instance">
+<h3>1. Start an EC2 Instance<a class="headerlink" href="#start-an-ec2-instance" title="Permalink to this headline"></a></h3>
+<p>Log in to the <a class="reference external" href="https://console.aws.amazon.com/">AWS Management Console</a>. Select <a class="reference external" href="https://aws.amazon.com/ec2/?ec2-whats-new.sort-by=item.additionalFields.postDateTime&amp;ec2-whats-new.sort-order=desc">EC2</a> under ‘services’.
+This will start a wizard to setup in EC2 instance. In the wizard, you can follow these steps:</p>
+<ul class="simple">
+<li><p>Select an <a class="reference external" href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html">Amazon Machine Image (AMI)</a> for the instance. I choose ‘Amazon Linux 2 AMI’ because it is eligible for the free tier. Other images will probably work similarly well.</p></li>
+<li><p>Then you need to choose an instance type. I choose t2.micro (- ECUs, 1 vCPUs, 2.5 GHz, -, 1 GiB memory, EBS only) which is eligible for the free tier.</p></li>
+<li><p>Then you will be asked to ‘Configure Instance Details’. The defaults should be fine.</p></li>
+<li><p>Next it will ask you to ‘Add Storage’. The defaults here are fine.</p></li>
+<li><p>Next it will ask you to ‘Add Tags’. That isn’t necessary at this stage.</p></li>
+<li><p>Next it will ask you to ‘Configure Security Group’. You need click the ‘Add Rule’ button to add the HTTP and then the HTTPS protocols. It should automatically select the correct ports (i.e. 80 and 443).</p></li>
+<li><p>Then it will show you a summary of your decisions and let you review your choices. You are now able to click the ‘Launch’ button.</p></li>
+<li><p>If you haven’t created an instance previously, it will prompt you to download a new key pair. Save it in your ~/.ssh directory. Make sure you keep it secret and never check it in to a repository. This key needs to be only readable by you so you may need to change the permissions. e.g. <code class="code docutils literal notranslate"><span class="pre">chmod</span> <span class="pre">600</span> <span class="pre">~/.ssh/&lt;name</span> <span class="pre">of</span> <span class="pre">key&gt;.pem</span></code>.</p></li>
+<li><p>You can now click the ‘Launch Instances’ button. The instance will then be launched. It may take a short time to fire up.</p></li>
+</ul>
+</section>
+<section id="create-an-elastic-ip">
+<h3>2. Create an Elastic IP<a class="headerlink" href="#create-an-elastic-ip" title="Permalink to this headline"></a></h3>
+<p>You need an IP address to get to your EC2 instance. The dashboard should show you an IP address for your EC2 instance but this one might change in the future. You can set up an ‘Elastic IP Address’ to point to your instance over its lifetime.
+This IP might changeAt the time of writing, a single elastic IP is available from AWS at no charge.</p>
+<ul class="simple">
+<li><p>On the navigation panel on the left, go down to ‘Network &amp; Security’ and choose ‘Elastic IPs’.</p></li>
+<li><p>Click the button ‘Allocate Elastic IP address’.</p></li>
+<li><p>By default it will have selected to choose an IP address from Amazon’s IPv4 pool which should be fine in most circumstances.</p></li>
+<li><p>Click ‘Allocate’ and it should give you a public IP address.</p></li>
+<li><p>On the ‘Actions’ dropdown bar, select ‘Associate Elastic IP address’.</p></li>
+<li><p>Then find the EC2 instance in the ‘Instance’ select box and press the ‘Associate’ button.</p></li>
+</ul>
+</section>
+<section id="set-up-a-domain-name">
+<h3>3. Set up a domain name<a class="headerlink" href="#set-up-a-domain-name" title="Permalink to this headline"></a></h3>
+<p>Now that we have a fixed IP address, we need to associate it with a domain name. At your domain name provider (which could be AWS, GoDaddy, Google Domains, or Freenom etc.), create ‘A’ records that point a domain name (and a ‘www’ subdomain if you like) to your new Elastic IP address.</p>
+</section>
+<section id="create-an-s3-bucket">
+<h3>4. Create an S3 bucket<a class="headerlink" href="#create-an-s3-bucket" title="Permalink to this headline"></a></h3>
+<p>Now we need to create an S3 storage bucket that we will set up for the media and static files for use in D-Codex.</p>
+<p>Instructions coming soon. For now see: <a class="reference external" href="https://docs.aws.amazon.com/AmazonS3/latest/user-guide/create-bucket.html">https://docs.aws.amazon.com/AmazonS3/latest/user-guide/create-bucket.html</a>.</p>
+</section>
+<section id="create-an-iam-role">
+<h3>5. Create an IAM role<a class="headerlink" href="#create-an-iam-role" title="Permalink to this headline"></a></h3>
+<p>Now we need to create an Identity and Access Management (IAM) role for the EC2 instance to access the S3 storage bucket.</p>
+<ul class="simple">
+<li><p>Click on ‘Services’ and find IAM.</p></li>
+<li><p>Find ‘Roles’ on the left navigation sidebar.</p></li>
+<li><p>Click the ‘Create Role’ button.</p></li>
+<li><p>Make sure that the button ‘AWS Service’ is selected and then choose EC2 (which might be under ‘Common Use Cases’). Then click the ‘Next: Permissions’ button.</p></li>
+<li><p>Put the term <code class="code docutils literal notranslate"><span class="pre">AmazonS3FullAccess</span></code> in the filter, select the policy with that name and the ‘Next’ button.</p></li>
+<li><p>You can skip the option to add tags.</p></li>
+<li><p>Give this role a name such as <code class="code docutils literal notranslate"><span class="pre">S3_Access</span></code> and then click ‘Create role’.</p></li>
+</ul>
+<p>We now need to give add this role to the EC2 instance:</p>
+<ul class="simple">
+<li><p>Go back to the EC2 dashboard and select the checkbox for the instance you created.</p></li>
+<li><p>On the ‘Actions’ dropdown bar, choose ‘Security’ and then ‘Modify IAM role’.</p></li>
+<li><p>Choose the IAM role you recently created (called <code class="code docutils literal notranslate"><span class="pre">S3_Access</span></code> or whatever you called it) and then click ‘Save’.</p></li>
+</ul>
+</section>
+<section id="configuration">
+<h3>6. Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline"></a></h3>
+<p>When you ran dcodex-cookiecutter to generate a D-Codex project, if would have created a folder at <code class="code docutils literal notranslate"><span class="pre">.envs/.production</span></code>.
+This includes environment variables used to configure your project in production.
+By default, this will be ignored by git and it should never be added to a respository.
+You need to add the name of your S3 bucket there.
+Find the line with <code class="code docutils literal notranslate"><span class="pre">DJANGO_AWS_STORAGE_BUCKET_NAME</span></code> and add the name of your bucket:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">DJANGO_AWS_STORAGE_BUCKET_NAME</span><span class="o">=</span><span class="n">my_bucket_name</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>You don’t have to set the <code class="code docutils literal notranslate"><span class="pre">DJANGO_AWS_ACCESS_KEY_ID</span></code> and <code class="code docutils literal notranslate"><span class="pre">DJANGO_AWS_SECRET_ACCESS_KEY</span></code> variables because you set up the IAM Role in the previous step.
+For further information, see the note in <a class="reference external" href="https://cookiecutter-django.readthedocs.io/en/latest/deployment-with-docker.html#optional-use-aws-iam-role-for-ec2-instance">django-cookiecutter</a> and <a class="reference external" href="https://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html">django-storages</a>.</p>
+</div>
+</section>
+<section id="install-docker-on-your-ec2-instance">
+<h3>7. Install Docker on your EC2 Instance<a class="headerlink" href="#install-docker-on-your-ec2-instance" title="Permalink to this headline"></a></h3>
+<p>You can now log in to your EC2 instance like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ ssh -i ~/.ssh/&lt;name of key&gt;.pem ec2-user@&lt;your domain name&gt;
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The username for everyone is exactly <code class="code docutils literal notranslate"><span class="pre">ec2-user</span></code>.</p>
+</div>
+<p>You can make this simpler for next time by adding an entry in your <code class="code docutils literal notranslate"><span class="pre">~/.ssh/config</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Host</span> <span class="n">ec2instance</span>
+        <span class="n">HostName</span> <span class="n">your</span> <span class="n">domain</span> <span class="n">name</span><span class="o">&gt;</span>
+        <span class="n">User</span> <span class="n">ec2</span><span class="o">-</span><span class="n">user</span>
+        <span class="n">IdentityFile</span> <span class="o">~/.</span><span class="n">ssh</span><span class="o">/&lt;</span><span class="n">name</span> <span class="n">of</span> <span class="n">key</span><span class="o">&gt;.</span><span class="n">pem</span>
+</pre></div>
+</div>
+<p>You can set the name of the ‘host’ (here <code class="code docutils literal notranslate"><span class="pre">ec2instance</span></code>) to be any shortcut you like. Then you should be able to simply log in with the command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ssh</span> <span class="n">ec2instance</span>
+</pre></div>
+</div>
+<p>Install Docker with the following commands:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">yum</span> <span class="n">update</span> <span class="o">-</span><span class="n">y</span>
+<span class="n">sudo</span> <span class="n">yum</span> <span class="n">install</span> <span class="o">-</span><span class="n">y</span> <span class="n">docker</span>
+<span class="n">sudo</span> <span class="n">service</span> <span class="n">docker</span> <span class="n">start</span>
+<span class="n">sudo</span> <span class="n">yum</span> <span class="n">install</span> <span class="o">-</span><span class="n">y</span> <span class="n">python3</span><span class="o">-</span><span class="n">devel</span>
+<span class="n">sudo</span> <span class="n">pip3</span> <span class="n">install</span> <span class="n">docker</span><span class="o">-</span><span class="n">compose</span>
+</pre></div>
+</div>
+<p>This command will enable you to use Docker without needed to sudo:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">usermod</span> <span class="o">-</span><span class="n">aG</span> <span class="n">docker</span> <span class="n">ec2</span><span class="o">-</span><span class="n">user</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For this to work, you might need to log out and log back in again.</p>
+</div>
+<p>Test your installation with the following command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">ps</span>
+</pre></div>
+</div>
+</section>
+<section id="copy-the-files">
+<h3>8. Copy the files<a class="headerlink" href="#copy-the-files" title="Permalink to this headline"></a></h3>
+<p>Now you can copy your files ot the EC3 instance using rsync. Just go to the project you created using dcodex-cookiecutter and run the command</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rsync</span> <span class="o">-</span><span class="n">av</span> <span class="o">.</span> <span class="n">ec2instance</span><span class="p">:</span><span class="o">~/</span><span class="n">app</span><span class="o">/</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Here <code class="code docutils literal notranslate"><span class="pre">ec2instance</span></code> is the shortcut host in your <code class="code docutils literal notranslate"><span class="pre">~/.ssh/config</span></code> file.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>You might want to exclude transferring your local media files directory since these will be going to the S3 bucket. You can also exclude your git history in .git.</p>
+</div>
+</section>
+<section id="deploy">
+<h3>9. Deploy!<a class="headerlink" href="#deploy" title="Permalink to this headline"></a></h3>
+<p>Now you can ssh back in to your EC2 instance and go to your new <code class="code docutils literal notranslate"><span class="pre">app</span></code> directory:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ssh</span> <span class="n">ec2instance</span>
+<span class="n">cd</span> <span class="n">app</span>
+</pre></div>
+</div>
+<p>From here you should finally be able to deploy your D-Codex project:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span><span class="o">-</span><span class="n">compose</span> <span class="o">-</span><span class="n">f</span> <span class="n">production</span><span class="o">.</span><span class="n">yml</span> <span class="n">up</span> <span class="o">-</span><span class="n">d</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">deps</span> <span class="o">--</span><span class="n">build</span>
+</pre></div>
+</div>
+<p>Then you can migrate your database:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span><span class="o">-</span><span class="n">compose</span> <span class="o">-</span><span class="n">f</span> <span class="n">production</span><span class="o">.</span><span class="n">yml</span> <span class="n">run</span> <span class="o">--</span><span class="n">rm</span> <span class="n">django</span> <span class="n">python</span> <span class="n">manage</span><span class="o">.</span><span class="n">py</span> <span class="n">migrate</span>
+</pre></div>
+</div>
+<p>If the D-Codex apps you are using need any database fixtures installed, then  you can to that now. e.g. To import the basic Bible verses into dcodex-bible, run this command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span><span class="o">-</span><span class="n">compose</span> <span class="o">-</span><span class="n">f</span> <span class="n">production</span><span class="o">.</span><span class="n">yml</span> <span class="n">run</span> <span class="o">--</span><span class="n">rm</span> <span class="n">django</span> <span class="n">python</span> <span class="n">manage</span><span class="o">.</span><span class="n">py</span> <span class="n">import_bibleverses</span>
+</pre></div>
+</div>
+<p>Your project should be accessible through your domain now! If there is an error, you can check the logs like this:</p>
+<blockquote>
+<div><p>docker-compose -f production.yml logs</p>
+</div></blockquote>
+<p>Please let me know if you have issues and I will try to help.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="core.html" class="btn btn-neutral float-left" title="Core Models" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="development.html" class="btn btn-neutral float-right" title="Development" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Robert Turnbull.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
