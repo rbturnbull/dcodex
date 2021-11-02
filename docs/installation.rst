@@ -2,14 +2,12 @@ Installation
 ============================================
 
 
-Package Installation
---------------------
 
 To install dcodex into a Django project without using dcodex-cookiecutter, first install the module with pip:
 
 .. code-block:: bash
 
-    pip install git+https://github.com/rbturnbull/dcodex.git
+    pip install dcodex
 
 Then add dcodex and its dependencies to your ``INSTALLED_APPS`` in your settings:
 
@@ -27,3 +25,4 @@ Then add dcodex and its dependencies to your ``INSTALLED_APPS`` in your settings
     ]
 
 See also the insallation instructions for other dcodex modules.
+

@@ -1,19 +1,22 @@
 # dcodex
 
+![dcodex](./dcodex/static/dcodex/images/DCodex-Logo.svg |width=300)
+
 ![pipline](https://github.com/rbturnbull/dcodex/actions/workflows/pipeline.yml/badge.svg)
 [<img src="https://img.shields.io/badge/code%20style-black-000000.svg">](<https://github.com/psf/black>)
+[![slack](https://img.shields.io/badge/dcodex-Join%20on%20Slack-green?style=flat&logo=slack)](https://join.slack.com/t/dcodex/shared_invite/zt-y2jpxumc-lDGGr3ZjndVqYLoyfCh1gA)
 
-This is an alpha release of D-Codex: A software framework for manuscript analysis.
+This is an alpha release of dcodex: a software framework for manuscript analysis.
 
 Documentation to come. For now, contact me to get a pre-publication version of my PhD thesis where I go into detail regarding the design of the software and each of the components.
 
 # Installation
 
-For a brand new D-Codex site, it is easiest to install using [dcodex-cookiecutter](https://github.com/rbturnbull/dcodex-cookiecutter).
+For a brand new dcodex site, it is easiest to install using [dcodex-cookiecutter](https://github.com/rbturnbull/dcodex-cookiecutter).
 
 To install dcodex as a plugin in a Django site already set up. Install with pip:
 ```
-pip install -e https://github.com/rbturnbull/dcodex.git#egg=dcodex
+pip install dcodex
 ```
 
 Then add to your installed apps:
@@ -37,16 +40,16 @@ urlpatterns += [
 ]
 ```
 
-# Other DCodex packages
+# Other dcodex packages
 
-The base DCodex app (i.e. this repository) is designed to be used with other apps to give the details for the types of manuscripts being used as well as the textual units. For example, see
+The base dcodex app (i.e. this repository) is designed to be used with other apps to give the details for the types of manuscripts being used as well as the textual units. For example, see
 
 * [dcodex_bible](https://github.com/rbturnbull/dcodex_bible)
 * [dcodex_lectionary](https://github.com/rbturnbull/dcodex_lectionary)
 * [dcodex_chrysostom](https://github.com/rbturnbull/dcodex_chrysostom)
 * [dcodex_ashurnasirpal](https://github.com/rbturnbull/dcodex_ashurnasirpal)
 
-There are other DCodex packages to extend the functionality of DCodex such as:
+There are other dcodex packages to extend the functionality of dcodex such as:
 
 * [dcodex_collation](https://github.com/rbturnbull/dcodex_collation)
 * [dcodex_variants](https://github.com/rbturnbull/dcodex_variants)

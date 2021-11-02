@@ -18,11 +18,12 @@
 # -- Project information -----------------------------------------------------
 
 project = 'dcodex'
-copyright = '2020, Robert Turnbull'
+copyright = f'2021, Robert Turnbull'
 author = 'Robert Turnbull'
 
 # The full version, including alpha/beta/rc tags
-release = '1.0.0'
+import importlib.metadata as metadata
+release = metadata.version("dcodex")
 
 
 # -- General configuration ---------------------------------------------------

@@ -3,18 +3,24 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-dcodex
-==================================
+
+.. image:: ../dcodex/static/dcodex/images/DCodex-Logo.svg
+  :width: 300px
+  :alt: dcodex logo
+  :align: center
+
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
-   cookiecutter
+   dependencies
+   generation
    installation
    architecture
    core
    deployment
+   development
 
 
 Indices and tables

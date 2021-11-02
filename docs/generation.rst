@@ -1,4 +1,4 @@
-dcodex-cookiecutter
+Project Generation
 ============================================
 
 To generate a new dcodex project, it is simplest to use the dcodex-cookiecutter project. First, install the `cookiecutter` Python module:
