@@ -33,6 +33,7 @@ release = metadata.version("dcodex")
 # ones.
 extensions = [
     "sphinx_rtd_theme",
+    "sphinx.ext.githubpages",
 ]
 
 # Add any paths that contain templates here, relative to this directory.

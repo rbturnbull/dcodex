@@ -1,6 +1,6 @@
 # dcodex
 
-![dcodex](./dcodex/static/dcodex/images/DCodex-Logo.svg |width=300)
+![dcodex](./dcodex/static/dcodex/images/DCodex-Logo.svg)
 
 ![pipline](https://github.com/rbturnbull/dcodex/actions/workflows/pipeline.yml/badge.svg)
 [<img src="https://img.shields.io/badge/code%20style-black-000000.svg">](<https://github.com/psf/black>)
