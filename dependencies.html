@@ -7,6 +7,7 @@
   <title>Dependencies &mdash; dcodex 1.0.3 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
@@ -15,6 +16,8 @@
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/clipboard.min.js"></script>
+        <script src="_static/copybutton.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -94,7 +97,11 @@
 </pre></div>
 </div>
 <p>Confirm that you have Python 3.8 or greater by doing:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python --version
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3 --version
+</pre></div>
+</div>
+<p>dcodex uses <a class="reference external" href="https://python-poetry.org">Poetry</a> to handle the Python dependencies. Install it using this command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py <span class="p">|</span> python -
 </pre></div>
 </div>
 <p>Now install and start <a class="reference external" href="https://www.postgresql.org/">PostgreSQL</a>:</p>
@@ -106,6 +113,10 @@ brew services start postgresql
 <section id="windows">
 <h2>Windows<a class="headerlink" href="#windows" title="Permalink to this headline"></a></h2>
 <p>I haven’t yet tried installing installing the dependencies on Windows. If you do, please consider writing some instructions and added them to this section of the documentation.</p>
+<p>To install poetry, run this command in a Powershell:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="o">(</span>Invoke-WebRequest -Uri https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py -UseBasicParsing<span class="o">)</span>.Content <span class="p">|</span> python -
+</pre></div>
+</div>
 </section>
 </section>
 

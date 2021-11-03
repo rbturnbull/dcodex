@@ -15,8 +15,6 @@ Then install the dependencies with poetry:
     poetry install
     poetry shell
 
-If you don't have poetry installed, get it by looking at the instructions here: https://python-poetry.org/docs/#installation
-
 You should then be able to run the tests:
 
 .. code-block:: bash

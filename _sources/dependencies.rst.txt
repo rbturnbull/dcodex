@@ -28,7 +28,14 @@ Confirm that you have Python 3.8 or greater by doing:
 
 .. code-block:: bash
 
-    python --version
+    python3 --version
+
+dcodex uses `Poetry <https://python-poetry.org>`_ to handle the Python dependencies. Install it using this command:
+
+.. code-block:: bash
+
+    curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py | python -
+
 
 Now install and start `PostgreSQL <https://www.postgresql.org/>`_:
 
@@ -41,3 +48,9 @@ Windows
 -------
 
 I haven't yet tried installing installing the dependencies on Windows. If you do, please consider writing some instructions and added them to this section of the documentation.
+
+To install poetry, run this command in a Powershell:
+
+.. code-block:: bash
+
+    (Invoke-WebRequest -Uri https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py -UseBasicParsing).Content | python -
