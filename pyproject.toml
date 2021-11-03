@@ -5,6 +5,7 @@ description = "A software framework for manuscript analysis"
 authors = ["Robert Turnbull <robert.turnbull@unimelb.edu.au>"]
 license = "Apache-2.0"
 readme = "README.md"
+homepage = "https://www.dcodex.net"
 repository = "https://github.com/rbturnbull/dcodex"
 
 [tool.poetry.dependencies]
