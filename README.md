@@ -1,18 +1,17 @@
 
-<center>
-
+<p align="center">
 <img src="./dcodex/static/dcodex/images/DCodex-Logo.svg" width="300px">
+</p>
 
 ![pipline](https://github.com/rbturnbull/dcodex/actions/workflows/pipeline.yml/badge.svg)
 [<img src="https://github.com/rbturnbull/dcodex/actions/workflows/docs.yml/badge.svg">](<https://www.dcodex.net>)
 [<img src="https://img.shields.io/badge/code%20style-black-000000.svg">](<https://github.com/psf/black>)
 [![slack](https://img.shields.io/badge/dcodex-Join%20on%20Slack-green?style=flat&logo=slack)](https://join.slack.com/t/dcodex/shared_invite/zt-y2jpxumc-lDGGr3ZjndVqYLoyfCh1gA)
 
-</center>
 
 This is an alpha release of dcodex: a software framework for manuscript analysis.
 
-Documentation to come. For now, contact me to get a pre-publication version of my PhD thesis where I go into detail regarding the design of the software and each of the components.
+Some documentation is available at https://www.dcodex.net. More documentation to come. For now, contact me to get a pre-publication version of my PhD thesis where I go into detail regarding the design of the software and each of the components.
 
 # Installation
 
