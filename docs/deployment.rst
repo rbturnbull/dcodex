@@ -15,6 +15,10 @@ Deployment on AWS
 These instructions are correct as of the beginning of 2021. AWS might change their interface from time to time. Hopefully these instructions should still make sense even if some of the elements change over time. If you have suggestions on how to update or supplement these instructions, please let us know!
 Additional instructions for setting up a cookiecutter-django project on AWS can be found on `Ben Lindsay's blog <https://benjlindsay.com/posts/deploying-a-cookiecutter-django-site-on-aws>`_.
 
+0. Accounts and Permissions
+You need an AWS account for completing the following instructions. It is possible for one user to set up the 'root' account and to have another user managing the deployment.
+If that is the case, then the root user needs to create another user in the IAM console and give them permission 
+
 1. Start an EC2 Instance
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -36,7 +40,7 @@ This will start a wizard to setup in EC2 instance. In the wizard, you can follow
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 You need an IP address to get to your EC2 instance. The dashboard should show you an IP address for your EC2 instance but this one might change in the future. You can set up an 'Elastic IP Address' to point to your instance over its lifetime. 
-This IP might changeAt the time of writing, a single elastic IP is available from AWS at no charge.
+This IP might change. At the time of writing, a single elastic IP is available from AWS at no charge.
 
 * On the navigation panel on the left, go down to 'Network & Security' and choose 'Elastic IPs'. 
 * Click the button 'Allocate Elastic IP address'.
@@ -53,7 +57,7 @@ Now that we have a fixed IP address, we need to associate it with a domain name.
 
 4. Create an S3 bucket
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Now we need to create an S3 storage bucket that we will set up for the media and static files for use in D-Codex.
+Now we need to create an S3 storage bucket that we will set up for the media and static files for use in dcodex.
 
 Instructions coming soon. For now see: https://docs.aws.amazon.com/AmazonS3/latest/user-guide/create-bucket.html.
 
@@ -107,7 +111,7 @@ You can now log in to your EC2 instance like this: ::
 You can make this simpler for next time by adding an entry in your :code:`~/.ssh/config`: ::
 
     Host ec2instance
-            HostName your domain name>
+            HostName <your domain name>
             User ec2-user
             IdentityFile ~/.ssh/<name of key>.pem
 
@@ -136,13 +140,16 @@ Test your installation with the following command: ::
 
     docker ps
 
+If docker is installed and you have access, then you should see an empty list of containers list this: ::
+
+    CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
 
 8. Copy the files
 ^^^^^^^^^^^^^^^^^^^
 
-Now you can copy your files ot the EC3 instance using rsync. Just go to the project you created using dcodex-cookiecutter and run the command ::
+Now you can copy your files ot the EC2 instance using rsync. Just go to the project you created using dcodex-cookiecutter and run the command ::
 
-    rsync -av . ec2instance:~/app/
+    rsync -av --exclude='.git/' . ec2instance:~/app/
 
 .. note ::
     
@@ -150,7 +157,7 @@ Now you can copy your files ot the EC3 instance using rsync. Just go to the proj
 
 .. note ::
 
-    You might want to exclude transferring your local media files directory since these will be going to the S3 bucket. You can also exclude your git history in .git.
+    The command will exclude your files in `.git`. You might want to also exclude transferring a local media directory if it exists since these will be going to the S3 bucket.
 
 9. Deploy!
 ^^^^^^^^^^^^^^^
@@ -160,20 +167,60 @@ Now you can ssh back in to your EC2 instance and go to your new :code:`app` dire
     ssh ec2instance
     cd app
 
-From here you should finally be able to deploy your D-Codex project: ::
+From here you should finally be able to deploy your dcodex project: ::
 
     docker-compose -f production.yml up -d --no-deps --build
 
-Then you can migrate your database: ::
+
+11. Setup a blank database
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If you are importing an existing database, skip to the next section. Otherwise, if you are starting from a blank database, then you just need to perform a migration: ::
 
     docker-compose -f production.yml run --rm django python manage.py migrate
 
-If the D-Codex apps you are using need any database fixtures installed, then  you can to that now. e.g. To import the basic Bible verses into dcodex-bible, run this command::
+If the dcodex apps you are using need any database fixtures installed, then  you can to that now. e.g. To import the basic Bible verses into dcodex-bible, run this command::
 
     docker-compose -f production.yml run --rm django python manage.py import_bibleverses
 
-Your project should be accessible through your domain now! If there is an error, you can check the logs like this:
+12. Importing an existing database
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If you have a database to import, then copy the database file from your local computer to the EC2 instance using scp. Here it is assumed that it is called MyDatabase.sql.gz ::
+
+    scp MyDatabase.sql.gz ec2instance:.
+
+Then find the ID of the PosgreSQL container on the EC2 instance. This is can be stored in an environment variable like this: ::
+
+    POSTGRES_CONTAINER_ID=$(docker container ls | grep postgres | awk '{print $1}')
+    echo $POSTGRES_CONTAINER_ID
+
+Now copy the database file to the backups directory in the PostgreSQL container: ::
+
+    docker cp ~/MyDatabase.sql.gz $POSTGRES_CONTAINER_ID:/backups/
+
+Bring down the site with this command: ::
+
+    docker-compose -f production.yml down
+
+Start up just the PostgreSQL container ::
+
+    docker-compose -f production.yml up -d postgres
+
+Import the backup with this command: ::
+
+    docker-compose -f production.yml exec postgres restore MyDatabase.sql.gz
+
+Now bring all the containers back up with ::
+
+    docker-compose -f production.yml up -d
+
+13. Visit your site
+^^^^^^^^^^^^^^^^^^^
+
+Your project should be accessible through your domain now! If there is an error, you can check the logs like this::
 
     docker-compose -f production.yml logs
 
 Please let me know if you have issues and I will try to help.
+
