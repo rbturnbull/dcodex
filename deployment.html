@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Deployment &mdash; dcodex 1.0.4 documentation</title>
+  <title>Deployment &mdash; dcodex 1.0.5 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
@@ -59,6 +59,9 @@
 <li class="toctree-l3"><a class="reference internal" href="#install-docker-on-your-ec2-instance">7. Install Docker on your EC2 Instance</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#copy-the-files">8. Copy the files</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#deploy">9. Deploy!</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#setup-a-blank-database">11. Setup a blank database</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#importing-an-existing-database">12. Importing an existing database</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#visit-your-site">13. Visit your site</a></li>
 </ul>
 </li>
 </ul>
@@ -101,6 +104,9 @@
 <h2>Deployment on AWS<a class="headerlink" href="#deployment-on-aws" title="Permalink to this headline"></a></h2>
 <p>These instructions are correct as of the beginning of 2021. AWS might change their interface from time to time. Hopefully these instructions should still make sense even if some of the elements change over time. If you have suggestions on how to update or supplement these instructions, please let us know!
 Additional instructions for setting up a cookiecutter-django project on AWS can be found on <a class="reference external" href="https://benjlindsay.com/posts/deploying-a-cookiecutter-django-site-on-aws">Ben Lindsay’s blog</a>.</p>
+<p>0. Accounts and Permissions
+You need an AWS account for completing the following instructions. It is possible for one user to set up the ‘root’ account and to have another user managing the deployment.
+If that is the case, then the root user needs to create another user in the IAM console and give them permission</p>
 <section id="start-an-ec2-instance">
 <h3>1. Start an EC2 Instance<a class="headerlink" href="#start-an-ec2-instance" title="Permalink to this headline"></a></h3>
 <p>Log in to the <a class="reference external" href="https://console.aws.amazon.com/">AWS Management Console</a>. Select <a class="reference external" href="https://aws.amazon.com/ec2/?ec2-whats-new.sort-by=item.additionalFields.postDateTime&amp;ec2-whats-new.sort-order=desc">EC2</a> under ‘services’.
@@ -120,7 +126,7 @@ This will start a wizard to setup in EC2 instance. In the wizard, you can follow
 <section id="create-an-elastic-ip">
 <h3>2. Create an Elastic IP<a class="headerlink" href="#create-an-elastic-ip" title="Permalink to this headline"></a></h3>
 <p>You need an IP address to get to your EC2 instance. The dashboard should show you an IP address for your EC2 instance but this one might change in the future. You can set up an ‘Elastic IP Address’ to point to your instance over its lifetime.
-This IP might changeAt the time of writing, a single elastic IP is available from AWS at no charge.</p>
+This IP might change. At the time of writing, a single elastic IP is available from AWS at no charge.</p>
 <ul class="simple">
 <li><p>On the navigation panel on the left, go down to ‘Network &amp; Security’ and choose ‘Elastic IPs’.</p></li>
 <li><p>Click the button ‘Allocate Elastic IP address’.</p></li>
@@ -136,7 +142,7 @@ This IP might changeAt the time of writing, a single elastic IP is available fro
 </section>
 <section id="create-an-s3-bucket">
 <h3>4. Create an S3 bucket<a class="headerlink" href="#create-an-s3-bucket" title="Permalink to this headline"></a></h3>
-<p>Now we need to create an S3 storage bucket that we will set up for the media and static files for use in D-Codex.</p>
+<p>Now we need to create an S3 storage bucket that we will set up for the media and static files for use in dcodex.</p>
 <p>Instructions coming soon. For now see: <a class="reference external" href="https://docs.aws.amazon.com/AmazonS3/latest/user-guide/create-bucket.html">https://docs.aws.amazon.com/AmazonS3/latest/user-guide/create-bucket.html</a>.</p>
 </section>
 <section id="create-an-iam-role">
@@ -186,7 +192,7 @@ For further information, see the note in <a class="reference external" href="htt
 </div>
 <p>You can make this simpler for next time by adding an entry in your <code class="code docutils literal notranslate"><span class="pre">~/.ssh/config</span></code>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Host</span> <span class="n">ec2instance</span>
-        <span class="n">HostName</span> <span class="n">your</span> <span class="n">domain</span> <span class="n">name</span><span class="o">&gt;</span>
+        <span class="n">HostName</span> <span class="o">&lt;</span><span class="n">your</span> <span class="n">domain</span> <span class="n">name</span><span class="o">&gt;</span>
         <span class="n">User</span> <span class="n">ec2</span><span class="o">-</span><span class="n">user</span>
         <span class="n">IdentityFile</span> <span class="o">~/.</span><span class="n">ssh</span><span class="o">/&lt;</span><span class="n">name</span> <span class="n">of</span> <span class="n">key</span><span class="o">&gt;.</span><span class="n">pem</span>
 </pre></div>
@@ -215,11 +221,15 @@ For further information, see the note in <a class="reference external" href="htt
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">ps</span>
 </pre></div>
 </div>
+<p>If docker is installed and you have access, then you should see an empty list of containers list this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CONTAINER</span> <span class="n">ID</span>   <span class="n">IMAGE</span>     <span class="n">COMMAND</span>   <span class="n">CREATED</span>   <span class="n">STATUS</span>    <span class="n">PORTS</span>     <span class="n">NAMES</span>
+</pre></div>
+</div>
 </section>
 <section id="copy-the-files">
 <h3>8. Copy the files<a class="headerlink" href="#copy-the-files" title="Permalink to this headline"></a></h3>
-<p>Now you can copy your files ot the EC3 instance using rsync. Just go to the project you created using dcodex-cookiecutter and run the command</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rsync</span> <span class="o">-</span><span class="n">av</span> <span class="o">.</span> <span class="n">ec2instance</span><span class="p">:</span><span class="o">~/</span><span class="n">app</span><span class="o">/</span>
+<p>Now you can copy your files ot the EC2 instance using rsync. Just go to the project you created using dcodex-cookiecutter and run the command</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rsync</span> <span class="o">-</span><span class="n">av</span> <span class="o">--</span><span class="n">exclude</span><span class="o">=</span><span class="s1">&#39;.git/&#39;</span> <span class="o">.</span> <span class="n">ec2instance</span><span class="p">:</span><span class="o">~/</span><span class="n">app</span><span class="o">/</span>
 </pre></div>
 </div>
 <div class="admonition note">
@@ -228,7 +238,7 @@ For further information, see the note in <a class="reference external" href="htt
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>You might want to exclude transferring your local media files directory since these will be going to the S3 bucket. You can also exclude your git history in .git.</p>
+<p>The command will exclude your files in <cite>.git</cite>. You might want to also exclude transferring a local media directory if it exists since these will be going to the S3 bucket.</p>
 </div>
 </section>
 <section id="deploy">
@@ -238,22 +248,60 @@ For further information, see the note in <a class="reference external" href="htt
 <span class="n">cd</span> <span class="n">app</span>
 </pre></div>
 </div>
-<p>From here you should finally be able to deploy your D-Codex project:</p>
+<p>From here you should finally be able to deploy your dcodex project:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span><span class="o">-</span><span class="n">compose</span> <span class="o">-</span><span class="n">f</span> <span class="n">production</span><span class="o">.</span><span class="n">yml</span> <span class="n">up</span> <span class="o">-</span><span class="n">d</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">deps</span> <span class="o">--</span><span class="n">build</span>
 </pre></div>
 </div>
-<p>Then you can migrate your database:</p>
+</section>
+<section id="setup-a-blank-database">
+<h3>11. Setup a blank database<a class="headerlink" href="#setup-a-blank-database" title="Permalink to this headline"></a></h3>
+<p>If you are importing an existing database, skip to the next section. Otherwise, if you are starting from a blank database, then you just need to perform a migration:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span><span class="o">-</span><span class="n">compose</span> <span class="o">-</span><span class="n">f</span> <span class="n">production</span><span class="o">.</span><span class="n">yml</span> <span class="n">run</span> <span class="o">--</span><span class="n">rm</span> <span class="n">django</span> <span class="n">python</span> <span class="n">manage</span><span class="o">.</span><span class="n">py</span> <span class="n">migrate</span>
 </pre></div>
 </div>
-<p>If the D-Codex apps you are using need any database fixtures installed, then  you can to that now. e.g. To import the basic Bible verses into dcodex-bible, run this command:</p>
+<p>If the dcodex apps you are using need any database fixtures installed, then  you can to that now. e.g. To import the basic Bible verses into dcodex-bible, run this command:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span><span class="o">-</span><span class="n">compose</span> <span class="o">-</span><span class="n">f</span> <span class="n">production</span><span class="o">.</span><span class="n">yml</span> <span class="n">run</span> <span class="o">--</span><span class="n">rm</span> <span class="n">django</span> <span class="n">python</span> <span class="n">manage</span><span class="o">.</span><span class="n">py</span> <span class="n">import_bibleverses</span>
 </pre></div>
 </div>
+</section>
+<section id="importing-an-existing-database">
+<h3>12. Importing an existing database<a class="headerlink" href="#importing-an-existing-database" title="Permalink to this headline"></a></h3>
+<p>If you have a database to import, then copy the database file from your local computer to the EC2 instance using scp. Here it is assumed that it is called MyDatabase.sql.gz</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">scp</span> <span class="n">MyDatabase</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">gz</span> <span class="n">ec2instance</span><span class="p">:</span><span class="o">.</span>
+</pre></div>
+</div>
+<p>Then find the ID of the PosgreSQL container on the EC2 instance. This is can be stored in an environment variable like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>POSTGRES_CONTAINER_ID=$(docker container ls | grep postgres | awk &#39;{print $1}&#39;)
+echo $POSTGRES_CONTAINER_ID
+</pre></div>
+</div>
+<p>Now copy the database file to the backups directory in the PostgreSQL container:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>docker cp ~/MyDatabase.sql.gz $POSTGRES_CONTAINER_ID:/backups/
+</pre></div>
+</div>
+<p>Bring down the site with this command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span><span class="o">-</span><span class="n">compose</span> <span class="o">-</span><span class="n">f</span> <span class="n">production</span><span class="o">.</span><span class="n">yml</span> <span class="n">down</span>
+</pre></div>
+</div>
+<p>Start up just the PostgreSQL container</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span><span class="o">-</span><span class="n">compose</span> <span class="o">-</span><span class="n">f</span> <span class="n">production</span><span class="o">.</span><span class="n">yml</span> <span class="n">up</span> <span class="o">-</span><span class="n">d</span> <span class="n">postgres</span>
+</pre></div>
+</div>
+<p>Import the backup with this command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span><span class="o">-</span><span class="n">compose</span> <span class="o">-</span><span class="n">f</span> <span class="n">production</span><span class="o">.</span><span class="n">yml</span> <span class="n">exec</span> <span class="n">postgres</span> <span class="n">restore</span> <span class="n">MyDatabase</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">gz</span>
+</pre></div>
+</div>
+<p>Now bring all the containers back up with</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span><span class="o">-</span><span class="n">compose</span> <span class="o">-</span><span class="n">f</span> <span class="n">production</span><span class="o">.</span><span class="n">yml</span> <span class="n">up</span> <span class="o">-</span><span class="n">d</span>
+</pre></div>
+</div>
+</section>
+<section id="visit-your-site">
+<h3>13. Visit your site<a class="headerlink" href="#visit-your-site" title="Permalink to this headline"></a></h3>
 <p>Your project should be accessible through your domain now! If there is an error, you can check the logs like this:</p>
-<blockquote>
-<div><p>docker-compose -f production.yml logs</p>
-</div></blockquote>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span><span class="o">-</span><span class="n">compose</span> <span class="o">-</span><span class="n">f</span> <span class="n">production</span><span class="o">.</span><span class="n">yml</span> <span class="n">logs</span>
+</pre></div>
+</div>
 <p>Please let me know if you have issues and I will try to help.</p>
 </section>
 </section>
