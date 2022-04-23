@@ -328,18 +328,11 @@ class Manuscript(PolymorphicModel, ImageDeckModelMixin):
         )
 
     def save_transcription(self, verse, text):
-        try:
-            (
-                transcription,
-                created,
-            ) = self.transcription_class().objects.update_or_create(
-                manuscript=self, verse=verse, defaults={"transcription": text}
-            )
-        except:
-            self.transcription_class().objects.filter(
-                manuscript=self, verse=verse
-            ).delete()
-            return self.save_transcription(verse, text)
+        transcription, _ = self.transcription_class().objects.update_or_create(
+            manuscript=self, 
+            verse=verse, 
+            defaults={"transcription": text}
+        )
 
         return transcription
 
@@ -1242,9 +1235,7 @@ class VerseTranscriptionBase(PolymorphicModel):
     verse = models.ForeignKey(
         Verse, on_delete=models.CASCADE, help_text="The verse of this transcription."
     )
-    transcription = models.CharField(
-        max_length=1024, help_text="The unnormalized text of this transcription."
-    )  # This should be refactored as 'text' and made a TextField.
+    transcription = models.TextField(help_text="The unnormalized text of this transcription.")
     markup = models.ForeignKey(
         Markup,
         on_delete=models.SET_DEFAULT,

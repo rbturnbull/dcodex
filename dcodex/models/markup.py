@@ -5,6 +5,7 @@ from polymorphic.models import PolymorphicModel
 from bs4 import BeautifulSoup
 import re
 import regex
+import unicodedata
 
 
 def remove_markup(string):
@@ -37,6 +38,13 @@ def get_punctuation_markers():
         "،",
         "∴",
         ":",
+        '·',
+        '˙',
+        '·',
+        '-',
+        '>',
+        '<',
+        '˙',
     ]
     return punctuation
 
@@ -53,6 +61,8 @@ def normalize_transcription(transcription):
 
     string = remove_punctuation(string)
     string = remove_markup(string)
+    string = strip_accents(string)
+    string = string.lower()
 
     return string.strip()
 
@@ -63,6 +73,7 @@ class Markup(PolymorphicModel):
         blank=True,
         help_text="A descriptive name for this markup object.",
     )
+    punctuation_tokens = models.BooleanField(default=False, help_text="Whether or not punctuation markers can be tokens.")
 
     def __str__(self):
         return self.name
@@ -75,9 +86,13 @@ class Markup(PolymorphicModel):
 
     def tokenize(self, string):
         string = self.remove_markup(string)
-        string = string.replace(".", " .")
-        string = string.replace(":", " :")
-        string = string.replace(",", " ,")
+        if self.punctuation_tokens:
+            string = string.replace(".", " .")
+            string = string.replace(":", " :")
+            string = string.replace(",", " ,")
+        else:
+            string = remove_punctuation(string)
+
         string = re.sub("\s+", " ", string)
 
         return string.split()
@@ -107,6 +122,41 @@ class MinimalMarkup(Markup):
 
 class StandardMarkup(Markup):
     pass
+
+
+def remove_latin(string):
+    string = re.sub(r"[A-Za-z]+", "", string)
+    string = re.sub(r"\s+", " ", string)
+    return string.strip()
+
+def remove_numbers(string):
+    string = re.sub(r"\d+", "", string)
+    return string
+
+def strip_accents(s):
+    if s:
+        return ''.join( c for c in unicodedata.normalize('NFD', s) if unicodedata.category(c) != 'Mn')
+    return s
+
+class NonLatinMarkup(Markup):
+    number_tokens = models.BooleanField(default=True, help_text="Whether or not numbers can be tokens.")
+
+    def regularize(self, string):
+        string = super().regularize(string)
+        string = remove_latin(string)
+        if not self.number_tokens:
+            string = remove_numbers(string)
+
+        string = strip_accents(string)
+
+        return string
+
+    def remove_markup(self, string):
+        string = super().remove_markup(string)
+        if not self.number_tokens:
+            string = remove_numbers(string)
+
+        return remove_latin(string)
 
 
 class SimpleArabicMarkup(Markup):
