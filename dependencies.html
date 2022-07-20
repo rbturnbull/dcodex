@@ -81,7 +81,7 @@
              
   <section id="dependencies">
 <h1>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this headline"></a></h1>
-<p>The main two dependencies needed are python (version 3.8 or later) and PostgreSQL. You can install these on your system directly or you can run a dcodex project in Docker.</p>
+<p>The main two dependencies needed are python (version 3.8 or 3.9 at the time of writing) and PostgreSQL. You can install these on your system directly or you can run a dcodex project in Docker.</p>
 <section id="mac">
 <h2>Mac<a class="headerlink" href="#mac" title="Permalink to this headline"></a></h2>
 <p>To install on a Mac, first you need <code class="docutils literal notranslate"><span class="pre">gcc</span></code>. The easiest way to get this is to get the XCode Command Line Tools:</p>
@@ -96,7 +96,7 @@
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>brew install python
 </pre></div>
 </div>
-<p>Confirm that you have Python 3.8 or greater by doing:</p>
+<p>Confirm that you have Python 3.8 or 3.9 by doing:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3 --version
 </pre></div>
 </div>
@@ -112,11 +112,16 @@ brew services start postgresql
 </section>
 <section id="windows">
 <h2>Windows<a class="headerlink" href="#windows" title="Permalink to this headline"></a></h2>
-<p>I haven’t yet tried installing installing the dependencies on Windows. If you do, please consider writing some instructions and added them to this section of the documentation.</p>
 <p>To install poetry, run this command in a Powershell:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="o">(</span>Invoke-WebRequest -Uri https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py -UseBasicParsing<span class="o">)</span>.Content <span class="p">|</span> python -
 </pre></div>
 </div>
+<p>To install some of the dependencies, you will need to have Microsoft Visual Studio and C++ Build Tools (<a class="reference external" href="https://visualstudio.microsoft.com/vs/">https://visualstudio.microsoft.com/vs/</a>) installed on your system.</p>
+<p>If you are setting up a dcodex project with dcodex-cookiecutter, make sure you enter <code class="docutils literal notranslate"><span class="pre">y</span></code> for the <code class="docutils literal notranslate"><span class="pre">windows</span></code> option.</p>
+<p>Once you have created your dcodex project, enter the project directory.
+If your default version of Python is 3.10 or later, you must ensure that poetry is using a virtual environment running version 3.8 or 3.9:</p>
+<p>(If you have the typical installation of Python under your user account, then the first part of this path should be <code class="docutils literal notranslate"><span class="pre">C:\Users\&lt;you&gt;\AppData\Local\Programs\Python\</span></code>.)</p>
+<p>From here, you should be able to install the dependencies for your dcodex project via</p>
 </section>
 </section>
 
