@@ -120,8 +120,15 @@ brew services start postgresql
 <p>If you are setting up a dcodex project with dcodex-cookiecutter, make sure you enter <code class="docutils literal notranslate"><span class="pre">y</span></code> for the <code class="docutils literal notranslate"><span class="pre">windows</span></code> option.</p>
 <p>Once you have created your dcodex project, enter the project directory.
 If your default version of Python is 3.10 or later, you must ensure that poetry is using a virtual environment running version 3.8 or 3.9:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>poetry env use &lt;path&gt;<span class="se">\\</span>&lt;to&gt;<span class="se">\\</span>Python38<span class="se">\\</span>python.exe
+poetry env use &lt;path&gt;<span class="se">\\</span>&lt;to&gt;<span class="se">\\</span>Python39<span class="se">\\</span>python.exe
+</pre></div>
+</div>
 <p>(If you have the typical installation of Python under your user account, then the first part of this path should be <code class="docutils literal notranslate"><span class="pre">C:\Users\&lt;you&gt;\AppData\Local\Programs\Python\</span></code>.)</p>
 <p>From here, you should be able to install the dependencies for your dcodex project via</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>poetry install
+</pre></div>
+</div>
 </section>
 </section>
 
