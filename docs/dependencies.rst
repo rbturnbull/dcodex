@@ -62,8 +62,8 @@ If your default version of Python is 3.10 or later, you must ensure that poetry 
 
 .. code-block:: bash
 
-    poetry env use <path>\\<to>\\Python38\\python.exe
-    poetry env use <path>\\<to>\\Python39\\python.exe
+    poetry env use <path>\<to>\Python38\python.exe
+    poetry env use <path>\<to>\Python39\python.exe
 
 (If you have the typical installation of Python under your user account, then the first part of this path should be ``C:\Users\<you>\AppData\Local\Programs\Python\``.)
 
