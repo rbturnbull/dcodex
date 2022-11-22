@@ -4,6 +4,7 @@ from polymorphic.admin import (
     PolymorphicChildModelAdmin,
     PolymorphicChildModelFilter,
 )
+from adminsortable2.admin import SortableAdminMixin
 
 from guardian.admin import GuardedModelAdminMixin, GuardedModelAdmin
 
@@ -20,7 +21,7 @@ from .models import *
 #     base_model = Manuscript
 
 
-class ManuscriptChildAdmin(GuardedModelAdmin):
+class ManuscriptChildAdmin(SortableAdminMixin, GuardedModelAdmin):
     base_model = Manuscript
     search_fields = ["siglum", "name"]
 

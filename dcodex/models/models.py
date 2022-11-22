@@ -65,6 +65,7 @@ class Manuscript(PolymorphicModel, ImageDeckModelMixin):
     text_direction = models.CharField(
         max_length=1, choices=TextDirection.choices, default=TextDirection.LEFT_TO_RIGHT
     )
+    rank = models.PositiveIntegerField(default=0, blank=False, null=False)
     # imagedeck = models.ForeignKey( DeckBase, on_delete=models.SET_DEFAULT, null=True, blank=True, default=None, help_text='The facsimile images for this manuscript.')
 
     def get_markup(self):
@@ -105,7 +106,7 @@ class Manuscript(PolymorphicModel, ImageDeckModelMixin):
         )
 
     class Meta:
-        ordering = ["siglum", "name"]
+        ordering = ["rank", "siglum", "name"]
 
     def is_rtl(self):
         return self.text_direction == "R"
