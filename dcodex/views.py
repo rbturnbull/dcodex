@@ -41,17 +41,17 @@ def get_manuscript(request, request_siglum=None, change=False):
 
     If the 'change' flag is True, then it checks if the permissions allow for changing the manuscript.
     """
-    if request_siglum:
-        lookup = (
-            dict(id=request_siglum)
-            if request_siglum.isdigit()
-            else dict(siglum=request_siglum)
-        )
-    else:
-        request_dict = get_request_dict(request)
-        lookup = dict(id=request_dict.get("manuscript_id"))
+    # Check for manuscript with siglum
+    manuscript = Manuscript.objects.filter(siglum=request_siglum).first()
+    if not manuscript:
+        # Check to get by ID
+        if request_siglum and request_siglum.isdigit():
+            manuscript_id =  int(request_siglum)
+        else:
+            request_dict = get_request_dict(request)
+            manuscript_id = request_dict.get("manuscript_id")
 
-    manuscript = get_object_or_404(Manuscript, **lookup)
+        manuscript = get_object_or_404(Manuscript, id=manuscript_id)
 
     if not manuscript.has_view_permission(request.user):
         raise PermissionDenied()
