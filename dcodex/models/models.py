@@ -66,6 +66,18 @@ class Manuscript(PolymorphicModel, ImageDeckModelMixin):
         max_length=1, choices=TextDirection.choices, default=TextDirection.LEFT_TO_RIGHT
     )
     rank = models.PositiveIntegerField(default=0, blank=False, null=False)
+    origin_date_earliest = models.IntegerField(
+        blank=True,
+        default=None,
+        null=True,
+        help_text="The earliest possible date for the origin of the manuscript.",
+    )
+    origin_date_latest = models.IntegerField(
+        blank=True,
+        default=None,
+        null=True,
+        help_text="The latest possible date for the origin of the manuscript.",
+    )
     # imagedeck = models.ForeignKey( DeckBase, on_delete=models.SET_DEFAULT, null=True, blank=True, default=None, help_text='The facsimile images for this manuscript.')
 
     def get_markup(self):
