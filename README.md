@@ -61,7 +61,7 @@ Then add to your installed apps:
 ```
 INSTALLED_APPS += [
     # dcodex dependencies
-    "adminsortable2",
+    'adminsortable2',
     'easy_thumbnails',
     'filer',
     'mptt',

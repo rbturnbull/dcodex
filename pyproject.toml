@@ -9,7 +9,7 @@ homepage = "https://www.dcodex.net"
 repository = "https://github.com/rbturnbull/dcodex"
 
 [tool.poetry.dependencies]
-python = ">=3.8,<3.10"
+python = ">=3.8,<3.12"
 Django = "^3.2.6"
 django-guardian = "^2.4.0"
 django-polymorphic = "^3.0.0"
