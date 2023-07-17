@@ -25,7 +25,7 @@ lxml = "^4.6.3"
 regex = "^2021.8.3"
 django-filer = "^2.0.2"
 django-imagedeck = "^0.3.3"
-gotoh = "^0.1.1"
+gotoh = "^0.1.4"
 
 [tool.poetry.dev-dependencies]
 coverage = "^5.5"
