@@ -30,11 +30,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> dcodex
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            dcodex
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -68,8 +72,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Dependencies</li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Dependencies</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/dependencies.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -85,48 +89,48 @@
 <section id="mac">
 <h2>Mac<a class="headerlink" href="#mac" title="Permalink to this headline"></a></h2>
 <p>To install on a Mac, first you need <code class="docutils literal notranslate"><span class="pre">gcc</span></code>. The easiest way to get this is to get the XCode Command Line Tools:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>xcode-select --install
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>xcode-select<span class="w"> </span>--install
 </pre></div>
 </div>
 <p>Then you can install <a class="reference external" href="https://brew.sh/">Homebrew</a>:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>/bin/bash -c <span class="s2">&quot;</span><span class="k">$(</span>curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh<span class="k">)</span><span class="s2">&quot;</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>/bin/bash<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span>curl<span class="w"> </span>-fsSL<span class="w"> </span>https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh<span class="k">)</span><span class="s2">&quot;</span>
 </pre></div>
 </div>
 <p>Use Homebrew to install Python:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>brew install python
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>brew<span class="w"> </span>install<span class="w"> </span>python
 </pre></div>
 </div>
 <p>Confirm that you have Python 3.8 or 3.9 by doing:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3 --version
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3<span class="w"> </span>--version
 </pre></div>
 </div>
 <p>dcodex uses <a class="reference external" href="https://python-poetry.org">Poetry</a> to handle the Python dependencies. Install it using this command:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py <span class="p">|</span> python -
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>-sSL<span class="w"> </span>https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py<span class="w"> </span><span class="p">|</span><span class="w"> </span>python<span class="w"> </span>-
 </pre></div>
 </div>
 <p>Now install and start <a class="reference external" href="https://www.postgresql.org/">PostgreSQL</a>:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>brew install postgresql
-brew services start postgresql
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>brew<span class="w"> </span>install<span class="w"> </span>postgresql
+brew<span class="w"> </span>services<span class="w"> </span>start<span class="w"> </span>postgresql
 </pre></div>
 </div>
 </section>
 <section id="windows">
 <h2>Windows<a class="headerlink" href="#windows" title="Permalink to this headline"></a></h2>
 <p>To install poetry, run this command in a Powershell:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="o">(</span>Invoke-WebRequest -Uri https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py -UseBasicParsing<span class="o">)</span>.Content <span class="p">|</span> python -
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="o">(</span>Invoke-WebRequest<span class="w"> </span>-Uri<span class="w"> </span>https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py<span class="w"> </span>-UseBasicParsing<span class="o">)</span>.Content<span class="w"> </span><span class="p">|</span><span class="w"> </span>python<span class="w"> </span>-
 </pre></div>
 </div>
 <p>To install some of the dependencies, you will need to have Microsoft Visual Studio and C++ Build Tools (<a class="reference external" href="https://visualstudio.microsoft.com/vs/">https://visualstudio.microsoft.com/vs/</a>) installed on your system.</p>
 <p>If you are setting up a dcodex project with dcodex-cookiecutter, make sure you enter <code class="docutils literal notranslate"><span class="pre">y</span></code> for the <code class="docutils literal notranslate"><span class="pre">windows</span></code> option.</p>
 <p>Once you have created your dcodex project, enter the project directory.
 If your default version of Python is 3.10 or later, you must ensure that poetry is using a virtual environment running version 3.8 or 3.9:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>poetry env use &lt;path&gt;<span class="se">\&lt;</span>to&gt;<span class="se">\P</span>ython38<span class="se">\p</span>ython.exe
-poetry env use &lt;path&gt;<span class="se">\&lt;</span>to&gt;<span class="se">\P</span>ython39<span class="se">\p</span>ython.exe
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>poetry<span class="w"> </span>env<span class="w"> </span>use<span class="w"> </span>&lt;path&gt;<span class="se">\&lt;</span>to&gt;<span class="se">\P</span>ython38<span class="se">\p</span>ython.exe
+poetry<span class="w"> </span>env<span class="w"> </span>use<span class="w"> </span>&lt;path&gt;<span class="se">\&lt;</span>to&gt;<span class="se">\P</span>ython39<span class="se">\p</span>ython.exe
 </pre></div>
 </div>
 <p>(If you have the typical installation of Python under your user account, then the first part of this path should be <code class="docutils literal notranslate"><span class="pre">C:\Users\&lt;you&gt;\AppData\Local\Programs\Python\</span></code>.)</p>
 <p>From here, you should be able to install the dependencies for your dcodex project via</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>poetry install
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>poetry<span class="w"> </span>install
 </pre></div>
 </div>
 </section>

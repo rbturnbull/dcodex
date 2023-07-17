@@ -30,11 +30,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> dcodex
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            dcodex
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -64,8 +68,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Project Generation</li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Project Generation</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/generation.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -78,11 +82,11 @@
   <section id="project-generation">
 <h1>Project Generation<a class="headerlink" href="#project-generation" title="Permalink to this headline"></a></h1>
 <p>To generate a new dcodex project, it is simplest to use the dcodex-cookiecutter project. First, install the <cite>cookiecutter</cite> Python module:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install cookiecutter
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>cookiecutter
 </pre></div>
 </div>
 <p>Then, run cookiecutter against the dcodex-cookiecutter repository:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cookiecutter https://github.com/rbturnbull/dcodex-cookiecutter
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cookiecutter<span class="w"> </span>https://github.com/rbturnbull/dcodex-cookiecutter
 </pre></div>
 </div>
 <p>It will ask you a number of questions. Most of the time the defaults are fine. At the end, a Django project using dcodex will be created for you.

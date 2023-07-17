@@ -29,11 +29,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> dcodex
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            dcodex
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -63,8 +67,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Development</li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Development</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/development.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -77,13 +81,13 @@
   <section id="development">
 <h1>Development<a class="headerlink" href="#development" title="Permalink to this headline"></a></h1>
 <p>To develop dcodex, you should clone the latest version from github:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git clone https://github.com/rbturnbull/dcodex.git
-<span class="nb">cd</span> dcodex
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/rbturnbull/dcodex.git
+<span class="nb">cd</span><span class="w"> </span>dcodex
 </pre></div>
 </div>
 <p>Then install the dependencies with poetry:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>poetry install
-poetry shell
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>poetry<span class="w"> </span>install
+poetry<span class="w"> </span>shell
 </pre></div>
 </div>
 <p>You should then be able to run the tests:</p>
@@ -91,12 +95,12 @@ poetry shell
 </pre></div>
 </div>
 <p>To check the testing coverage:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>coverage run ./runtests.py
-coverage report
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>coverage<span class="w"> </span>run<span class="w"> </span>./runtests.py
+coverage<span class="w"> </span>report
 </pre></div>
 </div>
 <p>To generate the documentation:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sphinx-autobuild docs docs/_build/html --open-browser
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sphinx-autobuild<span class="w"> </span>docs<span class="w"> </span>docs/_build/html<span class="w"> </span>--open-browser
 </pre></div>
 </div>
 <p>If this clashes with a port that you’re already running, then you can set a port manually with <code class="docutils literal notranslate"><span class="pre">--port</span></code>.</p>
