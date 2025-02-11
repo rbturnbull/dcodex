@@ -27,7 +27,7 @@ django-filer = ">=2.0.2"
 django-imagedeck = ">=0.3.3"
 gotoh = ">=0.1.4"
 
-[poetry.group.dev.dependencies]
+[tool.poetry.group.dev.dependencies]
 coverage = ">=5.5"
 black = ">=21.9b0"
 Sphinx = ">=4.2.0"
