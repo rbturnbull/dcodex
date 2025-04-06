@@ -394,7 +394,7 @@ function load_comparison(verse_id, manuscript_id) {
 
             var textarea = $( "#transcription" );
             var text = textarea.val();				
-            text+=transcription
+            text+=transcription.replace(/[\n\r]+/g, " ");
             setTranscription(text);
             text_modified = true;
             return false;
